@@ -29,7 +29,7 @@
     padding: 10px 5px 10px 5px;
 }
 
-.clean-trackInfoText {
+.clean-trackInfo-text {
     padding: 0px 3px;
 }
 
@@ -50,6 +50,8 @@
     -slider-active-border-color: #555;
     -slider-height: 10px;
     -slider-border-width: 1px;
+    -slider-active-height: 10px;
+    -slider-active-border-width: 1px;
     -slider-handle-height: 16px;
     -slider-handle-width: 10px;
     -slider-handle-color: #aaa;
@@ -79,7 +81,7 @@
     padding: 3px 0px 3px 0px;
 }
 
-.clean-trackInfoIcon {
+.clean-trackInfo-icon {
     icon-size: 1.4em;
 }
 

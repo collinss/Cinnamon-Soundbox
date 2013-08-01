@@ -248,12 +248,16 @@ Slider.prototype = {
         let handleBorderWidth = themeNode.get_length("-slider-handle-border-width");
         
         //inactive properties
+        let sliderBorderWidth = themeNode.get_length("-slider-border-width");
+        let sliderHeight = themeNode.get_length("-slider-height");
         let sliderBorderColor = themeNode.get_color("-slider-border-color");
         let sliderColor = themeNode.get_color("-slider-background-color");
         
         //active properties
         let sliderActiveBorderColor = themeNode.get_color("-slider-active-border-color");
         let sliderActiveColor = themeNode.get_color("-slider-active-background-color");
+        let sliderActiveBorderWidth = themeNode.get_length("-slider-active-border-width");
+        let sliderActiveHeight = themeNode.get_length("-slider-active-height");
         
         //general properties
         let sliderWidth, start;
@@ -265,22 +269,20 @@ Slider.prototype = {
             sliderWidth = width - 2 * handleRadius;
             start = handleRadius;
         }
-        let sliderBorderWidth = themeNode.get_length("-slider-border-width");
-        let sliderHeight = themeNode.get_length("-slider-height");
         
         cr.setSourceRGBA (
             sliderActiveColor.red / 255,
             sliderActiveColor.green / 255,
             sliderActiveColor.blue / 255,
             sliderActiveColor.alpha / 255);
-        cr.rectangle(start, (height - sliderHeight) / 2, sliderWidth * this._value, sliderHeight);
+        cr.rectangle(start, (height - sliderActiveHeight) / 2, sliderWidth * this._value, sliderActiveHeight);
         cr.fillPreserve();
         cr.setSourceRGBA (
             sliderActiveBorderColor.red / 255,
             sliderActiveBorderColor.green / 255,
             sliderActiveBorderColor.blue / 255,
             sliderActiveBorderColor.alpha / 255);
-        cr.setLineWidth(sliderBorderWidth);
+        cr.setLineWidth(sliderActiveBorderWidth);
         cr.stroke();
         
         cr.setSourceRGBA (
@@ -403,14 +405,14 @@ Slider.prototype = {
 Signals.addSignalMethods(Slider.prototype);
 
 
-function Divider(style) {
-    this._init(style);
+function Divider(theme) {
+    this._init(theme);
 }
 
 Divider.prototype = {
-    _init: function(style) {
-        this.actor = new St.BoxLayout({ vertical: true, style_class: style+"-box" });
-        this.actor.add_actor(new St.DrawingArea({ style_class: style }));
+    _init: function(theme) {
+        this.actor = new St.BoxLayout({ vertical: true, style_class: theme+"-divider-box" });
+        this.actor.add_actor(new St.DrawingArea({ style_class: theme+"-divider" }));
     }
 }
 
@@ -544,9 +546,9 @@ TrackInfo.prototype = {
         this.actor = new St.Button({ x_align: St.Align.START });
         let box = new St.BoxLayout({ style_class: theme+"-trackInfo" });
         this.actor.add_actor(box);
-        this.icon = new St.Icon({ icon_name: icon.toString(), style_class: theme+"-trackInfoIcon" });
+        this.icon = new St.Icon({ icon_name: icon.toString(), style_class: theme+"-trackInfo-icon" });
         box.add_actor(this.icon);
-        this.label = new St.Label({ text: label.toString(), style_class: theme+"-trackInfoText" });
+        this.label = new St.Label({ text: label.toString(), style_class: theme+"-trackInfo-text" });
         box.add_actor(this.label);
         if ( tooltip ) this.tooltip = new Tooltips.Tooltip(this.actor, label.toString());
     },
@@ -1084,7 +1086,7 @@ myDesklet.prototype = {
         this.playerLauncher = new ButtonMenu(new St.Label({ text: _("Launch Player") }), this.theme);
         topBox.add_actor(this.playerLauncher.actor);
         
-        let divider = new Divider(this.theme+"-divider");
+        let divider = new Divider(this.theme);
         this.mainBox.add_actor(divider.actor);
         
         //volume controls
@@ -1096,7 +1098,7 @@ myDesklet.prototype = {
         //volume text
         let volumeTextBin = new St.Bin({ x_align: St.Align.MIDDLE });
         volumeBox.add_actor(volumeTextBin);
-        let volumeTitleBox = new St.BoxLayout({ vertical: false });
+        let volumeTitleBox = new St.BoxLayout({ vertical: false, style_class: this.theme+"-volumeTextBox" });
         volumeTextBin.add_actor(volumeTitleBox);
         
         let volumeLabel = new St.Label({ text: _("Volume: "), style_class: this.theme+"-text" });
@@ -1118,7 +1120,7 @@ myDesklet.prototype = {
         volumeButton.connect("clicked", Lang.bind(this, this._toggleMute));
         this.volumeSlider.connect("value-changed", Lang.bind(this, this._sliderChanged));
         
-        let divider = new Divider(this.theme+"-divider");
+        let divider = new Divider(this.theme);
         this.mainBox.add_actor(divider.actor);
         
         let playerBox = new St.BoxLayout({ vertical: true, style_class: this.theme+"-playerBox" });

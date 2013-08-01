@@ -24,12 +24,14 @@
 .compact-slider {
     height: 1em;
     min-width: 120px;
-    -slider-background-color: #fff;
+    -slider-background-color: #5e5e5e;
     -slider-border-color: #5e5e5e;
     -slider-active-background-color: #fff;
     -slider-active-border-color: #fff;
     -slider-height: 2px;
     -slider-border-width: 2px;
+    -slider-active-height: 2px;
+    -slider-active-border-width: 2px;
 }
 
 .compact-titleBar {
@@ -47,7 +49,7 @@
     width: 200px;
 }
 
-.compact-trackInfoIcon {
+.compact-trackInfo-icon {
     icon-size: 1em;
 }
 
