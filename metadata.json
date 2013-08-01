@@ -1,0 +1,7 @@
+{
+    "uuid": "soundBox@scollins",
+    "name": "Soundbox ",
+    "description": "A desklet to view sound settings and manage media controls",
+    "prevent-decorations": true
+}
+

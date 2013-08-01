@@ -1,0 +1,12 @@
+{
+    "theme": {
+        "type": "radiogroup",
+        "description": "Theme",
+        "default": "clean",
+        "options": {
+            "Clean": "clean",
+            "Transparent": "trans",
+            "Compact": "compact"
+        }
+    }
+}

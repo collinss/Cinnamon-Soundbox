@@ -1,0 +1,113 @@
+/*transparent theme*/
+.trans-mainBox {
+    border: 1px solid #000;
+    border-radius: 5px 5px 5px 5px;
+    padding: 5px;
+}
+
+.trans-buttonMenu {
+    border: 1px solid #000;
+    border-radius: 5px 5px 5px 5px;
+    color: #000;
+    padding: 7px;
+    transition-duration: 150;
+}
+
+.trans-divider {
+    background-color: rgb(17,17,17);
+    border-radius: 5px;
+    box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.15);
+    -margin-horizontal: 14px;
+    height: 1px;
+}
+
+.trans-divider-box {
+    color: #000000;
+    padding: 10px 30px 10px 30px;
+}
+
+.trans-text, .trans-playerTitleText, .trans-trackInfoText {
+    color: #000;
+}
+
+.trans-volumeButton {
+    padding: 2px 3px 2px 3px;
+}
+
+.trans-volumeIcon {
+    icon-size: 16px;
+}
+
+.trans-slider {
+    border-radius: 3px;
+    border: 1px solid #555;
+    -slider-handle-radius: 0px;
+    -slider-handle-height: 10px;
+    -slider-handle-width: 10px;
+    -slider-handle-border-color: rgba(0,0,0,255);
+    -slider-handle-border-width: 1px;
+    -slider-height: 10px;
+    -slider-border-width: 1px;
+    height: 18px;
+    min-width: 180px;
+}
+
+.trans-titleBox {
+    border: 1px solid #000000;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+.trans-playerIcon {
+    icon_size: 16px;
+    width: 16px;
+}
+
+.trans-trackInfoBox {
+    padding: 5px 0px 5px 0px;
+    margin-top: 5px;
+    width: 200px;
+}
+
+.trans-trackInfo {
+    padding: 3px 0px 5px 0px;
+    
+}
+
+.trans-trackInfoIcon {
+    icon-size: 1em;
+}
+
+.trans-albumCover-box {
+}
+
+.trans-albumCover {
+    border: 1px solid #000000;
+    border-radius: 10px 10px 10px 10px;
+    icon_size: 200px;
+    width: 200px;
+    height: 200px;
+}
+
+.trans-buttonBox {
+    padding: 5px 5px 5px 5px;
+    
+}
+
+.trans-soundButton-box {
+    padding: 3px 3px 3px 3px;
+}
+
+.trans-soundButton {
+    border: 1px solid #000000;
+    border-radius: 5px 5px 5px 5px;
+    width: 25px;
+    height: 20px;
+    padding: 3px 3px 3px 3px;
+}
+
+.trans-soundButton-icon {
+    icon-size: 16px;
+}
+

@@ -1,0 +1,74 @@
+/*compact theme*/
+.compact-mainBox {
+    border: 1px solid #777;
+    border-radius: 5px 5px 5px 5px;
+    background-color: #ddd;
+}
+
+.compact-buttonMenu {
+    border: 1px solid #777;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    padding: 1px 0px 1px;
+}
+
+.compact-buttonMenu:hover {
+    background-color: #eee;
+}
+
+.compact-volumeIcon {
+    icon-size: 14px;
+}
+
+.compact-slider {
+    height: 1em;
+    min-width: 120px;
+    -slider-background-color: #fff;
+    -slider-border-color: #5e5e5e;
+    -slider-active-background-color: #fff;
+    -slider-active-border-color: #fff;
+    -slider-height: 2px;
+    -slider-border-width: 2px;
+}
+
+.compact-titleBar {
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(100,100,255,.65);
+    background-gradient-end: rgba(100,100,255,.5);
+}
+
+.compact-playerIcon {
+    icon_size: 16px;
+    width: 16px;
+}
+
+.compact-trackInfoBox {
+    width: 200px;
+}
+
+.compact-trackInfoIcon {
+    icon-size: 1em;
+}
+
+.compact-albumCover-box {
+}
+
+.compact-albumCover {
+    border: 1px solid #000000;
+    icon_size: 200px;
+    width: 200px;
+    height: 200px;
+}
+
+.compact-soundButton {
+    padding: 0px 4px 0px 4px;
+}
+
+.compact-soundButton:hover {
+    background-color: #eee;
+}
+
+.compact-soundButton-icon {
+    icon-size: 16px;
+}

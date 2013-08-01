@@ -1,0 +1,125 @@
+/*clean theme*/
+.clean-mainBox {
+    border: 1px solid #777;
+    border-radius: 5px 5px 5px 5px;
+    padding: 10px;
+    background-color: #ddd
+}
+
+.clean-buttonMenu {
+    border: 1px solid #444;
+    border-radius: 5px 5px 5px 5px;
+    padding: 7px;
+}
+
+.clean-buttonMenu:hover {
+    background-color: #eee;
+}
+
+.clean-divider {
+    background-color: rgb(17,17,17);
+    border-radius: 5px;
+    box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.15);
+    -margin-horizontal: 14px;
+    height: 1px;
+}
+
+.clean-divider-box {
+    color: #000000;
+    padding: 10px 5px 10px 5px;
+}
+
+.clean-trackInfoText {
+    padding: 0px 3px;
+}
+
+.clean-volumeButton {
+    padding: 2px 3px 2px 3px;
+}
+
+.clean-volumeIcon {
+    icon-size: 16px;
+}
+
+.clean-slider {
+    height: 20px;
+    min-width: 185px;
+    -slider-background-color: #fff;
+    -slider-border-color: #555;
+    -slider-active-background-color: #fff;
+    -slider-active-border-color: #555;
+    -slider-height: 10px;
+    -slider-border-width: 1px;
+    -slider-handle-height: 16px;
+    -slider-handle-width: 10px;
+    -slider-handle-color: #aaa;
+    -slider-handle-border-width: 1px;
+    -slider-handle-border-color: #444;
+}
+
+.clean-titleBar {
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(100,100,255,.65);
+    background-gradient-end: rgba(100,100,255,.5);
+    border-radius: 2px 2px 2px 2px;
+    width: 200px;
+}
+
+.clean-playerIcon {
+    icon_size: 16px;
+    width: 16px;
+}
+
+.clean-trackInfoBox {
+    padding: 3px 0px 5px 0px;
+    width: 200px;
+}
+
+.clean-trackInfo {
+    padding: 3px 0px 3px 0px;
+}
+
+.clean-trackInfoIcon {
+    icon-size: 1.4em;
+}
+
+.clean-albumCover-box {
+}
+
+.clean-albumCover {
+    border: 1px solid #000000;
+    border-radius: 5px 5px 5px 5px;
+    icon_size: 200px;
+    width: 200px;
+    height: 200px;
+}
+
+.clean-timeBox {
+    padding: 4px;
+}
+
+.clean-buttonBox {
+    padding: 5px 5px 5px 5px;
+    
+}
+
+.clean-soundButton-box {
+    padding: 3px 3px 3px 3px;
+}
+
+.clean-soundButton {
+    border: 1px solid #000000;
+    border-radius: 5px 5px 5px 5px;
+    width: 25px;
+    height: 20px;
+    padding: 3px 3px 3px 3px;
+}
+
+.clean-soundButton:hover {
+    background-color: #eee;
+}
+
+.clean-soundButton-icon {
+    icon-size: 16px;
+}
+
