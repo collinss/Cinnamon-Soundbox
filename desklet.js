@@ -1150,9 +1150,8 @@ myDesklet.prototype = {
             this.settings.bindProperty(Settings.BindingDirection.IN, "showApps", "showApps", this._setAppHideState);
             this.settings.bindProperty(Settings.BindingDirection.IN, "exceedNormVolume", "exceedNormVolume", this.updateVolume);
             
-            this._menu.addAction(_("Settings"), function() {
-                Util.spawnCommandLine("cinnamon-settings desklets " + UUID);
-            });
+            this._menu.addSettingsAction(_("Desklet Settings"), "desklets " + UUID);
+            this._menu.addSettingsAction(_("Sound Settings"), "sound");
             
             this.players = {};
             this.owners = [];
