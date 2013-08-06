@@ -790,12 +790,12 @@ Player.prototype = {
             let trackInfoBox = new St.BoxLayout({ vertical: true, style_class: theme+"-trackInfoBox" });
             trackInfoContainer.set_child(trackInfoBox);
             
-            this._artist = new TrackInfo(_("Unknown Artist"), "system-users", theme, true);
-            trackInfoBox.add_actor(this._artist.actor);
             this._title = new TrackInfo(_("Unknown Title"), "audio-x-generic", theme, true);
             trackInfoBox.add_actor(this._title.actor);
             this._album = new TrackInfo(_("Unknown Album"), "media-optical", theme, true);
             trackInfoBox.add_actor(this._album.actor);
+            this._artist = new TrackInfo(_("Unknown Artist"), "system-users", theme, true);
+            trackInfoBox.add_actor(this._artist.actor);
             
             //album image
             this._trackCoverFile = this._trackCoverFileTmp = false;
@@ -1240,17 +1240,18 @@ myDesklet.prototype = {
         this.mainBox.add_actor(this.appBox);
         if ( !this.showApps ) this.appBox.hide();
         
-        let divider = new Divider(this.theme);
-        this.mainBox.add_actor(divider.actor);
+        this.playersContainer = new St.BoxLayout({ vertical: true, style_class: this.theme+"-playerBox" });
+        this.mainBox.add_actor(this.playersContainer);
+        this.playersContainer.hide();
         
-        let playerBox = new St.BoxLayout({ vertical: true, style_class: this.theme+"-playerBox" });
+        let divider = new Divider(this.theme);
+        this.playersContainer.add_actor(divider.actor);
         
         //player title
         let titleBin = new St.Bin({ x_align: St.Align.MIDDLE, style_class: this.theme+"-titleBar" });
-        this.mainBox.add_actor(titleBin);
+        this.playersContainer.add_actor(titleBin);
         this.playerTitleBox = new St.BoxLayout({ vertical: false });
         titleBin.add_actor(this.playerTitleBox);
-        this.playerTitleBox.hide();
         
         this.playerBack = new St.Button({ style_class: this.theme+"-playerSelectButton", child: new St.Icon({ icon_name: "media-playback-start-rtl", icon_size: 16 }) });
         this.playerTitleBox.add_actor(this.playerBack);
@@ -1287,7 +1288,7 @@ myDesklet.prototype = {
         
         //player info
         this.playersBox = new St.Bin();
-        this.mainBox.add_actor(this.playersBox);
+        this.playersContainer.add_actor(this.playersBox);
         
         this.refresh_players();
     },
@@ -1456,7 +1457,7 @@ myDesklet.prototype = {
                     this.owners.splice(i, 1);
                     if ( this.playerShown == owner ) {
                         if ( this.owners.length < 1 ) {
-                            this.playerTitleBox.hide();
+                            this.playersContainer.hide();
                             this.playersBox.set_child(null);
                             this.playerShown = null;
                         }
@@ -1485,7 +1486,7 @@ myDesklet.prototype = {
         this.playerShown = player.owner;
         this.playersBox.set_child(player.actor);
         this.playerTitle.set_child(player.playerTitle.actor);
-        this.playerTitleBox.show();
+        this.playersContainer.show();
         if ( this.owners.length > 1 ) {
             this.playerBack.show();
             this.playerForward.show();
