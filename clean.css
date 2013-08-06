@@ -59,6 +59,10 @@
     -slider-handle-border-color: #444;
 }
 
+.clean-appIcon {
+    icon-size: 16px;
+}
+
 .clean-titleBar {
     background-gradient-direction: vertical;
     background-gradient-start: rgba(100,100,255,.65);

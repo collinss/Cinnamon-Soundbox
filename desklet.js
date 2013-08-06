@@ -405,6 +405,119 @@ Slider.prototype = {
 Signals.addSignalMethods(Slider.prototype);
 
 
+function AppControl(app, maxVol, theme) {
+    this._init(app, maxVol, theme);
+}
+
+AppControl.prototype = {
+    _init: function(app, maxVol, theme) {
+        
+        this.app = app;
+        global.log(app.icon_name);
+        this.maxVol = maxVol;
+        this.muteId = app.connect("notify::is-muted", Lang.bind(this, this.updateMute));
+        this.volumeId = app.connect("notify::volume", Lang.bind(this, this.updateVolume));
+        
+        this.actor = new St.BoxLayout({ vertical: true, style_class: theme+"-appBox" });
+        let divider = new Divider(theme);
+        this.actor.add_actor(divider.actor);
+        
+        let titleBin = new St.Bin({  });
+        this.actor.add_actor(titleBin);
+        let titleBox = new St.BoxLayout({ vertical: false });
+        titleBin.add_actor(titleBox);
+        
+        let icon = new St.Icon({ icon_name: app.icon_name, style_class: theme+"-appIcon" });
+        titleBox.add_actor(icon);
+        let label = new St.Label({ text: app.get_name(), style_class: theme+"-appTitle" });
+        titleBox.add_actor(label);
+        
+        let volumeBin = new St.Bin({  });
+        this.actor.add_actor(volumeBin);
+        let volumeBox = new St.BoxLayout({ vertical: false });
+        volumeBin.add_actor(volumeBox);
+        
+        let volumeButton = new St.Button({ style_class: theme+"-volumeButton" });
+        volumeBox.add_actor(volumeButton);
+        this.volumeIcon = new St.Icon({ style_class: theme+"-volumeIcon" });
+        volumeButton.add_actor(this.volumeIcon);
+        this.muteTooltip = new Tooltips.Tooltip(volumeButton);
+        this.volumeSlider = new Slider(1, theme);
+        volumeBox.add_actor(this.volumeSlider.actor);
+        
+        volumeButton.connect("clicked", Lang.bind(this, this.toggleMute));
+        this.volumeSlider.connect("value-changed", Lang.bind(this, this.sliderChanged));
+        
+        this.updateVolume();
+        
+    },
+    
+    updateVolume: function() {
+        if ( !this.app.is_muted ) {
+            this.volume = this.app.volume / this.maxVol;
+            this.volumeSlider.setValue(this.volume);
+            this.volumeIcon.icon_name = null;
+            
+            if ( this.volume <= 0 ) this.volumeIcon.icon_name = "audio-volume-muted";
+            else {
+                let n = Math.floor(3 * this.volume) + 1;
+                if (n < 2) this.volumeIcon.icon_name = "audio-volume-low";
+                else if (n >= 3) this.volumeIcon.icon_name = "audio-volume-high";
+                else this.volumeIcon.icon_name = "audio-volume-medium";
+            }
+        }
+    },
+    
+    updateMute: function () {
+        let muted = this.app.is_muted;
+        if ( muted ) {
+            this.volumeSlider.setValue(0);
+            this.volumeIcon.icon_name = "audio-volume-muted-symbolic";
+            this.muteTooltip.set_text(_("Unmute"));
+        }
+        else {
+            this.volume = this.app.volume / this.maxVol;
+            this.volumeSlider.setValue(this.volume);
+            this.volumeIcon.icon_name = null;
+            this.muteTooltip.set_text(_("Mute"));
+            
+            if ( this.volume <= 0 ) this.volumeIcon.icon_name = "audio-volume-muted";
+            else {
+                let n = Math.floor(3 * this.volume) + 1;
+                if ( n < 2 ) this.volumeIcon.icon_name = "audio-volume-low";
+                else if ( n >= 3 ) this.volumeIcon.icon_name = "audio-volume-high";
+                else this.volumeIcon.icon_name = "audio-volume-medium";
+            }
+        }
+    },
+    
+    toggleMute: function() {
+        if ( this.app.is_muted ) this.app.change_is_muted(false);
+        else this.app.change_is_muted(true);
+    },
+    
+    sliderChanged: function(slider, value) {
+        let volume = value * this.maxVol;
+        let prev_muted = this.app.is_muted;
+        if ( volume < 1 ) {
+            this.app.volume = 0;
+            if ( !prev_muted ) this.app.change_is_muted(true);
+        }
+        else {
+            this.app.volume = volume;
+            if ( prev_muted ) this.app.change_is_muted(false);
+        }
+        this.app.push_volume();
+    },
+    
+    destroy: function() {
+        this.app.disconnect(this.muteId);
+        this.app.disconnect(this.volumeId);
+        this.actor.destroy();
+    }
+}
+
+
 function Divider(theme) {
     this._init(theme);
 }
@@ -1034,14 +1147,15 @@ myDesklet.prototype = {
             
             this.settings = new Settings.DeskletSettings(this, metadata["uuid"], desklet_id);
             this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._setTheme);
+            this.settings.bindProperty(Settings.BindingDirection.IN, "showApps", "showApps", this._setAppHideState);
             
-            //this.setHeader(_("Sound"));
             this._menu.addAction(_("Settings"), function() {
                 Util.spawnCommandLine("cinnamon-settings desklets " + UUID);
             });
             
             this.players = {};
             this.owners = [];
+            this.apps = [];
             for ( let p = 0; p < compatible_players.length; p++ ) {
                 DBus.session.watch_name("org.mpris.MediaPlayer2." + compatible_players[p], false,
                     Lang.bind(this, this._addPlayer),
@@ -1052,11 +1166,11 @@ myDesklet.prototype = {
             this.volumeControl = new Gvc.MixerControl({ name: "Cinnamon Volume Control" });
             this.volumeControl.connect("state-changed", Lang.bind(this, this._onControlStateChanged));
             this.volumeControl.connect("default-sink-changed", Lang.bind(this, this._readOutput));
-            this.volumeControl.connect('card-added', Lang.bind(this, this._onControlStateChanged));
-            this.volumeControl.connect('card-removed', Lang.bind(this, this._onControlStateChanged));
-            //this.volumeControl.connect("stream-added", Lang.bind(this, this._maybeShowInput));
-            //this.volumeControl.connect("stream-removed", Lang.bind(this, this._maybeShowInput));
-            this.maxVolume = 1 * this.volumeControl.get_vol_max_norm();
+            this.volumeControl.connect("card-added", Lang.bind(this, this._onControlStateChanged));
+            this.volumeControl.connect("card-removed", Lang.bind(this, this._onControlStateChanged));
+            this.volumeControl.connect("stream-added", Lang.bind(this, this._reloadApps));
+            this.volumeControl.connect("stream-removed", Lang.bind(this, this._reloadApps));
+            this.maxVolume = this.volumeControl.get_vol_max_norm();
             
             this.playerShown = null;
             this.volume = 0;
@@ -1083,6 +1197,7 @@ myDesklet.prototype = {
         this.mainBox.add_actor(topBin);
         let topBox = new St.BoxLayout({ vertical: false });
         topBin.add_actor(topBox);
+        
         this.playerLauncher = new ButtonMenu(new St.Label({ text: _("Launch Player") }), this.theme);
         topBox.add_actor(this.playerLauncher.actor);
         
@@ -1119,6 +1234,11 @@ myDesklet.prototype = {
         
         volumeButton.connect("clicked", Lang.bind(this, this._toggleMute));
         this.volumeSlider.connect("value-changed", Lang.bind(this, this._sliderChanged));
+        
+        //application volume controls
+        this.appBox = new St.BoxLayout({ vertical: true });
+        this.mainBox.add_actor(this.appBox);
+        if ( !this.showApps ) this.appBox.hide();
         
         let divider = new Divider(this.theme);
         this.mainBox.add_actor(divider.actor);
@@ -1177,12 +1297,19 @@ myDesklet.prototype = {
         this.playerTitle.set_child(null);
         this._build_interface();
         this._volumeChanged();
+        this._reloadApps();
         for ( let i = 0; i < this.owners.length; i++ ) {
             let owner = this.owners[i];
             this.players[owner].updateTheme(this.theme);
         }
         
         this._showPlayer(this.players[this.playerShown]);
+        
+    },
+    
+    _setAppHideState: function() {
+        if ( this.showApps ) this.appBox.show();
+        else this.appBox.hide();
     },
     
     _mutedChanged: function(object, param_spec) {
@@ -1203,8 +1330,8 @@ myDesklet.prototype = {
             if ( this.volume <= 0 ) this.volumeIcon.icon_name = "audio-volume-muted";
             else {
                 let n = Math.floor(3 * this.volume) + 1;
-                if (n < 2) this.volumeIcon.icon_name = "audio-volume-low";
-                else if (n >= 3) this.volumeIcon.icon_name = "audio-volume-high";
+                if ( n < 2 ) this.volumeIcon.icon_name = "audio-volume-low";
+                else if ( n >= 3 ) this.volumeIcon.icon_name = "audio-volume-high";
                 else this.volumeIcon.icon_name = "audio-volume-medium";
             }
         }
@@ -1363,6 +1490,25 @@ myDesklet.prototype = {
             this.playerBack.show();
             this.playerForward.show();
         }
+    },
+    
+    _reloadApps: function () {
+        
+        for ( let i = 0; i < this.apps.length; i++ ) {
+            this.apps[i].destroy();
+        }
+        this.apps = [];
+        
+        let streams = this.volumeControl.get_sink_inputs();
+        for ( let i = 0; i < streams.length; i++ ) {
+            let output = streams[i]
+            if ( output.get_application_id() != "org.Cinnamon" ) {
+                let app = new AppControl(output, this.maxVolume, this.theme);
+                this.appBox.add_actor(app.actor);
+                this.apps.push(app);
+            }
+        }
+        
     }
 }
 

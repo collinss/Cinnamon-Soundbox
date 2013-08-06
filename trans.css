@@ -26,7 +26,7 @@
     padding: 10px 30px 10px 30px;
 }
 
-.trans-text, .trans-playerTitleText, .trans-trackInfo-text {
+.trans-text, .trans-appTitle, .trans-playerTitleText, .trans-trackInfo-text {
     color: #000;
 }
 
@@ -52,6 +52,10 @@
     -slider-active-border-width: 1px;
     height: 18px;
     min-width: 180px;
+}
+
+.trans-appIcon {
+    icon-size: 16px;
 }
 
 .trans-titleBox {

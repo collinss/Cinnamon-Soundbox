@@ -1,4 +1,10 @@
 {
+    "showApps": {
+        "type": "checkbox",
+        "description": "Show application volume controls",
+        "default": false
+    },
+    
     "theme": {
         "type": "radiogroup",
         "description": "Theme",
