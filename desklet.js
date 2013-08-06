@@ -1148,6 +1148,7 @@ myDesklet.prototype = {
             this.settings = new Settings.DeskletSettings(this, metadata["uuid"], desklet_id);
             this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._setTheme);
             this.settings.bindProperty(Settings.BindingDirection.IN, "showApps", "showApps", this._setAppHideState);
+            this.settings.bindProperty(Settings.BindingDirection.IN, "exceedNormVolume", "exceedNormVolume", this.updateVolume);
             
             this._menu.addAction(_("Settings"), function() {
                 Util.spawnCommandLine("cinnamon-settings desklets " + UUID);
@@ -1170,7 +1171,8 @@ myDesklet.prototype = {
             this.volumeControl.connect("card-removed", Lang.bind(this, this._onControlStateChanged));
             this.volumeControl.connect("stream-added", Lang.bind(this, this._reloadApps));
             this.volumeControl.connect("stream-removed", Lang.bind(this, this._reloadApps));
-            this.maxVolume = this.volumeControl.get_vol_max_norm();
+            this.normVolume = this.volumeControl.get_vol_max_norm();
+            this.maxVolume = this.volumeControl.get_vol_max_amplified();
             
             this.playerShown = null;
             this.volume = 0;
@@ -1297,7 +1299,7 @@ myDesklet.prototype = {
         this.playersBox.set_child(null);
         this.playerTitle.set_child(null);
         this._build_interface();
-        this._volumeChanged();
+        this.updateVolume();
         this._reloadApps();
         for ( let i = 0; i < this.owners.length; i++ ) {
             let owner = this.owners[i];
@@ -1322,8 +1324,9 @@ myDesklet.prototype = {
             this.muteTooltip.set_text(_("Unmute"));
         }
         else {
-            this.volume = this._output.volume / this.maxVolume;
-            this.volumeSlider.setValue(this.volume);
+            this.volume = this._output.volume / this.normVolume;
+            if ( this.exceedNormVolume ) this.volumeSlider.setValue(this._output.volume/this.maxVolume);
+            else this.volumeSlider.setValue(this.volume);
             this.volumeValueText.text = Math.floor(100 * this.volume) + "%";
             this.volumeIcon.icon_name = null;
             this.muteTooltip.set_text(_("Mute"));
@@ -1338,12 +1341,14 @@ myDesklet.prototype = {
         }
     },
     
-    _volumeChanged: function(object, param_spec) {
+    updateVolume: function(object, param_spec) {
         if ( !this._output.is_muted ) {
-            this.volume = this._output.volume / this.maxVolume;
-            this.volumeSlider.setValue(this.volume);
+            this.volume = this._output.volume / this.normVolume;
+            
             this.volumeValueText.text = Math.floor(100 * this.volume) + "%";
             this.volumeIcon.icon_name = null;
+            if ( this.exceedNormVolume ) this.volumeSlider.setValue(this._output.volume/this.maxVolume);
+            else this.volumeSlider.setValue(this.volume);
             
             if ( this.volume <= 0 ) this.volumeIcon.icon_name = "audio-volume-muted";
             else {
@@ -1369,9 +1374,9 @@ myDesklet.prototype = {
         this._output = this.volumeControl.get_default_sink();
         if ( this._output ) {
             this._outputMutedId = this._output.connect("notify::is-muted", Lang.bind(this, this._mutedChanged));
-            this._outputVolumeId = this._output.connect("notify::volume", Lang.bind(this, this._volumeChanged));
+            this._outputVolumeId = this._output.connect("notify::volume", Lang.bind(this, this.updateVolume));
             this._mutedChanged(null, null, "_output");
-            this._volumeChanged();
+            this.updateVolume();
         }
         else {
             this.volumeSlider.setValue(0);
@@ -1409,7 +1414,9 @@ myDesklet.prototype = {
     },
     
     _sliderChanged: function(slider, value) {
-        let volume = value * this.maxVolume;
+        let volume;
+        if ( this.exceedNormVolume ) volume = value * this.maxVolume;
+        else volume = value * this.normVolume;
         let prev_muted = this._output.is_muted;
         if ( volume < 1 ) {
             this._output.volume = 0;
@@ -1504,7 +1511,7 @@ myDesklet.prototype = {
         for ( let i = 0; i < streams.length; i++ ) {
             let output = streams[i]
             if ( output.get_application_id() != "org.Cinnamon" ) {
-                let app = new AppControl(output, this.maxVolume, this.theme);
+                let app = new AppControl(output, this.normVolume, this.theme);
                 this.appBox.add_actor(app.actor);
                 this.apps.push(app);
             }

@@ -5,6 +5,12 @@
         "default": false
     },
     
+    "exceedNormVolume": {
+        "type": "checkbox",
+        "description": "Allow volume control to exceed 100% volume",
+        "default": false
+    },
+    
     "theme": {
         "type": "radiogroup",
         "description": "Theme",
