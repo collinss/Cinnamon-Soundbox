@@ -18,7 +18,8 @@
         "options": {
             "Clean": "clean",
             "Transparent": "trans",
-            "Compact": "compact"
+            "Compact": "compact",
+            "Use Theme Default (not supported by all themes)": "soundbox"
         }
     }
 }
