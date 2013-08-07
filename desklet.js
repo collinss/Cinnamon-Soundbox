@@ -413,7 +413,6 @@ AppControl.prototype = {
     _init: function(app, maxVol, theme) {
         
         this.app = app;
-        global.log(app.icon_name);
         this.maxVol = maxVol;
         this.muteId = app.connect("notify::is-muted", Lang.bind(this, this.updateMute));
         this.volumeId = app.connect("notify::volume", Lang.bind(this, this.updateVolume));
