@@ -441,8 +441,11 @@ AppControl.prototype = {
         this.volumeIcon = new St.Icon({ style_class: theme+"-volumeIcon" });
         volumeButton.add_actor(this.volumeIcon);
         this.muteTooltip = new Tooltips.Tooltip(volumeButton);
+        
+        let sliderBin = new St.Bin();
+        volumeBox.add_actor(sliderBin);
         this.volumeSlider = new Slider(1, theme);
-        volumeBox.add_actor(this.volumeSlider.actor);
+        sliderBin.add_actor(this.volumeSlider.actor);
         
         volumeButton.connect("clicked", Lang.bind(this, this.toggleMute));
         this.volumeSlider.connect("value-changed", Lang.bind(this, this.sliderChanged));
@@ -1229,8 +1232,11 @@ myDesklet.prototype = {
         volumeButton.set_child(this.volumeIcon);
         this.muteTooltip = new Tooltips.Tooltip(volumeButton);
         volumeSliderBox.add_actor(volumeButton);
+        
+        let volumeSliderBin = new St.Bin();
+        volumeSliderBox.add_actor(volumeSliderBin);
         this.volumeSlider = new Slider(this.volume, this.theme);
-        volumeSliderBox.add_actor(this.volumeSlider.actor);
+        volumeSliderBin.add_actor(this.volumeSlider.actor);
         
         volumeButton.connect("clicked", Lang.bind(this, this._toggleMute));
         this.volumeSlider.connect("value-changed", Lang.bind(this, this._sliderChanged));
