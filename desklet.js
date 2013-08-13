@@ -109,6 +109,8 @@ const MediaServer2PlayerIFace = {
                 inSignature: 'x' }]
 };
 
+let desklet_drag_object;
+
 
 let compatible_players = [
     "clementine",
@@ -218,6 +220,12 @@ Slider.prototype = {
             this.actor.connect("repaint", Lang.bind(this, this._sliderRepaint));
             this.actor.connect("button-press-event", Lang.bind(this, this._startDragging));
             this.actor.connect("scroll-event", Lang.bind(this, this._onScrollEvent));
+            this.actor.connect("enter_event", Lang.bind(this, function() {
+                desklet_drag_object.inhibit = true;
+            }));
+            this.actor.connect("leave_event", Lang.bind(this, function() {
+                desklet_drag_object.inhibit = false;
+            }));
             
             this._releaseId = this._motionId = 0;
             this._dragging = false;
@@ -1146,6 +1154,7 @@ myDesklet.prototype = {
         try {
             
             Desklet.Desklet.prototype._init.call(this, metadata);
+            desklet_drag_object = this._draggable;
             
             this.settings = new Settings.DeskletSettings(this, metadata["uuid"], desklet_id);
             this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._setTheme);
