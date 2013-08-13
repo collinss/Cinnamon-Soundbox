@@ -109,8 +109,6 @@ const MediaServer2PlayerIFace = {
                 inSignature: 'x' }]
 };
 
-let desklet_drag_object;
-
 
 let compatible_players = [
     "clementine",
@@ -156,6 +154,8 @@ let support_seek = [
     "gnome-mplayer",
     "qmmp"
 ];
+
+let desklet_drag_object;
 
 
 function ButtonMenu(content, theme) {
@@ -341,13 +341,15 @@ Slider.prototype = {
         this._moveHandle(absX, absY);
     },
 
-    _endDragging: function() {
+    _endDragging: function(actor, event) {
         if (this._dragging) {
             this.actor.disconnect(this._releaseId);
             this.actor.disconnect(this._motionId);
             
             Clutter.ungrab_pointer();
             this._dragging = false;
+            
+            if ( !this.actor.has_pointer ) desklet_drag_object.inhibit = false;
             
             this.emit("drag-end");
         }
