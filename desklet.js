@@ -333,6 +333,7 @@ Slider.prototype = {
         
         this._dragging = true;
         
+        global.set_stage_input_mode(Cinnamon.StageInputMode.FULLSCREEN);
         Clutter.grab_pointer(this.actor);
         this._releaseId = this.actor.connect("button-release-event", Lang.bind(this, this._endDragging));
         this._motionId = this.actor.connect("motion-event", Lang.bind(this, this._motionEvent));
@@ -342,11 +343,12 @@ Slider.prototype = {
     },
 
     _endDragging: function(actor, event) {
-        if (this._dragging) {
+        if ( this._dragging ) {
             this.actor.disconnect(this._releaseId);
             this.actor.disconnect(this._motionId);
             
             Clutter.ungrab_pointer();
+            global.set_stage_input_mode(Cinnamon.StageInputMode.NORMAL);
             this._dragging = false;
             
             if ( !this.actor.has_pointer ) desklet_drag_object.inhibit = false;
