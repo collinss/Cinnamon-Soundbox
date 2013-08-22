@@ -36,6 +36,7 @@
 
 .trans-volumeIcon {
     icon-size: 16px;
+    color: #000;
 }
 
 .trans-slider {
@@ -55,7 +56,12 @@
 }
 
 .trans-appIcon {
-    icon-size: 16px;
+    icon-size: 20px;
+    padding: 0px 4px 4px 4px;
+}
+
+.trans-appTitleBox {
+    padding: 0px 0px 2px 0px;
 }
 
 .trans-titleBox {
@@ -83,6 +89,7 @@
 
 .trans-trackInfo-icon {
     icon-size: 1em;
+    color: #000;
 }
 
 .trans-albumCover-box {
@@ -115,5 +122,6 @@
 
 .trans-soundButton-icon {
     icon-size: 16px;
+    color: #000;
 }
 

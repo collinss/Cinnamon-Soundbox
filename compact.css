@@ -17,8 +17,13 @@
     background-color: #eee;
 }
 
+.compact-text, .compact-buttonText, .compact-appTitle, .compact-playerTitleText, .compact-trackInfo-text {
+    color: #555;
+}
+
 .compact-volumeIcon {
     icon-size: 14px;
+    color: #555;
 }
 
 .compact-slider {
@@ -36,6 +41,7 @@
 
 .compact-appIcon {
     icon-size: 16px;
+    padding: 0px 2px 0px 2px;
 }
 
 .compact-titleBar {
@@ -55,6 +61,7 @@
 
 .compact-trackInfo-icon {
     icon-size: 1em;
+    color: #555;
 }
 
 .compact-albumCover-box {
@@ -79,4 +86,5 @@
 
 .compact-soundButton-icon {
     icon-size: 16px;
+    color: #555;
 }
