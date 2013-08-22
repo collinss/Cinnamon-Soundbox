@@ -433,15 +433,19 @@ AppControl.prototype = {
         let divider = new Divider(theme);
         this.actor.add_actor(divider.actor);
         
-        let titleBin = new St.Bin({  });
+        let titleBin = new St.Bin({ style_class: theme+"-appTitleBox" });
         this.actor.add_actor(titleBin);
         let titleBox = new St.BoxLayout({ vertical: false });
         titleBin.add_actor(titleBox);
         
-        let icon = new St.Icon({ icon_name: app.icon_name, style_class: theme+"-appIcon" });
-        titleBox.add_actor(icon);
+        let iconBin = new St.Bin({ y_align: St.Align.MIDDLE });
+        titleBox.add_actor(iconBin);
+        let icon = new St.Icon({ icon_name: app.icon_name, icon_type: St.IconType.FULLCOLOR, style_class: theme+"-appIcon" });
+        iconBin.add_actor(icon);
+        let labelBin = new St.Bin({ y_align: St.Align.MIDDLE });
+        titleBox.add_actor(labelBin);
         let label = new St.Label({ text: app.get_name(), style_class: theme+"-appTitle" });
-        titleBox.add_actor(label);
+        labelBin.add_actor(label);
         
         let volumeBin = new St.Bin({  });
         this.actor.add_actor(volumeBin);
@@ -479,6 +483,10 @@ AppControl.prototype = {
                 else if (n >= 3) this.volumeIcon.icon_name = "audio-volume-high";
                 else this.volumeIcon.icon_name = "audio-volume-medium";
             }
+        }
+        else {
+            this.volumeSlider.setValue(0);
+            this.volumeIcon.icon_name = "audio-volume-muted";
         }
     },
     
@@ -1214,7 +1222,7 @@ myDesklet.prototype = {
         let topBox = new St.BoxLayout({ vertical: false });
         topBin.add_actor(topBox);
         
-        this.playerLauncher = new ButtonMenu(new St.Label({ text: _("Launch Player") }), this.theme);
+        this.playerLauncher = new ButtonMenu(new St.Label({ text: _("Launch Player"), style_class: this.theme+"-buttonText" }), this.theme);
         topBox.add_actor(this.playerLauncher.actor);
         
         let divider = new Divider(this.theme);
