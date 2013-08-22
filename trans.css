@@ -26,7 +26,7 @@
     padding: 10px 30px 10px 30px;
 }
 
-.trans-text, .trans-appTitle, .trans-playerTitleText, .trans-trackInfo-text {
+.trans-text, .trans-buttonText, .trans-appTitle, .trans-playerTitleText, .trans-trackInfo-text {
     color: #000;
 }
 
