@@ -840,7 +840,7 @@ Player.prototype = {
             this.seekControls = new St.BoxLayout({ vertical: true });
             this._seekControls.set_child(this.seekControls);
             
-            let timeBin = new St.Button({ x_align: St.Align.MIDDLE });
+            let timeBin = new St.Bin({ x_align: St.Align.MIDDLE });
             this.seekControls.add_actor(timeBin);
             this._time = new TrackInfo("0:00 / 0:00", "document-open-recent", theme, false);
             timeBin.add_actor(this._time.actor);
@@ -848,7 +848,7 @@ Player.prototype = {
             this._positionSlider = new Slider(0, theme);
             this.seekControls.add_actor(this._positionSlider.actor);
             
-            timeBin.connect("clicked", Lang.bind(this, function() {
+            this._time.actor.connect("clicked", Lang.bind(this, function() {
                 this.countUp = !this.countUp;
                 this._setTimeText();
             }));
