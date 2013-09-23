@@ -19,6 +19,8 @@
             "Clean": "clean",
             "Transparent": "trans",
             "Compact": "compact",
+            "Ghost": "ghost",
+            "Ice": "ice",
             "Use Theme Default (not supported by all themes)": "soundbox"
         }
     }

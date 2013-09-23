@@ -166,11 +166,14 @@ ButtonMenu.prototype = {
     _init: function(content, theme) {
         try {
             
+            this.theme = theme;
             this.actor = new St.Button({ style_class: theme+"-buttonMenu" });
             this.actor.set_child(content);
             
             this.menuManager = new PopupMenu.PopupMenuManager(this);
-            this.menu = new PopupMenu.PopupMenu(this.actor, 0.0, St.Side.TOP, 0);
+            this.menu = new PopupMenu.PopupMenu(this.actor, 0.5, St.Side.TOP, 0);
+            this.menu.box.set_name(theme+"-popup");
+            this.menu.actor.set_name(theme+"-popup-boxPointer");
             this.menuManager.addMenu(this.menu);
             Main.uiGroup.add_actor(this.menu.actor);
             this.menu.actor.hide();
@@ -188,6 +191,7 @@ ButtonMenu.prototype = {
     
     addMenuItem: function(title, icon, callback) {
         let menuItem = new PopupMenu.PopupBaseMenuItem();
+        menuItem.actor.set_name(this.theme+"-popup-menuitem");
         if ( icon ) menuItem.addActor(icon);
         let label = new St.Label({ text: title });
         menuItem.addActor(label);
@@ -457,6 +461,7 @@ AppControl.prototype = {
         this.volumeIcon = new St.Icon({ style_class: theme+"-volumeIcon" });
         volumeButton.add_actor(this.volumeIcon);
         this.muteTooltip = new Tooltips.Tooltip(volumeButton);
+        this.muteTooltip._tooltip.add_style_class_name(theme+"-tooltip");
         
         let sliderBin = new St.Bin();
         volumeBox.add_actor(sliderBin);
@@ -466,6 +471,7 @@ AppControl.prototype = {
         volumeButton.connect("clicked", Lang.bind(this, this.toggleMute));
         this.volumeSlider.connect("value-changed", Lang.bind(this, this.sliderChanged));
         
+        this.updateMute();
         this.updateVolume();
         
     },
@@ -685,7 +691,10 @@ TrackInfo.prototype = {
         box.add_actor(this.icon);
         this.label = new St.Label({ text: label.toString(), style_class: theme+"-trackInfo-text" });
         box.add_actor(this.label);
-        if ( tooltip ) this.tooltip = new Tooltips.Tooltip(this.actor, label.toString());
+        if ( tooltip ) {
+            this.tooltip = new Tooltips.Tooltip(this.actor, label.toString());
+            this.tooltip._tooltip.add_style_class_name(theme+"-tooltip");
+        }
     },
     
     setLabel: function(label) {
@@ -866,24 +875,28 @@ Player.prototype = {
                 this._mediaServerPlayer.PreviousRemote();
             }));
             this._prevButtonTooltip = new Tooltips.Tooltip(this._prevButton.button, _("Previous"));
+            this._prevButtonTooltip._tooltip.add_style_class_name(this.theme+"-tooltip");
             this.controls.add_actor(this._prevButton.getActor());
             
             this._playButton = new ControlButton("media-playback-start", theme, Lang.bind(this, function() {
                 this._mediaServerPlayer.PlayPauseRemote();
             }));
             this._playButtonTooltip = new Tooltips.Tooltip(this._playButton.button, _("Play"));
+            this._playButtonTooltip._tooltip.add_style_class_name(this.theme+"-tooltip");
             this.controls.add_actor(this._playButton.getActor());
             
             this._stopButton = new ControlButton("media-playback-stop", theme, Lang.bind(this, function() {
                 this._mediaServerPlayer.StopRemote();
             }));
             this._stopButtonTooltip = new Tooltips.Tooltip(this._stopButton.button, _("Stop"));
+            this._stopButtonTooltip._tooltip.add_style_class_name(this.theme+"-tooltip");
             this.controls.add_actor(this._stopButton.getActor());
             
             this._nextButton = new ControlButton("media-skip-forward", theme, Lang.bind(this, function() {
                 this._mediaServerPlayer.NextRemote();
             }));
             this._nextButtonTooltip = new Tooltips.Tooltip(this._nextButton.button, _("Next"));
+            this._nextButtonTooltip._tooltip.add_style_class_name(this.theme+"-tooltip");
             this.controls.add_actor(this._nextButton.getActor());
             
             this._mediaServer.getRaise(Lang.bind(this, function(sender, raise) {
@@ -892,6 +905,7 @@ Player.prototype = {
                         this._mediaServer.RaiseRemote();// this._system_status_button.menu.actor.hide();
                     }));
                     this._raiseButtonTooltip = new Tooltips.Tooltip(this._raiseButton.button, _("Open Player"));
+                    this._raiseButtonTooltip._tooltip.add_style_class_name(this.theme+"-tooltip");
                     this.controls.add_actor(this._raiseButton.getActor());
                 }
             }));
@@ -903,6 +917,7 @@ Player.prototype = {
                     }));
                     this.controls.add_actor(this._quitButton.getActor());
                     this._quitButtonTooltip = new Tooltips.Tooltip(this._quitButton.button, _("Quit Player"));
+                    this._quitButtonTooltip._tooltip.add_style_class_name(this.theme+"-tooltip");
                 }
             }));
             
@@ -1252,6 +1267,7 @@ myDesklet.prototype = {
         let volumeButton = new St.Button({ style_class: this.theme+"-volumeButton" });
         volumeButton.set_child(this.volumeIcon);
         this.muteTooltip = new Tooltips.Tooltip(volumeButton);
+        this.muteTooltip._tooltip.add_style_class_name(this.theme+"-tooltip");
         volumeSliderBox.add_actor(volumeButton);
         
         let volumeSliderBin = new St.Bin();
@@ -1324,6 +1340,7 @@ myDesklet.prototype = {
         this.playersBox.set_child(null);
         this.playerTitle.set_child(null);
         this._build_interface();
+        this._mutedChanged();
         this.updateVolume();
         this._reloadApps();
         for ( let i = 0; i < this.owners.length; i++ ) {

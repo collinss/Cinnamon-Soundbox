@@ -1,0 +1,184 @@
+/*ice theme*/
+.ice-mainBox {
+    border: 1px solid #1991E8;
+    border-radius: 5px 5px 5px 5px;
+    padding: 10px;
+    background-color: #0A161E;
+}
+
+.ice-buttonMenu {
+    border: 1px solid #1991E8;
+    border-radius: 5px 5px 5px 5px;
+    padding: 7px;
+}
+
+.ice-buttonMenu:hover {
+    background-gradient-direction: vertical;
+    background-gradient-start: #214B66;
+    background-gradient-end: #112430;
+}
+
+.ice-divider {
+    background-color: #1991E8;
+    border-radius: 5px;
+    -margin-horizontal: 14px;
+    height: 1px;
+}
+
+.ice-divider-box {
+    color: #000000;
+    padding: 10px 5px 10px 5px;
+}
+
+.ice-text, .ice-buttonText, .ice-playerTitleText, .ice-appTitle, .ice-trackInfo-text {
+    color: #1991E8;
+}
+
+.ice-trackInfo-text {
+    padding: 0px 3px;
+}
+
+.ice-volumeButton {
+    padding: 2px 3px 2px 3px;
+}
+
+.ice-volumeIcon {
+    icon-size: 16px;
+    color: #1991E8;
+}
+
+.ice-slider {
+    height: 20px;
+    min-width: 185px;
+    -slider-background-color: #01538E;
+    -slider-border-color: #004577;
+    -slider-active-background-color: #1991E8;
+    -slider-active-border-color: #004577;
+    -slider-height: 6px;
+    -slider-border-width: 1px;
+    -slider-active-height: 6px;
+    -slider-active-border-width: 1px;
+    -slider-handle-height: 10px;
+    -slider-handle-width: 8px;
+    -slider-handle-color: #1991E8;
+    -slider-handle-border-width: 0px;
+}
+
+.ice-appIcon {
+    icon-size: 20px;
+    padding: 0px 4px 2px 4px;
+}
+
+.ice-titleBar {
+    background-gradient-direction: vertical;
+    background-gradient-start: #0e4b77;
+    background-gradient-end: #01365b;
+    border: solid 1px #1991E8;
+    border-radius: 2px 2px 2px 2px;
+    width: 200px;
+}
+
+.ice-playerSelectButton {
+    color: #1991E8;
+}
+
+.ice-playerIcon {
+    icon_size: 16px;
+    width: 16px;
+}
+
+.ice-trackInfoBox {
+    padding: 3px 0px 5px 0px;
+    width: 200px;
+}
+
+.ice-trackInfo {
+    padding: 3px 0px 3px 0px;
+}
+
+.ice-trackInfo-icon {
+    icon-size: 1.4em;
+    color: #1991E8;
+}
+
+.ice-albumCover-box {
+}
+
+.ice-albumCover {
+    border: 1px solid #1991E8;
+    border-radius: 5px 5px 5px 5px;
+    icon_size: 200px;
+    width: 200px;
+    height: 200px;
+}
+
+.ice-timeBox {
+    padding: 4px;
+}
+
+.ice-buttonBox {
+    padding: 5px 5px 5px 5px;
+}
+
+.ice-soundButton-box {
+    padding: 3px 3px 3px 3px;
+}
+
+.ice-soundButton {
+    border: 1px solid #1991E8;
+    border-radius: 5px 5px 5px 5px;
+    width: 25px;
+    height: 20px;
+    padding: 3px 3px 3px 3px;
+}
+
+.ice-soundButton:hover {
+    background-gradient-direction: vertical;
+    background-gradient-start: #214B66;
+    background-gradient-end: #112430;
+}
+
+.ice-soundButton-icon {
+    icon-size: 16px;
+    color: #1991E8;
+}
+
+#ice-popup-menuitem {
+    border-image: none;
+    border-radius: 5px 5px 5px 5px;
+    padding: .4em 1em;
+    spacing: 1em;
+}
+
+#ice-popup-menuitem:active {
+    border-image: none;
+    background-gradient-direction: vertical;
+    background-gradient-start: #214B66;
+    background-gradient-end: #112430;
+}
+
+#Tooltip.ice-tooltip {
+    border-image: none;
+    color: #1991E8;
+    border: solid 1px #1991E8;
+    background-color: #0A161E;
+    padding: 4px 15px 4px 12px;
+}
+
+#ice-popup {
+    border-image: none;
+    color: #1991E8;
+    border: solid 1px #1991E8;
+    border-radius: 5px 5px 5px 5px;
+    background-color: #0A161E;
+    padding: 4px 12px 4px 12px;
+}
+
+#ice-popup-boxPointer {
+    border-image: none;
+    -arrow-border-width: 0px;
+    -arrow-base: 0px;
+    -arrow-border-radius: 0px;
+    -boxpointer-gap: 0px;
+    -arrow-rise: 0px;
+}

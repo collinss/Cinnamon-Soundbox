@@ -1,0 +1,195 @@
+/*ghost theme*/
+.ghost-mainBox {
+    border: 1px solid #A3A3A3;
+    /*border-radius: 5px 5px 5px 5px;*/
+    padding: 10px;
+    background-color: #000000;
+}
+
+.ghost-buttonMenu {
+    border: 1px solid #A3A3A3;
+    border-radius: 5px 5px 5px 5px;
+    padding: 7px;
+}
+
+.ghost-buttonMenu:hover {
+    /*background-color: #444;*/
+    background-gradient-direction: vertical;
+    background-gradient-start: #111111;
+    background-gradient-end: #353535;
+}
+
+.ghost-divider {
+    background-color: rgb(17,17,17);
+    border-radius: 5px;
+    box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.15);
+    -margin-horizontal: 14px;
+    height: 1px;
+}
+
+.ghost-divider-box {
+    color: #000000;
+    padding: 10px 5px 10px 5px;
+}
+
+.ghost-text, .ghost-buttonText, .ghost-appTitle, .ghost-trackInfo-text {
+    color: #A3A3A3;
+}
+
+.ghost-playerTitleText {
+    color: #222;
+}
+
+.ghost-trackInfo-text {
+    padding: 0px 3px;
+}
+
+.ghost-volumeButton {
+    padding: 2px 3px 2px 3px;
+}
+
+.ghost-volumeIcon {
+    icon-size: 16px;
+    color: #A3A3A3;
+}
+
+.ghost-slider {
+    height: 20px;
+    min-width: 185px;
+    -slider-background-color: #555;
+    -slider-border-color: #555;
+    -slider-active-background-color: #A3A3A3;
+    -slider-active-border-color: #555;
+    -slider-height: 6px;
+    -slider-border-width: 0px;
+    -slider-active-height: 6px;
+    -slider-active-border-width: 0px;
+    -slider-handle-radius: 6px;
+    -slider-handle-height: 12px;
+    -slider-handle-width: 10px;
+    -slider-handle-color: #A3A3A3;
+    -slider-handle-border-width: 0px;
+    -slider-handle-border-color: #555;
+}
+
+.ghost-appIcon {
+    icon-size: 20px;
+    padding: 0px 4px 2px 4px;
+}
+
+.ghost-titleBar {
+    /*background-color: #A3A3A3;*/
+    background-gradient-direction: vertical;
+    background-gradient-start: #969696;
+    background-gradient-end: #C9C9C9;
+    border: solid 1px #555;
+    border-radius: 8px 8px 8px 8px;
+    width: 200px;
+}
+
+.ghost-playerSelectButton {
+    color: #828282;
+}
+
+.ghost-playerIcon {
+    color: #222;
+    icon_size: 16px;
+    width: 16px;
+}
+
+.ghost-trackInfoBox {
+    padding: 3px 0px 5px 0px;
+    width: 200px;
+}
+
+.ghost-trackInfo {
+    padding: 3px 0px 3px 0px;
+}
+
+.ghost-trackInfo-icon {
+    icon-size: 1.4em;
+    color: #A3A3A3;
+}
+
+.ghost-albumCover-box {
+}
+
+.ghost-albumCover {
+    border: 1px solid #000000;
+    border-radius: 5px 5px 5px 5px;
+    icon_size: 200px;
+    width: 200px;
+    height: 200px;
+}
+
+.ghost-timeBox {
+    padding: 4px;
+}
+
+.ghost-buttonBox {
+    padding: 5px 5px 5px 5px;
+}
+
+.ghost-soundButton-box {
+    padding: 3px 3px 3px 3px;
+}
+
+.ghost-soundButton {
+    border: 1px solid #A3A3A3;
+    border-radius: 5px 5px 5px 5px;
+    width: 25px;
+    height: 20px;
+    padding: 3px 3px 3px 3px;
+}
+
+.ghost-soundButton:hover {
+    background-gradient-direction: vertical;
+    background-gradient-start: #111111;
+    background-gradient-end: #353535;
+}
+
+.ghost-soundButton-icon {
+    icon-size: 16px;
+    color: #A3A3A3;
+}
+
+#ghost-popup-menuitem {
+    border-image: none;
+    border-radius: 5px 5px 5px 5px;
+    padding: .4em 1em;
+    spacing: 1em;
+}
+
+#ghost-popup-menuitem:active {
+    border-image: none;
+    background-gradient-direction: vertical;
+    background-gradient-start: #111111;
+    background-gradient-end: #353535;
+}
+
+#Tooltip.ghost-tooltip {
+    border-image: none;
+    color: #A3A3A3;
+    border: solid 1px #A3A3A3;
+    border-radius: 5px 5px 5px 5px;
+    background-color: #000000;
+    padding: 4px 15px 4px 12px;
+}
+
+#ghost-popup {
+    border-image: none;
+    color: #A3A3A3;
+    border: solid 1px #A3A3A3;
+    border-radius: 5px 5px 5px 5px;
+    background-color: #000000;
+    padding: 0px 0px 0px 0px;
+}
+
+#ghost-popup-boxPointer {
+    border-image: none;
+    -arrow-border-width: 0px;
+    -arrow-base: 0px;
+    -arrow-border-radius: 0px;
+    -boxpointer-gap: 0px;
+    -arrow-rise: 0px;
+}
