@@ -134,7 +134,9 @@ let compatible_players = [
     "pithos",
     "gnome-mplayer",
     "nuvolaplayer",
-    "qmmp"
+    "qmmp",
+    "deadbeef",
+    "smplayer"
 ];
 
 let support_seek = [
@@ -152,7 +154,8 @@ let support_seek = [
     "vlc",
     "beatbox",
     "gnome-mplayer",
-    "qmmp"
+    "qmmp",
+    "deadbeef"
 ];
 
 let desklet_drag_object;
