@@ -1,9 +1,9 @@
 /*clean theme*/
 .clean-mainBox {
-    border: 1px solid #777;
+    border: 1px solid #515151;
     border-radius: 5px 5px 5px 5px;
     padding: 10px;
-    background-color: #ddd
+    background-color: #ddd;
 }
 
 .clean-buttonMenu {
@@ -30,7 +30,7 @@
 }
 
 .clean-text, .clean-buttonText, .clean-appTitle, .clean-playerTitleText, .clean-trackInfo-text {
-    color: #555;
+    color: #444;
 }
 
 .clean-trackInfo-text {
@@ -50,9 +50,9 @@
     height: 20px;
     min-width: 185px;
     -slider-background-color: #fff;
-    -slider-border-color: #555;
+    -slider-border-color: #000000;
     -slider-active-background-color: #fff;
-    -slider-active-border-color: #555;
+    -slider-active-border-color: #000000;
     -slider-height: 10px;
     -slider-border-width: 1px;
     -slider-active-height: 10px;
@@ -61,7 +61,7 @@
     -slider-handle-width: 10px;
     -slider-handle-color: #aaa;
     -slider-handle-border-width: 1px;
-    -slider-handle-border-color: #444;
+    -slider-handle-border-color: #000000;
 }
 
 .clean-appIcon {
@@ -137,3 +137,53 @@
     color: #555;
 }
 
+#clean-popup-menuitem {
+    border-image: none;
+    border: none;
+    text-shadow: 0px 0px 0px 0px;
+    color: #444;
+    border-radius: 5px 5px 5px 5px;
+    padding: .4em 1em;
+    spacing: 1em;
+}
+
+#clean-popup-menuitem:active {
+    box-shadow: 0px 0px 0px 0px;
+    border-image: none ;
+    border: none;
+    text-shadow: 0px 0px 0px 0px;
+    color: #444;
+    background-gradient-direction: none;
+    background-color: #eee;
+}
+
+#Tooltip.clean-tooltip {
+    border-image: none;
+    color: #444;
+    border: 1px solid #444;
+    border-radius: 5px 5px 5px 5px;
+    background-color: #ddd;
+    padding: 4px 15px 4px 12px;
+}
+
+#clean-popup {
+    border-image: none;
+    text-shadow: 0px 0px 0px 0px;
+    color: #444;
+    border: 1px solid #444;
+    border-radius: 5px 5px 5px 5px;
+    background-color: #ddd;
+    padding: 4px 12px 4px 12px;
+}
+
+#clean-popup-boxPointer {
+    border-image: none;
+    border: none;
+    -arrow-border-width: 0px;
+    -arrow-base: 0px;
+    -arrow-border-radius: 0px;
+    -boxpointer-gap: 0px;
+    -arrow-rise: 0px;
+    -arrow-border-color: rgba(0,0,0,0);
+    -arrow-background-color: rgba(0,0,0,0);
+}
