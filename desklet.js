@@ -136,7 +136,8 @@ let compatible_players = [
     "nuvolaplayer",
     "qmmp",
     "deadbeef",
-    "smplayer"
+    "smplayer",
+    "tomahawk"
 ];
 
 let support_seek = [
@@ -155,7 +156,8 @@ let support_seek = [
     "beatbox",
     "gnome-mplayer",
     "qmmp",
-    "deadbeef"
+    "deadbeef",
+    "tomahawk"
 ];
 
 let desklet_drag_object;
