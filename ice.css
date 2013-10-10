@@ -1,7 +1,7 @@
 /*ice theme*/
 .ice-mainBox {
-    border: 1px solid #1991E8;
-    border-radius: 5px 5px 5px 5px;
+    border: 2px solid #1991E8;
+    border-radius: 10px 10px 10px 10px;
     padding: 10px;
     background-color: #0A161E;
 }
@@ -171,6 +171,7 @@
     border-radius: 5px 5px 5px 5px;
     background-color: #0A161E;
     padding: 4px 15px 4px 12px;
+    background-gradient-direction: none;
 }
 
 #ice-popup {

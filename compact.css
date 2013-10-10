@@ -118,6 +118,7 @@
     border-radius: 5px 5px 5px 5px;
     background-color: #ddd;
     padding: 4px 15px 4px 12px;
+    background-gradient-direction: none;
 }
 
 #compact-popup {
