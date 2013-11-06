@@ -865,6 +865,20 @@ Player.prototype = {
             this._trackCover = new St.Bin({ style_class: settings.theme+"-albumCover-box" });
             this._trackCover.set_child(new St.Icon({ icon_name: "media-optical-cd-audio", style_class: settings.theme+"-albumCover", icon_type: St.IconType.FULLCOLOR }));
             mainBox.add_actor(this._trackCover);
+            this.artHiddenDivider = new Divider();
+            mainBox.add_actor(this.artHiddenDivider.actor);
+            if ( settings.showArt ) this.artHiddenDivider.actor.hide();
+            else this._trackCover.hide();
+            settings.connect("art-show-hide", Lang.bind(this, function() {
+                if ( settings.showArt ) {
+                    this._trackCover.show();
+                    this.artHiddenDivider.actor.hide();
+                }
+                else {
+                    this._trackCover.hide();
+                    this.artHiddenDivider.actor.show();
+                }
+            }))
             
             //seek controls
             this._seekControls = new St.Bin({ style_class: settings.theme+"-timeBox" });
