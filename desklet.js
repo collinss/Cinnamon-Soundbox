@@ -137,7 +137,9 @@ let compatible_players = [
     "qmmp",
     "deadbeef",
     "smplayer",
-    "tomahawk"
+    "tomahawk",
+    "musique",
+    "potamus"
 ];
 
 let support_seek = [
