@@ -174,7 +174,7 @@ SettingsInterface.prototype = {
         
         this.settings = new Settings.DeskletSettings(this, uuid, deskletId);
         this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this.queRebuild);
-        this.settings.bindProperty(Settings.BindingDirection.IN, "showApps", "showApps", this._setAppHideState);
+        this.settings.bindProperty(Settings.BindingDirection.IN, "showApps", "showApps", this.setAppShowState);
         this.settings.bindProperty(Settings.BindingDirection.IN, "compact", "compact", this.queRebuild);
         this.settings.bindProperty(Settings.BindingDirection.IN, "showArt", "showArt", this.setArtShowState);
         this.settings.bindProperty(Settings.BindingDirection.IN, "exceedNormVolume", "exceedNormVolume", this.updateVolume);
@@ -191,6 +191,10 @@ SettingsInterface.prototype = {
     
     setArtShowState: function() {
         this.emit("art-show-hide");
+    },
+    
+    setAppShowState: function() {
+        this.emit("app-show-hide");
     }
 }
 Signals.addSignalMethods(SettingsInterface.prototype);
@@ -324,6 +328,7 @@ ButtonMenu.prototype = {
         try {
             
             this.actor = new St.Button({ style_class: settings.theme+"-buttonMenu" });
+            if ( settings.compact ) this.actor.add_style_pseudo_class("compact");
             this.actor.set_child(content);
             
             this.menuManager = new PopupMenu.PopupMenuManager(this);
@@ -582,15 +587,19 @@ AppControl.prototype = {
         
         this.app = app;
         this.maxVol = maxVol;
+        this.compactibleElements = [];
+        
         this.muteId = app.connect("notify::is-muted", Lang.bind(this, this.updateMute));
         this.volumeId = app.connect("notify::volume", Lang.bind(this, this.updateVolume));
         
         this.actor = new St.BoxLayout({ vertical: true, style_class: settings.theme+"-appBox" });
+        this.compactibleElements.push(this.actor);
         let divider = new Divider();
         this.actor.add_actor(divider.actor);
         
         let titleBin = new St.Bin({ style_class: settings.theme+"-appTitleBox" });
         this.actor.add_actor(titleBin);
+        this.compactibleElements.push(titleBin);
         let titleBox = new St.BoxLayout({ vertical: false });
         titleBin.add_actor(titleBox);
         
@@ -598,6 +607,7 @@ AppControl.prototype = {
         titleBox.add_actor(iconBin);
         let icon = new St.Icon({ icon_name: app.icon_name, icon_type: St.IconType.FULLCOLOR, style_class: settings.theme+"-appIcon" });
         iconBin.add_actor(icon);
+        this.compactibleElements.push(icon);
         let labelBin = new St.Bin({ y_align: St.Align.MIDDLE });
         titleBox.add_actor(labelBin);
         let label = new St.Label({ text: app.get_name(), style_class: settings.theme+"-appTitle" });
@@ -612,6 +622,7 @@ AppControl.prototype = {
         volumeBox.add_actor(volumeButton);
         this.volumeIcon = new St.Icon({ style_class: settings.theme+"-volumeIcon" });
         volumeButton.add_actor(this.volumeIcon);
+        this.compactibleElements.push(volumeButton, this.volumeIcon);
         this.muteTooltip = new Tooltips.Tooltip(volumeButton);
         this.muteTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
         
@@ -622,6 +633,10 @@ AppControl.prototype = {
         
         volumeButton.connect("clicked", Lang.bind(this, this.toggleMute));
         this.volumeSlider.connect("value-changed", Lang.bind(this, this.sliderChanged));
+        
+        if ( settings.compact ) {
+            for ( let i = 0; i < this.compactibleElements.length; i++ ) this.compactibleElements[i].add_style_pseudo_class("compact");
+        }
         
         this.updateMute();
         this.updateVolume();
@@ -705,7 +720,12 @@ function Divider() {
 Divider.prototype = {
     _init: function() {
         this.actor = new St.BoxLayout({ vertical: true, style_class: settings.theme+"-divider-box" });
-        this.actor.add_actor(new St.DrawingArea({ style_class: settings.theme+"-divider" }));
+        let divider = new St.DrawingArea({ style_class: settings.theme+"-divider" });
+        if ( settings.compact ) {
+            this.actor.add_style_pseudo_class("compact");
+            divider.add_style_pseudo_class("compact");
+        }
+        this.actor.add_actor(divider);
     }
 }
 
@@ -727,6 +747,11 @@ TrackInfo.prototype = {
         if ( tooltip ) {
             this.tooltip = new Tooltips.Tooltip(this.actor, label.toString());
             this.tooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
+        }
+        
+        if ( settings.compact ) {
+            box.add_style_pseudo_class("compact");
+            this.icon.add_style_pseudo_class("compact");
         }
     },
     
@@ -757,10 +782,16 @@ ControlButton.prototype = {
     _init: function(icon, callback) {
         this.actor = new St.Bin({ style_class: settings.theme+"-soundButton-box" });
         this.button = new St.Button({ style_class: settings.theme+"-soundButton" });
+        this.actor.add_actor(this.button);
         this.button.connect("clicked", callback);
         this.icon = new St.Icon({ icon_type: St.IconType.SYMBOLIC, icon_name: icon, style_class: settings.theme+"-soundButton-icon" });
         this.button.set_child(this.icon);
-        this.actor.add_actor(this.button);        
+        
+        if ( settings.compact ) {
+            this.actor.add_style_pseudo_class("compact");
+            this.button.add_style_pseudo_class("compact");
+            this.icon.add_style_pseudo_class("compact");
+        }
     },
     
     getActor: function() {
@@ -839,6 +870,8 @@ Player.prototype = {
     _buildLayout: function() {
         try {
             
+            this.compactibleElements = [];
+            
             this.actor.destroy_all_children();
             
             let mainBox = new St.BoxLayout({ vertical: true });
@@ -852,6 +885,7 @@ Player.prototype = {
             mainBox.add_actor(trackInfoContainer);
             let trackInfoBox = new St.BoxLayout({ vertical: true, style_class: settings.theme+"-trackInfoBox" });
             trackInfoContainer.set_child(trackInfoBox);
+            this.compactibleElements.push(trackInfoBox);
             
             this._title = new TrackInfo(_("Unknown Title"), "audio-x-generic", true);
             trackInfoBox.add_actor(this._title.actor);
@@ -861,38 +895,41 @@ Player.prototype = {
             trackInfoBox.add_actor(this._artist.actor);
             
             //album image
-            this._trackCoverFile = this._trackCoverFileTmp = false;
-            this._trackCover = new St.Bin({ style_class: settings.theme+"-albumCover-box" });
-            this._trackCover.set_child(new St.Icon({ icon_name: "media-optical-cd-audio", style_class: settings.theme+"-albumCover", icon_type: St.IconType.FULLCOLOR }));
-            mainBox.add_actor(this._trackCover);
+            this.trackCoverFile = this.trackCoverFileTmp = false;
+            this.trackCover = new St.Bin({ style_class: settings.theme+"-albumCover-box" });
+            mainBox.add_actor(this.trackCover);
+            let trackCoverIcon = new St.Icon({ icon_name: "media-optical-cd-audio", style_class: settings.theme+"-albumCover", icon_type: St.IconType.FULLCOLOR });
+            this.trackCover.set_child(trackCoverIcon);
+            this.compactibleElements.push(this.trackCover, trackCoverIcon);
             this.artHiddenDivider = new Divider();
             mainBox.add_actor(this.artHiddenDivider.actor);
             if ( settings.showArt ) this.artHiddenDivider.actor.hide();
-            else this._trackCover.hide();
+            else this.trackCover.hide();
             settings.connect("art-show-hide", Lang.bind(this, function() {
                 if ( settings.showArt ) {
-                    this._trackCover.show();
+                    this.trackCover.show();
                     this.artHiddenDivider.actor.hide();
                 }
                 else {
-                    this._trackCover.hide();
+                    this.trackCover.hide();
                     this.artHiddenDivider.actor.show();
                 }
             }))
             
             //seek controls
-            this._seekControls = new St.Bin({ style_class: settings.theme+"-timeBox" });
-            mainBox.add_actor(this._seekControls);
-            this.seekControls = new St.BoxLayout({ vertical: true });
-            this._seekControls.set_child(this.seekControls);
+            this.seekControlsBin = new St.Bin({ style_class: settings.theme+"-timeBox" });
+            this.compactibleElements.push(this.seekControlsBin);
+            mainBox.add_actor(this.seekControlsBin);
+            this.seekControlsBox = new St.BoxLayout({ vertical: true });
+            this.seekControlsBin.set_child(this.seekControlsBox);
             
             let timeBin = new St.Bin({ x_align: St.Align.MIDDLE });
-            this.seekControls.add_actor(timeBin);
+            this.seekControlsBox.add_actor(timeBin);
             this._time = new TrackInfo("0:00 / 0:00", "document-open-recent", false);
             timeBin.add_actor(this._time.actor);
             
             this._positionSlider = new Slider(0);
-            this.seekControls.add_actor(this._positionSlider.actor);
+            this.seekControlsBox.add_actor(this._positionSlider.actor);
             
             this._time.actor.connect("clicked", Lang.bind(this, function() {
                 this.countUp = !this.countUp;
@@ -912,10 +949,11 @@ Player.prototype = {
             }));
             
             //control buttons
-            this._trackControls = new St.Bin({ style_class: settings.theme+"-buttonBox", x_align: St.Align.MIDDLE });
-            mainBox.add_actor(this._trackControls);
+            this.trackControls = new St.Bin({ style_class: settings.theme+"-buttonBox", x_align: St.Align.MIDDLE });
+            mainBox.add_actor(this.trackControls);
+            this.compactibleElements.push(this.trackControls);
             this.controls = new St.BoxLayout();
-            this._trackControls.set_child(this.controls);
+            this.trackControls.set_child(this.controls);
             
             this._prevButton = new ControlButton("media-skip-backward", Lang.bind(this, function() {
                 this._mediaServerPlayer.PreviousRemote();
@@ -967,8 +1005,12 @@ Player.prototype = {
                 }
             }));
             
+            if ( settings.compact ) {
+                for ( let i = 0; i < this.compactibleElements.length; i++ ) this.compactibleElements[i].add_style_pseudo_class("compact");
+            }
+            
             if ( support_seek.indexOf(this._name) == -1 ) {
-                this.seekControls.hide();
+                this.seekControlsBin.hide();
                 this.showPosition = false;
             }
             this._getStatus();
@@ -1058,29 +1100,29 @@ Player.prototype = {
         
         let change = false;
         if ( metadata["mpris:artUrl"] ) {
-            if ( this._trackCoverFile != metadata["mpris:artUrl"].toString() ) {
-                this._trackCoverFile = metadata["mpris:artUrl"].toString();
+            if ( this.trackCoverFile != metadata["mpris:artUrl"].toString() ) {
+                this.trackCoverFile = metadata["mpris:artUrl"].toString();
                 change = true;
             }
         }
         else {
-            if ( this._trackCoverFile != false ) {
-                this._trackCoverFile = false;
+            if ( this.trackCoverFile != false ) {
+                this.trackCoverFile = false;
                 change = true;
             }
         }
         
         if ( change ) {
-            if ( this._trackCoverFile ) {
+            if ( this.trackCoverFile ) {
                 let cover_path = "";
-                if ( this._trackCoverFile.match(/^http/) ) {
+                if ( this.trackCoverFile.match(/^http/) ) {
                     this._hideCover();
-                    let cover = Gio.file_new_for_uri(decodeURIComponent(this._trackCoverFile));
-                    if ( !this._trackCoverFileTmp ) this._trackCoverFileTmp = Gio.file_new_tmp("XXXXXX.mediaplayer-cover")[0];
+                    let cover = Gio.file_new_for_uri(decodeURIComponent(this.trackCoverFile));
+                    if ( !this.trackCoverFileTmp ) this.trackCoverFileTmp = Gio.file_new_tmp("XXXXXX.mediaplayer-cover")[0];
                     cover.read_async(null, null, Lang.bind(this, this._onReadCover));
                 }
                 else {
-                    cover_path = decodeURIComponent(this._trackCoverFile);
+                    cover_path = decodeURIComponent(this.trackCoverFile);
                     cover_path = cover_path.replace("file://", "");
                     this._showCover(cover_path);
                 }
@@ -1179,13 +1221,13 @@ Player.prototype = {
     
     _onReadCover: function(cover, result) {
         let inStream = cover.read_finish(result);
-        let outStream = this._trackCoverFileTmp.replace(null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null, null);
+        let outStream = this.trackCoverFileTmp.replace(null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null, null);
         outStream.splice_async(inStream, Gio.OutputStreamSpliceFlags.CLOSE_TARGET, 0, null, Lang.bind(this, this._onSavedCover));
     },
     
     _onSavedCover: function(outStream, result) {
         outStream.splice_finish(result, null);
-        let cover_path = this._trackCoverFileTmp.get_path();
+        let cover_path = this.trackCoverFileTmp.get_path();
         this._showCover(cover_path);
     },
     
@@ -1195,7 +1237,7 @@ Player.prototype = {
     _showCover: function(cover_path) {
         try {
         if ( ! cover_path || ! GLib.file_test(cover_path, GLib.FileTest.EXISTS) ) {
-            this._trackCover.set_child(new St.Icon({ icon_name: "media-optical-cd-audio", style_class: settings.theme+"albumCover", icon_type: St.IconType.FULLCOLOR }));
+            this.trackCover.set_child(new St.Icon({ icon_name: "media-optical-cd-audio", style_class: settings.theme+"albumCover", icon_type: St.IconType.FULLCOLOR }));
         }
         else {
             let l = new Clutter.BinLayout();
@@ -1204,7 +1246,7 @@ Player.prototype = {
             b.set_layout_manager(l);
             b.set_width(200);
             b.add_actor(c);
-            this._trackCover.set_child(b);
+            this.trackCover.set_child(b);
         }
         } catch (e) {
             global.logError(e);
@@ -1270,10 +1312,14 @@ myDesklet.prototype = {
     },
     
     _build_interface: function() {
+        
+        this.compactibleElements = [];
+        
         if ( this.mainBox ) this.mainBox.destroy();
         
         this.mainBox = new St.BoxLayout({ style_class: settings.theme+"-mainBox", vertical: true });
         this.setContent(this.mainBox);
+        this.compactibleElements.push(this.mainBox);
         
         let topBin = new St.Bin({ x_align: St.Align.MIDDLE });
         this.mainBox.add_actor(topBin);
@@ -1291,6 +1337,7 @@ myDesklet.prototype = {
         this.mainBox.add_actor(volumeBin);
         let volumeBox = new St.BoxLayout({ vertical: true, style_class: settings.theme+"-volumeBox" });
         volumeBin.add_actor(volumeBox);
+        this.compactibleElements.push(volumeBox);
         
         //volume text
         let volumeTextBin = new St.Bin({ x_align: St.Align.MIDDLE });
@@ -1306,12 +1353,13 @@ myDesklet.prototype = {
         //volume slider
         let volumeSliderBox = new St.BoxLayout({ vertical: false });
         volumeBox.add_actor(volumeSliderBox);
-        this.volumeIcon = new St.Icon({ icon_name: "audio-volume-high", style_class: settings.theme+"-volumeIcon" });
         let volumeButton = new St.Button({ style_class: settings.theme+"-volumeButton" });
+        volumeSliderBox.add_actor(volumeButton);
+        this.volumeIcon = new St.Icon({ icon_name: "audio-volume-high", style_class: settings.theme+"-volumeIcon" });
         volumeButton.set_child(this.volumeIcon);
+        this.compactibleElements.push(volumeButton, this.volumeIcon);
         this.muteTooltip = new Tooltips.Tooltip(volumeButton);
         this.muteTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
-        volumeSliderBox.add_actor(volumeButton);
         
         let volumeSliderBin = new St.Bin();
         volumeSliderBox.add_actor(volumeSliderBin);
@@ -1325,6 +1373,7 @@ myDesklet.prototype = {
         this.appBox = new St.BoxLayout({ vertical: true });
         this.mainBox.add_actor(this.appBox);
         if ( !settings.showApps ) this.appBox.hide();
+        settings.connect("app-show-hide", Lang.bind(this, this._setAppHideState));
         
         this.playersContainer = new St.BoxLayout({ vertical: true, style_class: settings.theme+"-playerBox" });
         this.mainBox.add_actor(this.playersContainer);
@@ -1336,6 +1385,7 @@ myDesklet.prototype = {
         //player title
         let titleBin = new St.Bin({ x_align: St.Align.MIDDLE, style_class: settings.theme+"-titleBar" });
         this.playersContainer.add_actor(titleBin);
+        this.compactibleElements.push(titleBin);
         this.playerTitleBox = new St.BoxLayout({ vertical: false });
         titleBin.add_actor(this.playerTitleBox);
         
@@ -1345,7 +1395,8 @@ myDesklet.prototype = {
         
         this.playerTitle = new St.Bin({ style_class: settings.theme+"-titleBox" });
         this.playerTitleBox.add_actor(this.playerTitle);
-        this.playerTitle.set_alignment(St.Align.MIDDLE, St.Align.MIDDLE)
+        this.compactibleElements.push(this.playerTitle);
+        this.playerTitle.set_alignment(St.Align.MIDDLE, St.Align.MIDDLE);
         
         this.playerForward = new St.Button({ style_class: settings.theme+"-playerSelectButton", child: new St.Icon({ icon_name: "media-playback-start", icon_size: 16 }) });
         this.playerTitleBox.add_actor(this.playerForward);
@@ -1376,23 +1427,32 @@ myDesklet.prototype = {
         this.playersBox = new St.Bin();
         this.playersContainer.add_actor(this.playersBox);
         
+        if ( settings.compact ) {
+            for ( let i = 0; i < this.compactibleElements.length; i++ ) this.compactibleElements[i].add_style_pseudo_class("compact");
+        }
+        
         this.refresh_players();
     },
     
     rebuild: function() {
-        this.playersBox.set_child(null);
-        this.playerTitle.set_child(null);
-        this._build_interface();
-        this._mutedChanged();
-        this.updateVolume();
-        this._reloadApps();
-        for ( let i = 0; i < this.owners.length; i++ ) {
-            let owner = this.owners[i];
-            this.players[owner].updateTheme(settings.theme);
+        try {
+            
+            this.playersBox.set_child(null);
+            this.playerTitle.set_child(null);
+            this._build_interface();
+            this._mutedChanged();
+            this.updateVolume();
+            this._reloadApps();
+            for ( let i = 0; i < this.owners.length; i++ ) {
+                let owner = this.owners[i];
+                this.players[owner].updateTheme(settings.theme);
+            }
+            
+            this._showPlayer(this.players[this.playerShown]);
+            
+        } catch(e) {
+            global.logError(e);
         }
-        
-        this._showPlayer(this.players[this.playerShown]);
-        
     },
     
     _setAppHideState: function() {
