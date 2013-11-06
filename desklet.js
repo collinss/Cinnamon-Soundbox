@@ -162,25 +162,174 @@ let support_seek = [
     "tomahawk"
 ];
 
-let desklet_drag_object;
+let desklet_drag_object, settings;
 
 
-function ButtonMenu(content, theme) {
-    this._init(content, theme);
+function SettingsInterface(uuid, deskletId) {
+    this._init(uuid, deskletId);
+}
+
+SettingsInterface.prototype = {
+    _init: function(uuid, deskletId) {
+        
+        this.settings = new Settings.DeskletSettings(this, uuid, deskletId);
+        this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this.queRebuild);
+        this.settings.bindProperty(Settings.BindingDirection.IN, "showApps", "showApps", this._setAppHideState);
+        this.settings.bindProperty(Settings.BindingDirection.IN, "compact", "compact", this.queRebuild);
+        this.settings.bindProperty(Settings.BindingDirection.IN, "showArt", "showArt", this.setArtShowState);
+        this.settings.bindProperty(Settings.BindingDirection.IN, "exceedNormVolume", "exceedNormVolume", this.updateVolume);
+        
+    },
+    
+    queRebuild: function() {
+        this.emit("que-rebuild");
+    },
+    
+    updateVolume: function() {
+        this.emit("volume-settings-changed");
+    },
+    
+    setArtShowState: function() {
+        this.emit("art-show-hide");
+    }
+}
+Signals.addSignalMethods(SettingsInterface.prototype);
+
+
+function Prop(owner) {
+    this._init(owner);
+}
+
+Prop.prototype = {
+    _init: function(owner) {
+        DBus.session.proxifyObject(this, owner, "/org/mpris/MediaPlayer2", this);
+    }
+}
+DBus.proxifyPrototype(Prop.prototype, PropIFace)
+
+
+function MediaServer2(owner) {
+    this._init(owner);
+}
+
+MediaServer2.prototype = {
+    _init: function(owner) {
+        DBus.session.proxifyObject(this, owner, "/org/mpris/MediaPlayer2", this);
+    },
+    
+    getRaise: function(callback) {
+        this.GetRemote("CanRaise", Lang.bind(this, function(raise, ex) {
+            if ( !ex ) callback(this, raise);
+        }));
+    },
+    
+    getQuit: function(callback) {
+        this.GetRemote("CanQuit", Lang.bind(this, function(quit, ex) {
+            if ( !ex ) callback(this, quit);
+        }));
+    }
+}
+DBus.proxifyPrototype(MediaServer2.prototype, MediaServer2IFace)
+
+
+function MediaServer2Player(owner) {
+    this._init(owner);
+}
+
+MediaServer2Player.prototype = {
+    _init: function(owner) {
+        this._owner = owner;
+        DBus.session.proxifyObject(this, owner, "/org/mpris/MediaPlayer2", this);
+    },
+    
+    getMetadata: function(callback) {
+        this.GetRemote("Metadata", Lang.bind(this, function(metadata, ex) {
+            if ( !ex ) callback(this, metadata);
+        }));
+    },
+    
+    getPlaybackStatus: function(callback) {
+        this.GetRemote("PlaybackStatus", Lang.bind(this, function(status, ex) {
+            if ( !ex ) callback(this, status);
+        }));
+    },
+    
+    getRate: function(callback) {
+        this.GetRemote("Rate", Lang.bind(this, function(rate, ex) {
+            if ( !ex ) callback(this, rate);
+        }));
+    },
+    
+    getPosition: function(callback) {
+        this.GetRemote("Position", Lang.bind(this, function(position, ex) {
+            if ( !ex ) callback(this, position);
+        }));
+    },
+    
+    setPosition: function(value) {
+        this.SetRemote("Position", value);
+    },
+    
+    getShuffle: function(callback) {
+        this.GetRemote("Shuffle", Lang.bind(this, function(shuffle, ex) {
+            if ( !ex ) callback(this, shuffle);
+        }));
+    },
+    
+    setShuffle: function(value) {
+        this.SetRemote("Shuffle", value);
+    },
+    
+    getVolume: function(callback) {
+        this.GetRemote("Volume", Lang.bind(this, function(volume, ex) {
+            if ( !ex ) callback(this, volume);
+        }));
+    },
+    
+    setVolume: function(value) {
+        this.SetRemote("Volume", parseFloat(value));
+    },
+    
+    getRepeat: function(callback) {
+        this.GetRemote("LoopStatus", Lang.bind(this, function(repeat, ex) {
+            if ( !ex ) {
+                if ( repeat == "None" ) repeat = false;
+                else repeat = true;
+                callback(this, repeat);
+            }
+        }));
+    },
+    
+    setRepeat: function(value) {
+        if ( value ) value = "Playlist";
+        else value = "None";
+        this.SetRemote("LoopStatus", value);
+    },
+    
+    getCanSeek: function(callback) {
+        this.GetRemote("CanSeek", Lang.bind(this, function(canSeek, err) {
+            if ( !err ) callback(this, canSeek);
+        }));
+    }
+}
+DBus.proxifyPrototype(MediaServer2Player.prototype, MediaServer2PlayerIFace)
+
+
+function ButtonMenu(content) {
+    this._init(content);
 }
 
 ButtonMenu.prototype = {
-    _init: function(content, theme) {
+    _init: function(content) {
         try {
             
-            this.theme = theme;
-            this.actor = new St.Button({ style_class: theme+"-buttonMenu" });
+            this.actor = new St.Button({ style_class: settings.theme+"-buttonMenu" });
             this.actor.set_child(content);
             
             this.menuManager = new PopupMenu.PopupMenuManager(this);
             this.menu = new PopupMenu.PopupMenu(this.actor, 0.5, St.Side.TOP, 0);
-            this.menu.box.set_name(theme+"-popup");
-            this.menu.actor.set_name(theme+"-popup-boxPointer");
+            this.menu.box.set_name(settings.theme+"-popup");
+            this.menu.actor.set_name(settings.theme+"-popup-boxPointer");
             this.menuManager.addMenu(this.menu);
             Main.uiGroup.add_actor(this.menu.actor);
             this.menu.actor.hide();
@@ -198,7 +347,7 @@ ButtonMenu.prototype = {
     
     addMenuItem: function(title, icon, callback) {
         let menuItem = new PopupMenu.PopupBaseMenuItem();
-        menuItem.actor.set_name(this.theme+"-popup-menuitem");
+        menuItem.actor.set_name(settings.theme+"-popup-menuitem");
         if ( icon ) menuItem.addActor(icon);
         let label = new St.Label({ text: title });
         menuItem.addActor(label);
@@ -209,25 +358,21 @@ ButtonMenu.prototype = {
     removeAll: function() {
         this.menu.removeAll();
     },
-    
-    set_style: function(style) {
-        
-    }
 }
 
 
-function Slider(value, theme) {
-    this._init(value, theme);
+function Slider(value) {
+    this._init(value);
 }
 
 Slider.prototype = {
-    _init: function(value, theme) {
+    _init: function(value) {
         try {
             
             if (isNaN(value)) throw TypeError("The slider value must be a number");
             this._value = Math.max(Math.min(value, 1), 0);
             
-            this.actor = new St.DrawingArea({ style_class: theme+"-slider", reactive: true });
+            this.actor = new St.DrawingArea({ style_class: settings.theme+"-slider", reactive: true });
             this.actor.connect("repaint", Lang.bind(this, this._sliderRepaint));
             this.actor.connect("button-press-event", Lang.bind(this, this._startDragging));
             this.actor.connect("scroll-event", Lang.bind(this, this._onScrollEvent));
@@ -428,34 +573,34 @@ Slider.prototype = {
 Signals.addSignalMethods(Slider.prototype);
 
 
-function AppControl(app, maxVol, theme) {
-    this._init(app, maxVol, theme);
+function AppControl(app, maxVol) {
+    this._init(app, maxVol);
 }
 
 AppControl.prototype = {
-    _init: function(app, maxVol, theme) {
+    _init: function(app, maxVol) {
         
         this.app = app;
         this.maxVol = maxVol;
         this.muteId = app.connect("notify::is-muted", Lang.bind(this, this.updateMute));
         this.volumeId = app.connect("notify::volume", Lang.bind(this, this.updateVolume));
         
-        this.actor = new St.BoxLayout({ vertical: true, style_class: theme+"-appBox" });
-        let divider = new Divider(theme);
+        this.actor = new St.BoxLayout({ vertical: true, style_class: settings.theme+"-appBox" });
+        let divider = new Divider();
         this.actor.add_actor(divider.actor);
         
-        let titleBin = new St.Bin({ style_class: theme+"-appTitleBox" });
+        let titleBin = new St.Bin({ style_class: settings.theme+"-appTitleBox" });
         this.actor.add_actor(titleBin);
         let titleBox = new St.BoxLayout({ vertical: false });
         titleBin.add_actor(titleBox);
         
         let iconBin = new St.Bin({ y_align: St.Align.MIDDLE });
         titleBox.add_actor(iconBin);
-        let icon = new St.Icon({ icon_name: app.icon_name, icon_type: St.IconType.FULLCOLOR, style_class: theme+"-appIcon" });
+        let icon = new St.Icon({ icon_name: app.icon_name, icon_type: St.IconType.FULLCOLOR, style_class: settings.theme+"-appIcon" });
         iconBin.add_actor(icon);
         let labelBin = new St.Bin({ y_align: St.Align.MIDDLE });
         titleBox.add_actor(labelBin);
-        let label = new St.Label({ text: app.get_name(), style_class: theme+"-appTitle" });
+        let label = new St.Label({ text: app.get_name(), style_class: settings.theme+"-appTitle" });
         labelBin.add_actor(label);
         
         let volumeBin = new St.Bin({  });
@@ -463,16 +608,16 @@ AppControl.prototype = {
         let volumeBox = new St.BoxLayout({ vertical: false });
         volumeBin.add_actor(volumeBox);
         
-        let volumeButton = new St.Button({ style_class: theme+"-volumeButton" });
+        let volumeButton = new St.Button({ style_class: settings.theme+"-volumeButton" });
         volumeBox.add_actor(volumeButton);
-        this.volumeIcon = new St.Icon({ style_class: theme+"-volumeIcon" });
+        this.volumeIcon = new St.Icon({ style_class: settings.theme+"-volumeIcon" });
         volumeButton.add_actor(this.volumeIcon);
         this.muteTooltip = new Tooltips.Tooltip(volumeButton);
-        this.muteTooltip._tooltip.add_style_class_name(theme+"-tooltip");
+        this.muteTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
         
         let sliderBin = new St.Bin();
         volumeBox.add_actor(sliderBin);
-        this.volumeSlider = new Slider(1, theme);
+        this.volumeSlider = new Slider(1);
         sliderBin.add_actor(this.volumeSlider.actor);
         
         volumeButton.connect("clicked", Lang.bind(this, this.toggleMute));
@@ -553,154 +698,35 @@ AppControl.prototype = {
 }
 
 
-function Divider(theme) {
-    this._init(theme);
+function Divider() {
+    this._init();
 }
 
 Divider.prototype = {
-    _init: function(theme) {
-        this.actor = new St.BoxLayout({ vertical: true, style_class: theme+"-divider-box" });
-        this.actor.add_actor(new St.DrawingArea({ style_class: theme+"-divider" }));
+    _init: function() {
+        this.actor = new St.BoxLayout({ vertical: true, style_class: settings.theme+"-divider-box" });
+        this.actor.add_actor(new St.DrawingArea({ style_class: settings.theme+"-divider" }));
     }
 }
 
 
-function Prop(owner) {
-    this._init(owner);
-}
-
-Prop.prototype = {
-    _init: function(owner) {
-        DBus.session.proxifyObject(this, owner, "/org/mpris/MediaPlayer2", this);
-    }
-}
-DBus.proxifyPrototype(Prop.prototype, PropIFace)
-
-
-function MediaServer2(owner) {
-    this._init(owner);
-}
-
-MediaServer2.prototype = {
-    _init: function(owner) {
-        DBus.session.proxifyObject(this, owner, "/org/mpris/MediaPlayer2", this);
-    },
-    
-    getRaise: function(callback) {
-        this.GetRemote("CanRaise", Lang.bind(this, function(raise, ex) {
-            if ( !ex ) callback(this, raise);
-        }));
-    },
-    
-    getQuit: function(callback) {
-        this.GetRemote("CanQuit", Lang.bind(this, function(quit, ex) {
-            if ( !ex ) callback(this, quit);
-        }));
-    }
-}
-DBus.proxifyPrototype(MediaServer2.prototype, MediaServer2IFace)
-
-
-function MediaServer2Player(owner) {
-    this._init(owner);
-}
-
-MediaServer2Player.prototype = {
-    _init: function(owner) {
-        this._owner = owner;
-        DBus.session.proxifyObject(this, owner, "/org/mpris/MediaPlayer2", this);
-    },
-    
-    getMetadata: function(callback) {
-        this.GetRemote("Metadata", Lang.bind(this, function(metadata, ex) {
-            if ( !ex ) callback(this, metadata);
-        }));
-    },
-    
-    getPlaybackStatus: function(callback) {
-        this.GetRemote("PlaybackStatus", Lang.bind(this, function(status, ex) {
-            if ( !ex ) callback(this, status);
-        }));
-    },
-    
-    getRate: function(callback) {
-        this.GetRemote("Rate", Lang.bind(this, function(rate, ex) {
-            if ( !ex ) callback(this, rate);
-        }));
-    },
-    
-    getPosition: function(callback) {
-        this.GetRemote("Position", Lang.bind(this, function(position, ex) {
-            if ( !ex ) callback(this, position);
-        }));
-    },
-    
-    setPosition: function(value) {
-        this.SetRemote("Position", value);
-    },
-    
-    getShuffle: function(callback) {
-        this.GetRemote("Shuffle", Lang.bind(this, function(shuffle, ex) {
-            if ( !ex ) callback(this, shuffle);
-        }));
-    },
-    
-    setShuffle: function(value) {
-        this.SetRemote("Shuffle", value);
-    },
-    
-    getVolume: function(callback) {
-        this.GetRemote("Volume", Lang.bind(this, function(volume, ex) {
-            if ( !ex ) callback(this, volume);
-        }));
-    },
-    
-    setVolume: function(value) {
-        this.SetRemote("Volume", parseFloat(value));
-    },
-    
-    getRepeat: function(callback) {
-        this.GetRemote("LoopStatus", Lang.bind(this, function(repeat, ex) {
-            if ( !ex ) {
-                if ( repeat == "None" ) repeat = false;
-                else repeat = true;
-                callback(this, repeat);
-            }
-        }));
-    },
-    
-    setRepeat: function(value) {
-        if ( value ) value = "Playlist";
-        else value = "None";
-        this.SetRemote("LoopStatus", value);
-    },
-    
-    getCanSeek: function(callback) {
-        this.GetRemote("CanSeek", Lang.bind(this, function(canSeek, err) {
-            if ( !err ) callback(this, canSeek);
-        }));
-    }
-}
-DBus.proxifyPrototype(MediaServer2Player.prototype, MediaServer2PlayerIFace)
-
-
-function TrackInfo(label, icon, theme, tooltip) {
-    this._init(label, icon, theme, tooltip);
+function TrackInfo(label, icon, tooltip) {
+    this._init(label, icon, tooltip);
 }
 
 TrackInfo.prototype = {
-    _init: function(label, icon, theme, tooltip) {
+    _init: function(label, icon, tooltip) {
         this.hasTooltip = tooltip;
         this.actor = new St.Button({ x_align: St.Align.START });
-        let box = new St.BoxLayout({ style_class: theme+"-trackInfo" });
+        let box = new St.BoxLayout({ style_class: settings.theme+"-trackInfo" });
         this.actor.add_actor(box);
-        this.icon = new St.Icon({ icon_name: icon.toString(), style_class: theme+"-trackInfo-icon" });
+        this.icon = new St.Icon({ icon_name: icon.toString(), style_class: settings.theme+"-trackInfo-icon" });
         box.add_actor(this.icon);
-        this.label = new St.Label({ text: label.toString(), style_class: theme+"-trackInfo-text" });
+        this.label = new St.Label({ text: label.toString(), style_class: settings.theme+"-trackInfo-text" });
         box.add_actor(this.label);
         if ( tooltip ) {
             this.tooltip = new Tooltips.Tooltip(this.actor, label.toString());
-            this.tooltip._tooltip.add_style_class_name(theme+"-tooltip");
+            this.tooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
         }
     },
     
@@ -723,16 +749,16 @@ TrackInfo.prototype = {
 }
 
 
-function ControlButton(icon, theme, callback) {
-    this._init(icon, theme, callback);
+function ControlButton(icon, callback) {
+    this._init(icon, callback);
 }
 
 ControlButton.prototype = {
-    _init: function(icon, theme, callback) {
-        this.actor = new St.Bin({ style_class: theme+"-soundButton-box" });
-        this.button = new St.Button({ style_class: theme+"-soundButton" });
+    _init: function(icon, callback) {
+        this.actor = new St.Bin({ style_class: settings.theme+"-soundButton-box" });
+        this.button = new St.Button({ style_class: settings.theme+"-soundButton" });
         this.button.connect("clicked", callback);
-        this.icon = new St.Icon({ icon_type: St.IconType.SYMBOLIC, icon_name: icon, style_class: theme+"-soundButton-icon" });
+        this.icon = new St.Icon({ icon_type: St.IconType.SYMBOLIC, icon_name: icon, style_class: settings.theme+"-soundButton-icon" });
         this.button.set_child(this.icon);
         this.actor.add_actor(this.button);        
     },
@@ -747,18 +773,18 @@ ControlButton.prototype = {
 }
 
 
-function PlayerBar(title, image, theme) {
-    this._init(title, image, theme);
+function PlayerBar(title, image) {
+    this._init(title, image);
 }
 
 PlayerBar.prototype = {
-    _init: function(title, image, theme) {
+    _init: function(title, image) {
         
-        this.actor = new St.BoxLayout({ style_class: theme+"-playerInfoBar", vertical: false });
-        this.icon = new St.Bin({ style_class: theme+"-playerIcon" });
+        this.actor = new St.BoxLayout({ style_class: settings.theme+"-playerInfoBar", vertical: false });
+        this.icon = new St.Bin({ style_class: settings.theme+"-playerIcon" });
         this.actor.add_actor(this.icon);
         this.setImage(image);
-        this.title = new St.Label({ text: title, style_class: theme+"-playerTitleText" });
+        this.title = new St.Label({ text: title, style_class: settings.theme+"-playerTitleText" });
         this.actor.add_actor(this.title);
     },
     
@@ -777,12 +803,12 @@ PlayerBar.prototype = {
 }
 
 
-function Player(system_status_button, owner, theme) {
-    this._init(system_status_button, owner, theme);
+function Player(system_status_button, owner) {
+    this._init(system_status_button, owner);
 }
 
 Player.prototype = {
-    _init: function(system_status_button, owner, theme) {
+    _init: function(system_status_button, owner) {
         try {
             this.actor = new St.Bin();
             
@@ -803,56 +829,55 @@ Player.prototype = {
                 } 
             }));
             
-            this._buildLayout(theme);
+            this._buildLayout();
             
         } catch (e) {
             global.logError(e);
         }
     },
     
-    _buildLayout: function(theme) {
+    _buildLayout: function() {
         try {
             
-            this.theme = theme;
             this.actor.destroy_all_children();
             
             let mainBox = new St.BoxLayout({ vertical: true });
             this.actor.set_child(mainBox);
             
             //player bar
-            this.playerTitle = new PlayerBar(this._getName(), "player-stopped", theme);
+            this.playerTitle = new PlayerBar(this._getName(), "player-stopped");
             
             //track info
             let trackInfoContainer = new St.Bin({  });
             mainBox.add_actor(trackInfoContainer);
-            let trackInfoBox = new St.BoxLayout({ vertical: true, style_class: theme+"-trackInfoBox" });
+            let trackInfoBox = new St.BoxLayout({ vertical: true, style_class: settings.theme+"-trackInfoBox" });
             trackInfoContainer.set_child(trackInfoBox);
             
-            this._title = new TrackInfo(_("Unknown Title"), "audio-x-generic", theme, true);
+            this._title = new TrackInfo(_("Unknown Title"), "audio-x-generic", true);
             trackInfoBox.add_actor(this._title.actor);
-            this._album = new TrackInfo(_("Unknown Album"), "media-optical", theme, true);
+            this._album = new TrackInfo(_("Unknown Album"), "media-optical", true);
             trackInfoBox.add_actor(this._album.actor);
-            this._artist = new TrackInfo(_("Unknown Artist"), "system-users", theme, true);
+            this._artist = new TrackInfo(_("Unknown Artist"), "system-users", true);
             trackInfoBox.add_actor(this._artist.actor);
             
             //album image
             this._trackCoverFile = this._trackCoverFileTmp = false;
-            this._trackCover = new St.Bin({ style_class: theme+"-albumCover-box" });
-            this._trackCover.set_child(new St.Icon({ icon_name: "media-optical-cd-audio", style_class: theme+"-albumCover", icon_type: St.IconType.FULLCOLOR }));
+            this._trackCover = new St.Bin({ style_class: settings.theme+"-albumCover-box" });
+            this._trackCover.set_child(new St.Icon({ icon_name: "media-optical-cd-audio", style_class: settings.theme+"-albumCover", icon_type: St.IconType.FULLCOLOR }));
             mainBox.add_actor(this._trackCover);
             
             //seek controls
-            this._seekControls = new St.Bin({ style_class: theme+"-timeBox" });
+            this._seekControls = new St.Bin({ style_class: settings.theme+"-timeBox" });
             mainBox.add_actor(this._seekControls);
             this.seekControls = new St.BoxLayout({ vertical: true });
             this._seekControls.set_child(this.seekControls);
             
             let timeBin = new St.Bin({ x_align: St.Align.MIDDLE });
             this.seekControls.add_actor(timeBin);
-            this._time = new TrackInfo("0:00 / 0:00", "document-open-recent", theme, false);
+            this._time = new TrackInfo("0:00 / 0:00", "document-open-recent", false);
             timeBin.add_actor(this._time.actor);
             
-            this._positionSlider = new Slider(0, theme);
+            this._positionSlider = new Slider(0);
             this.seekControls.add_actor(this._positionSlider.actor);
             
             this._time.actor.connect("clicked", Lang.bind(this, function() {
@@ -873,58 +898,58 @@ Player.prototype = {
             }));
             
             //control buttons
-            this._trackControls = new St.Bin({ style_class: theme+"-buttonBox", x_align: St.Align.MIDDLE });
+            this._trackControls = new St.Bin({ style_class: settings.theme+"-buttonBox", x_align: St.Align.MIDDLE });
             mainBox.add_actor(this._trackControls);
             this.controls = new St.BoxLayout();
             this._trackControls.set_child(this.controls);
             
-            this._prevButton = new ControlButton("media-skip-backward", theme, Lang.bind(this, function() {
+            this._prevButton = new ControlButton("media-skip-backward", Lang.bind(this, function() {
                 this._mediaServerPlayer.PreviousRemote();
             }));
             this._prevButtonTooltip = new Tooltips.Tooltip(this._prevButton.button, _("Previous"));
-            this._prevButtonTooltip._tooltip.add_style_class_name(this.theme+"-tooltip");
+            this._prevButtonTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
             this.controls.add_actor(this._prevButton.getActor());
             
-            this._playButton = new ControlButton("media-playback-start", theme, Lang.bind(this, function() {
+            this._playButton = new ControlButton("media-playback-start", Lang.bind(this, function() {
                 this._mediaServerPlayer.PlayPauseRemote();
             }));
             this._playButtonTooltip = new Tooltips.Tooltip(this._playButton.button, _("Play"));
-            this._playButtonTooltip._tooltip.add_style_class_name(this.theme+"-tooltip");
+            this._playButtonTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
             this.controls.add_actor(this._playButton.getActor());
             
-            this._stopButton = new ControlButton("media-playback-stop", theme, Lang.bind(this, function() {
+            this._stopButton = new ControlButton("media-playback-stop", Lang.bind(this, function() {
                 this._mediaServerPlayer.StopRemote();
             }));
             this._stopButtonTooltip = new Tooltips.Tooltip(this._stopButton.button, _("Stop"));
-            this._stopButtonTooltip._tooltip.add_style_class_name(this.theme+"-tooltip");
+            this._stopButtonTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
             this.controls.add_actor(this._stopButton.getActor());
             
-            this._nextButton = new ControlButton("media-skip-forward", theme, Lang.bind(this, function() {
+            this._nextButton = new ControlButton("media-skip-forward", Lang.bind(this, function() {
                 this._mediaServerPlayer.NextRemote();
             }));
             this._nextButtonTooltip = new Tooltips.Tooltip(this._nextButton.button, _("Next"));
-            this._nextButtonTooltip._tooltip.add_style_class_name(this.theme+"-tooltip");
+            this._nextButtonTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
             this.controls.add_actor(this._nextButton.getActor());
             
             this._mediaServer.getRaise(Lang.bind(this, function(sender, raise) {
                 if ( raise ) {
-                    this._raiseButton = new ControlButton("go-up", theme, Lang.bind(this, function() {
+                    this._raiseButton = new ControlButton("go-up", Lang.bind(this, function() {
                         this._mediaServer.RaiseRemote();// this._system_status_button.menu.actor.hide();
                     }));
                     this._raiseButtonTooltip = new Tooltips.Tooltip(this._raiseButton.button, _("Open Player"));
-                    this._raiseButtonTooltip._tooltip.add_style_class_name(this.theme+"-tooltip");
+                    this._raiseButtonTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
                     this.controls.add_actor(this._raiseButton.getActor());
                 }
             }));
             
             this._mediaServer.getQuit(Lang.bind(this, function(sender, quit) {
                 if ( quit ) {
-                    this._quitButton = new ControlButton("window-close", theme, Lang.bind(this, function() {
+                    this._quitButton = new ControlButton("window-close", Lang.bind(this, function() {
                         this._mediaServer.QuitRemote();
                     }));
                     this.controls.add_actor(this._quitButton.getActor());
                     this._quitButtonTooltip = new Tooltips.Tooltip(this._quitButton.button, _("Quit Player"));
-                    this._quitButtonTooltip._tooltip.add_style_class_name(this.theme+"-tooltip");
+                    this._quitButtonTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
                 }
             }));
             
@@ -960,12 +985,12 @@ Player.prototype = {
         this.playerTitle.actor.destroy();
     },
     
-    updateTheme: function(theme) {
+    updateTheme: function() {
         if ( this._timeoutId != 0 ) {
             Mainloop.source_remove(this._timeoutId);
             this._timeoutId = 0;
         }
-        this._buildLayout(theme);
+        this._buildLayout();
     },
     
     _getName: function() {
@@ -1156,7 +1181,7 @@ Player.prototype = {
     _showCover: function(cover_path) {
         try {
         if ( ! cover_path || ! GLib.file_test(cover_path, GLib.FileTest.EXISTS) ) {
-            this._trackCover.set_child(new St.Icon({ icon_name: "media-optical-cd-audio", style_class: this.theme+"albumCover", icon_type: St.IconType.FULLCOLOR }));
+            this._trackCover.set_child(new St.Icon({ icon_name: "media-optical-cd-audio", style_class: settings.theme+"albumCover", icon_type: St.IconType.FULLCOLOR }));
         }
         else {
             let l = new Clutter.BinLayout();
@@ -1190,10 +1215,8 @@ myDesklet.prototype = {
             Desklet.Desklet.prototype._init.call(this, metadata);
             desklet_drag_object = this._draggable;
             
-            this.settings = new Settings.DeskletSettings(this, metadata["uuid"], desklet_id);
-            this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this._setTheme);
-            this.settings.bindProperty(Settings.BindingDirection.IN, "showApps", "showApps", this._setAppHideState);
-            this.settings.bindProperty(Settings.BindingDirection.IN, "exceedNormVolume", "exceedNormVolume", this.updateVolume);
+            settings = new SettingsInterface(metadata["uuid"], desklet_id);
+            settings.connect("que-rebuild", Lang.bind(this, this.rebuild));
             
             this._menu.addSettingsAction(_("Sound Settings"), "sound");
             
@@ -1235,7 +1258,7 @@ myDesklet.prototype = {
     _build_interface: function() {
         if ( this.mainBox ) this.mainBox.destroy();
         
-        this.mainBox = new St.BoxLayout({ style_class: this.theme+"-mainBox", vertical: true });
+        this.mainBox = new St.BoxLayout({ style_class: settings.theme+"-mainBox", vertical: true });
         this.setContent(this.mainBox);
         
         let topBin = new St.Bin({ x_align: St.Align.MIDDLE });
@@ -1243,42 +1266,42 @@ myDesklet.prototype = {
         let topBox = new St.BoxLayout({ vertical: false });
         topBin.add_actor(topBox);
         
-        this.playerLauncher = new ButtonMenu(new St.Label({ text: _("Launch Player"), style_class: this.theme+"-buttonText" }), this.theme);
+        this.playerLauncher = new ButtonMenu(new St.Label({ text: _("Launch Player"), style_class: settings.theme+"-buttonText" }));
         topBox.add_actor(this.playerLauncher.actor);
         
-        let divider = new Divider(this.theme);
+        let divider = new Divider();
         this.mainBox.add_actor(divider.actor);
         
         //volume controls
         let volumeBin = new St.Bin({ x_align: St.Align.MIDDLE });
         this.mainBox.add_actor(volumeBin);
-        let volumeBox = new St.BoxLayout({ vertical: true, style_class: this.theme+"-volumeBox" });
+        let volumeBox = new St.BoxLayout({ vertical: true, style_class: settings.theme+"-volumeBox" });
         volumeBin.add_actor(volumeBox);
         
         //volume text
         let volumeTextBin = new St.Bin({ x_align: St.Align.MIDDLE });
         volumeBox.add_actor(volumeTextBin);
-        let volumeTitleBox = new St.BoxLayout({ vertical: false, style_class: this.theme+"-volumeTextBox" });
+        let volumeTitleBox = new St.BoxLayout({ vertical: false, style_class: settings.theme+"-volumeTextBox" });
         volumeTextBin.add_actor(volumeTitleBox);
         
-        let volumeLabel = new St.Label({ text: _("Volume: "), style_class: this.theme+"-text" });
+        let volumeLabel = new St.Label({ text: _("Volume: "), style_class: settings.theme+"-text" });
         volumeTitleBox.add_actor(volumeLabel);
-        this.volumeValueText = new St.Label({ text: Math.floor(100*this.volume) + "%", style_class: this.theme+"-text" });
+        this.volumeValueText = new St.Label({ text: Math.floor(100*this.volume) + "%", style_class: settings.theme+"-text" });
         volumeTitleBox.add_actor(this.volumeValueText);
         
         //volume slider
         let volumeSliderBox = new St.BoxLayout({ vertical: false });
         volumeBox.add_actor(volumeSliderBox);
-        this.volumeIcon = new St.Icon({ icon_name: "audio-volume-high", style_class: this.theme+"-volumeIcon" });
-        let volumeButton = new St.Button({ style_class: this.theme+"-volumeButton" });
+        this.volumeIcon = new St.Icon({ icon_name: "audio-volume-high", style_class: settings.theme+"-volumeIcon" });
+        let volumeButton = new St.Button({ style_class: settings.theme+"-volumeButton" });
         volumeButton.set_child(this.volumeIcon);
         this.muteTooltip = new Tooltips.Tooltip(volumeButton);
-        this.muteTooltip._tooltip.add_style_class_name(this.theme+"-tooltip");
+        this.muteTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
         volumeSliderBox.add_actor(volumeButton);
         
         let volumeSliderBin = new St.Bin();
         volumeSliderBox.add_actor(volumeSliderBin);
-        this.volumeSlider = new Slider(this.volume, this.theme);
+        this.volumeSlider = new Slider(this.volume);
         volumeSliderBin.add_actor(this.volumeSlider.actor);
         
         volumeButton.connect("clicked", Lang.bind(this, this._toggleMute));
@@ -1287,30 +1310,30 @@ myDesklet.prototype = {
         //application volume controls
         this.appBox = new St.BoxLayout({ vertical: true });
         this.mainBox.add_actor(this.appBox);
-        if ( !this.showApps ) this.appBox.hide();
+        if ( !settings.showApps ) this.appBox.hide();
         
-        this.playersContainer = new St.BoxLayout({ vertical: true, style_class: this.theme+"-playerBox" });
+        this.playersContainer = new St.BoxLayout({ vertical: true, style_class: settings.theme+"-playerBox" });
         this.mainBox.add_actor(this.playersContainer);
         this.playersContainer.hide();
         
-        let divider = new Divider(this.theme);
+        let divider = new Divider();
         this.playersContainer.add_actor(divider.actor);
         
         //player title
-        let titleBin = new St.Bin({ x_align: St.Align.MIDDLE, style_class: this.theme+"-titleBar" });
+        let titleBin = new St.Bin({ x_align: St.Align.MIDDLE, style_class: settings.theme+"-titleBar" });
         this.playersContainer.add_actor(titleBin);
         this.playerTitleBox = new St.BoxLayout({ vertical: false });
         titleBin.add_actor(this.playerTitleBox);
         
-        this.playerBack = new St.Button({ style_class: this.theme+"-playerSelectButton", child: new St.Icon({ icon_name: "media-playback-start-rtl", icon_size: 16 }) });
+        this.playerBack = new St.Button({ style_class: settings.theme+"-playerSelectButton", child: new St.Icon({ icon_name: "media-playback-start-rtl", icon_size: 16 }) });
         this.playerTitleBox.add_actor(this.playerBack);
         this.playerBack.hide();
         
-        this.playerTitle = new St.Bin({ style_class: this.theme+"-titleBox" });
+        this.playerTitle = new St.Bin({ style_class: settings.theme+"-titleBox" });
         this.playerTitleBox.add_actor(this.playerTitle);
         this.playerTitle.set_alignment(St.Align.MIDDLE, St.Align.MIDDLE)
         
-        this.playerForward = new St.Button({ style_class: this.theme+"-playerSelectButton", child: new St.Icon({ icon_name: "media-playback-start", icon_size: 16 }) });
+        this.playerForward = new St.Button({ style_class: settings.theme+"-playerSelectButton", child: new St.Icon({ icon_name: "media-playback-start", icon_size: 16 }) });
         this.playerTitleBox.add_actor(this.playerForward);
         this.playerForward.hide();
         
@@ -1342,7 +1365,7 @@ myDesklet.prototype = {
         this.refresh_players();
     },
     
-    _setTheme: function() {
+    rebuild: function() {
         this.playersBox.set_child(null);
         this.playerTitle.set_child(null);
         this._build_interface();
@@ -1351,7 +1374,7 @@ myDesklet.prototype = {
         this._reloadApps();
         for ( let i = 0; i < this.owners.length; i++ ) {
             let owner = this.owners[i];
-            this.players[owner].updateTheme(this.theme);
+            this.players[owner].updateTheme(settings.theme);
         }
         
         this._showPlayer(this.players[this.playerShown]);
@@ -1359,7 +1382,7 @@ myDesklet.prototype = {
     },
     
     _setAppHideState: function() {
-        if ( this.showApps ) this.appBox.show();
+        if ( settings.showApps ) this.appBox.show();
         else this.appBox.hide();
     },
     
@@ -1373,7 +1396,7 @@ myDesklet.prototype = {
         }
         else {
             this.volume = this._output.volume / this.normVolume;
-            if ( this.exceedNormVolume ) this.volumeSlider.setValue(this._output.volume/this.maxVolume);
+            if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this._output.volume/this.maxVolume);
             else this.volumeSlider.setValue(this.volume);
             this.volumeValueText.text = Math.floor(100 * this.volume) + "%";
             this.volumeIcon.icon_name = null;
@@ -1395,7 +1418,7 @@ myDesklet.prototype = {
             
             this.volumeValueText.text = Math.floor(100 * this.volume) + "%";
             this.volumeIcon.icon_name = null;
-            if ( this.exceedNormVolume ) this.volumeSlider.setValue(this._output.volume/this.maxVolume);
+            if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this._output.volume/this.maxVolume);
             else this.volumeSlider.setValue(this.volume);
             
             if ( this.volume <= 0 ) this.volumeIcon.icon_name = "audio-volume-muted";
@@ -1463,7 +1486,7 @@ myDesklet.prototype = {
     
     _sliderChanged: function(slider, value) {
         let volume;
-        if ( this.exceedNormVolume ) volume = value * this.maxVolume;
+        if ( settings.exceedNormVolume ) volume = value * this.maxVolume;
         else volume = value * this.normVolume;
         let prev_muted = this._output.is_muted;
         if ( volume < 1 ) {
@@ -1485,7 +1508,7 @@ myDesklet.prototype = {
     _addPlayer: function(owner) {
         try {
             
-            this.players[owner] = new Player(this, owner, this.theme);
+            this.players[owner] = new Player(this, owner);
             this.owners.push(owner);
             if ( this.playerShown == null ) this._showPlayer(this.players[owner]);
             
@@ -1559,7 +1582,7 @@ myDesklet.prototype = {
         for ( let i = 0; i < streams.length; i++ ) {
             let output = streams[i]
             if ( output.get_application_id() != "org.Cinnamon" ) {
-                let app = new AppControl(output, this.normVolume, this.theme);
+                let app = new AppControl(output, this.normVolume);
                 this.appBox.add_actor(app.actor);
                 this.apps.push(app);
             }

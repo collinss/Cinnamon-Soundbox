@@ -11,6 +11,23 @@
         "default": false
     },
     
+    "showArt": {
+        "type": "checkbox",
+        "description": "Show album artwork",
+        "default": true
+    },
+    
+    "appearance": {
+        "type": "header",
+        "description": "Appearance"
+    },
+    
+    "compact": {
+        "type": "checkbox",
+        "description": "Use compact layout",
+        "default": false
+    },
+    
     "theme": {
         "type": "radiogroup",
         "description": "Theme",
