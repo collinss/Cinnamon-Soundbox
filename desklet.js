@@ -139,7 +139,12 @@ let compatible_players = [
     "smplayer",
     "tomahawk",
     "musique",
-    "potamus"
+    "potamus", //Just launches
+    'bmp',  
+    'atunes', 
+    'muine', 
+    'xmms',
+    'totem' //Just launches
 ];
 
 let support_seek = [
@@ -155,7 +160,6 @@ let support_seek = [
     "gmusicbrowser",
     "spotify",
     "vlc",
-    "beatbox",
     "gnome-mplayer",
     "qmmp",
     "deadbeef",
