@@ -163,6 +163,7 @@ let support_seek = [
     "gnome-mplayer",
     "qmmp",
     "deadbeef",
+    "audacious",
 ];
 
 let desklet_drag_object;
