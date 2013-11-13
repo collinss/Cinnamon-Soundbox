@@ -378,6 +378,7 @@ Slider.prototype = {
             this._value = Math.max(Math.min(value, 1), 0);
             
             this.actor = new St.DrawingArea({ style_class: settings.theme+"-slider", reactive: true });
+            if ( settings.compact ) this.actor.add_style_pseudo_class("compact");
             this.actor.connect("repaint", Lang.bind(this, this._sliderRepaint));
             this.actor.connect("button-press-event", Lang.bind(this, this._startDragging));
             this.actor.connect("scroll-event", Lang.bind(this, this._onScrollEvent));
@@ -558,7 +559,7 @@ Slider.prototype = {
         this.emit("value-changed", this._value);
     },
     
-    get value() {
+    get_value: function() {
         return this._value;
     },
     
@@ -935,8 +936,8 @@ Player.prototype = {
                 this.countUp = !this.countUp;
                 this._setTimeText();
             }));
-            this._positionSlider.connect("value-changed", Lang.bind(this, function(item) {
-                this._currentTime = item._value * this._songLength;
+            this._positionSlider.connect("value-changed", Lang.bind(this, function(item, value) {
+                this._currentTime = value * this._songLength;
                 this._setTimeText();
                 this._wantedSeekValue = Math.round(this._currentTime * 1000000);
                 this._mediaServerPlayer.SetPositionRemote(this._trackObj, this._currentTime * 1000000);
@@ -949,11 +950,11 @@ Player.prototype = {
             }));
             
             //control buttons
-            this.trackControls = new St.Bin({ style_class: settings.theme+"-buttonBox", x_align: St.Align.MIDDLE });
+            this.trackControls = new St.Bin({ x_align: St.Align.MIDDLE });
             mainBox.add_actor(this.trackControls);
-            this.compactibleElements.push(this.trackControls);
-            this.controls = new St.BoxLayout();
+            this.controls = new St.BoxLayout({ style_class: settings.theme+"-buttonBox" });
             this.trackControls.set_child(this.controls);
+            this.compactibleElements.push(this.controls);
             
             this._prevButton = new ControlButton("media-skip-backward", Lang.bind(this, function() {
                 this._mediaServerPlayer.PreviousRemote();

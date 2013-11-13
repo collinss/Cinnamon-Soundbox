@@ -107,7 +107,7 @@
 .ice-albumCover {
     border: 1px solid #1991E8;
     border-radius: 5px 5px 5px 5px;
-    icon_size: 200px;
+    icon-size: 200px;
     width: 200px;
     height: 200px;
 }
@@ -195,3 +195,101 @@
     -arrow-border-color: rgba(0,0,0,0);
     -arrow-background-color: rgba(0,0,0,0);
 }
+
+/*compact*/
+.ice-mainBox:compact {
+    padding: 0px 0px 0px 0px;
+}
+
+.ice-buttonMenu:compact {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    padding: 1px 0px 1px 0px;
+    border-radius: 0px;
+}
+
+.ice-divider:compact {
+    background-color: transparent;
+    height: 0px;
+}
+
+.ice-divider-box:compact {
+    padding: 0px;
+}
+
+.ice-volumeButton:compact {
+    padding: 0px 2px 2px 2px;
+}
+
+.ice-volumeIcon:compact {
+    icon-size: 14px;
+}
+
+.ice-slider:compact {
+    height: 10px;
+    min-width: 175px;
+    -slider-height: 2px;
+    -slider-active-height: 2px;
+    -slider-handle-height: 5px;
+}
+
+.ice-appBox:compact {
+    
+}
+
+.ice-appTitleBox:compact {
+    
+}
+
+.ice-appIcon:compact {
+    icon-size: 1em;
+}
+
+.ice-titleBar:compact {
+    
+}
+
+.ice-playerIcon:compact {
+    
+}
+
+.ice-trackInfoBox:compact {
+    padding: 0px;
+}
+
+.ice-trackInfo:compact {
+    padding: 0px;
+}
+
+.ice-trackInfo-icon:compact {
+    icon-size: 1em;
+}
+
+.ice-timeBox:compact {
+    padding: 0px;
+}
+
+.ice-buttonBox:compact{
+    padding: 0px 2px 0px 2px;
+    border: solid 1px #1991E8;
+    border-radius: 5px 5px 5px 5px;
+}
+
+.ice-soundButton:compact {
+    border: none;
+    height: 16px;
+    width: 16px;
+}
+
+.ice-soundButton-box:compact {
+    padding: 0px;
+}
+
+.ice-soundButton-icon:compact {
+    
+}
+
+
+
+

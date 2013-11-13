@@ -205,3 +205,116 @@
     -arrow-border-color: rgba(0,0,0,0);
     -arrow-background-color: rgba(0,0,0,0);
 }
+
+/*compact*/
+.ghost-mainBox:compact {
+    padding: 0px 0px 0px 0px;
+    /*border-radius: 0px 0px 0px 0px;*/
+    /*background-color: red;*/
+}
+
+.ghost-buttonMenu:compact {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    padding: 1px 0px 1px 0px;
+    border-radius: 0px;
+}
+
+.ghost-divider:compact {
+    background-color: transparent;
+    height: 0px;
+}
+
+.ghost-divider-box:compact {
+    padding: 0px;
+}
+
+.ghost-volumeButton:compact {
+    padding: 0px 2px 2px 2px;
+}
+
+.ghost-volumeIcon:compact {
+    icon-size: 14px;
+}
+
+.ghost-slider:compact {
+    height: 1em;
+    min-width: 120px;
+    /*-slider-background-color: #5e5e5e;*/
+    /*-slider-border-color: #5e5e5e;*/
+    /*-slider-active-background-color: #fff;*/
+    /*-slider-active-border-color: #fff;*/
+    -slider-height: 2px;
+    -slider-border-width: 2px;
+    -slider-active-height: 2px;
+    -slider-active-border-width: 2px;
+    -slider-handle-radius: 4px;
+    /*-slider-handle-height: 0px;*/
+    /*-slider-handle-width: 0px;*/
+}
+
+.ghost-appBox:compact {
+    
+}
+
+.ghost-appTitleBox:compact {
+    
+}
+
+.ghost-appIcon:compact {
+    icon-size: 1em;
+}
+
+.ghost-titleBar:compact {
+    border-radius: 0px;
+}
+
+.ghost-playerIcon:compact {
+    
+}
+
+.ghost-trackInfoBox:compact {
+    padding: 0px 0px 0px 0px;
+}
+
+.ghost-trackInfo:compact {
+    padding: 0px;
+}
+
+.ghost-trackInfo-icon:compact {
+    icon-size: 1em;
+}
+
+.ghost-albumCover:compact {
+    border-radius: 0px;
+    border-left: 0px;
+    border-right: 0px;
+}
+
+.ghost-timeBox:compact {
+    padding: 0px;
+}
+
+.ghost-buttonBox:compact {
+    padding: 0px;
+}
+
+.ghost-soundButton:compact {
+    padding: 0px 3px 0px 3px;
+    /*border: solid 1px #444;*/
+    border-bottom: none;
+    border-radius: 0px;
+    height: 16px;
+    width: 16px;
+}
+
+.ghost-soundButton-box:compact {
+    padding: 0px;
+}
+
+.ghost-soundButton-icon:compact {
+    
+}
+
+

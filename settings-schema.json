@@ -11,12 +11,6 @@
         "default": false
     },
     
-    "showArt": {
-        "type": "checkbox",
-        "description": "Show album artwork",
-        "default": true
-    },
-    
     "appearance": {
         "type": "header",
         "description": "Appearance"
@@ -28,14 +22,19 @@
         "default": false
     },
     
+    "showArt": {
+        "type": "checkbox",
+        "description": "Show album artwork",
+        "default": true
+    },
+    
     "theme": {
         "type": "radiogroup",
         "description": "Theme",
         "default": "clean",
         "options": {
             "Clean": "clean",
-            "Transparent": "trans",
-            "Compact": "compact",
+            "Shadow": "shadow",
             "Ghost": "ghost",
             "Ice": "ice",
             "Use Theme Default (not supported by all themes)": "soundbox"
