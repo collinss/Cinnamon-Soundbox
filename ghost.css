@@ -1,7 +1,6 @@
 /*ghost theme*/
 .ghost-mainBox {
     border: 1px solid #A3A3A3;
-    /*border-radius: 5px 5px 5px 5px;*/
     padding: 10px;
     background-color: #000000;
 }
@@ -13,7 +12,6 @@
 }
 
 .ghost-buttonMenu:hover {
-    /*background-color: #444;*/
     background-gradient-direction: vertical;
     background-gradient-start: #111111;
     background-gradient-end: #353535;
@@ -111,9 +109,6 @@
     color: #A3A3A3;
 }
 
-.ghost-albumCover-box {
-}
-
 .ghost-albumCover {
     border: 1px solid #000000;
     border-radius: 5px 5px 5px 5px;
@@ -175,6 +170,7 @@
 }
 
 #Tooltip.ghost-tooltip {
+    font-size: 12px;
     border-image: none;
     color: #A3A3A3;
     border: solid 1px #A3A3A3;
@@ -209,8 +205,6 @@
 /*compact*/
 .ghost-mainBox:compact {
     padding: 0px 0px 0px 0px;
-    /*border-radius: 0px 0px 0px 0px;*/
-    /*background-color: red;*/
 }
 
 .ghost-buttonMenu:compact {
@@ -241,25 +235,11 @@
 .ghost-slider:compact {
     height: 1em;
     min-width: 120px;
-    /*-slider-background-color: #5e5e5e;*/
-    /*-slider-border-color: #5e5e5e;*/
-    /*-slider-active-background-color: #fff;*/
-    /*-slider-active-border-color: #fff;*/
     -slider-height: 2px;
     -slider-border-width: 2px;
     -slider-active-height: 2px;
     -slider-active-border-width: 2px;
     -slider-handle-radius: 4px;
-    /*-slider-handle-height: 0px;*/
-    /*-slider-handle-width: 0px;*/
-}
-
-.ghost-appBox:compact {
-    
-}
-
-.ghost-appTitleBox:compact {
-    
 }
 
 .ghost-appIcon:compact {
@@ -268,10 +248,6 @@
 
 .ghost-titleBar:compact {
     border-radius: 0px;
-}
-
-.ghost-playerIcon:compact {
-    
 }
 
 .ghost-trackInfoBox:compact {
@@ -302,7 +278,6 @@
 
 .ghost-soundButton:compact {
     padding: 0px 3px 0px 3px;
-    /*border: solid 1px #444;*/
     border-bottom: none;
     border-radius: 0px;
     height: 16px;
@@ -312,9 +287,3 @@
 .ghost-soundButton-box:compact {
     padding: 0px;
 }
-
-.ghost-soundButton-icon:compact {
-    
-}
-
-

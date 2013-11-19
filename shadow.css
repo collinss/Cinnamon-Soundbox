@@ -11,7 +11,10 @@
     border-radius: 5px 5px 5px 5px;
     color: #021544;
     padding: 7px;
-    shadowition-duration: 150;
+}
+
+.shadow-buttonMenu:hover {
+    background-color: rgba(32, 58, 119, 0.25);
 }
 
 .shadow-divider {
@@ -48,10 +51,8 @@
     -slider-handle-border-width: 0px;
     -slider-height: 6px;
     -slider-background-color: #203A77;
-    /*-slider-border-width: 0px;*/
     -slider-active-height: 6px;
     -slider-active-background-color: #021544;
-    /*-slider-active-border-width: 0px;*/
     height: 10px;
     min-width: 175px;
 }
@@ -85,15 +86,11 @@
 
 .shadow-trackInfo {
     padding: 3px 0px 5px 0px;
-    
 }
 
 .shadow-trackInfo-icon {
     icon-size: 1em;
     color: #021544;
-}
-
-.shadow-albumCover-box {
 }
 
 .shadow-albumCover {
@@ -119,6 +116,10 @@
     width: 25px;
     height: 20px;
     padding: 3px 3px 3px 3px;
+}
+
+.shadow-soundButton:hover {
+    background-color: rgba(32, 58, 119, 0.25);
 }
 
 .shadow-soundButton-icon {
@@ -147,11 +148,12 @@
 }
 
 #Tooltip.shadow-tooltip {
+    font-size: 12px;
     border-image: none;
     color: #021544;
     border: solid 1px #021544;
     border-radius: 5px 5px 5px 5px;
-    background-color: rgba(69, 76, 94, 0.9);
+    background-color: rgba(136, 146, 170, 0.9);
     padding: 4px 16px 4px 16px;
     background-gradient-direction: none;
 }
@@ -162,7 +164,7 @@
     color: #021544;
     border: solid 1px #021544;
     border-radius: 5px 5px 5px 5px;
-    background-color: rgba(69, 76, 94, 0.9);
+    background-color: rgba(136, 146, 170, 0.9);
     padding: 4px 12px 4px 12px;
 }
 
@@ -181,8 +183,6 @@
 /*compact*/
 .shadow-mainBox:compact {
     padding: 0px 0px 0px 0px;
-    /*border-radius: 0px 0px 0px 0px;*/
-    /*background-color: red;*/
 }
 
 .shadow-buttonMenu:compact {
@@ -194,7 +194,7 @@
 }
 
 .shadow-divider:compact {
-    background-color: shadowparent;
+    background-color: transparent;
     height: 0px;
 }
 
@@ -210,38 +210,8 @@
     icon-size: 14px;
 }
 
-/*.shadow-slider:compact {*/
-/*    -slider-handle-radius: 0px;*/
-/*    -slider-handle-height: 10px;*/
-/*    -slider-handle-width: 10px;*/
-/*    -slider-handle-color: #333;*/
-/*    -slider-handle-border-width: 0px;*/
-/*    -slider-height: 10px;*/
-/*    -slider-border-color: #333;*/
-/*    -slider-border-width: 1px;*/
-/*    -slider-active-height: 10px;*/
-/*    -slider-active-border-color: #333;*/
-/*    -slider-active-border-width: 1px;*/
-/*}*/
-
-.shadow-appBox:compact {
-    
-}
-
-.shadow-appTitleBox:compact {
-    
-}
-
 .shadow-appIcon:compact {
     icon-size: 1em;
-}
-
-.shadow-titleBar:compact {
-    
-}
-
-.shadow-playerIcon:compact {
-    
 }
 
 .shadow-trackInfoBox:compact {
@@ -261,14 +231,10 @@
 }
 
 .shadow-soundButton:compact {
-    height: 16px;
+    height: 14px;
     width: 16px;
 }
 
 .shadow-soundButton-box:compact {
-    padding: 0px;
-}
-
-.shadow-soundButton-icon:compact {
-    
+    padding: 2px;
 }

@@ -29,14 +29,16 @@
     },
     
     "theme": {
-        "type": "radiogroup",
+        "type": "combobox",
         "description": "Theme",
-        "default": "clean",
+        "default": "mint",
         "options": {
+            "Mint": "mint",
             "Clean": "clean",
             "Shadow": "shadow",
             "Ghost": "ghost",
             "Ice": "ice",
+            "Forest": "forest",
             "Use Theme Default (not supported by all themes)": "soundbox"
         }
     }

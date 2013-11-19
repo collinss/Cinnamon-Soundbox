@@ -1,6 +1,6 @@
 /*clean theme*/
 .clean-mainBox {
-    border: 1px solid #515151;
+    border: 1px solid #000;
     border-radius: 5px 5px 5px 5px;
     padding: 10px;
     background-color: #ddd;
@@ -16,6 +16,10 @@
     background-color: #eee;
 }
 
+.clean-buttonMenu:active {
+    background-color: #fff;
+}
+
 .clean-divider {
     background-color: rgb(17,17,17);
     border-radius: 5px;
@@ -25,12 +29,12 @@
 }
 
 .clean-divider-box {
-    color: #000000;
+    color: #000;
     padding: 10px 5px 10px 5px;
 }
 
 .clean-text, .clean-buttonText, .clean-appTitle, .clean-playerTitleText, .clean-trackInfo-text {
-    color: #444;
+    color: #000;
 }
 
 .clean-trackInfo-text {
@@ -43,25 +47,24 @@
 
 .clean-volumeIcon {
     icon-size: 16px;
-    color: #555;
+    color: #000;
 }
 
 .clean-slider {
-    height: 20px;
+    height: 16px;
     min-width: 180px;
-    -slider-background-color: #fff;
-    -slider-border-color: #000000;
+    -slider-background-color: #000;
+    -slider-border-color: #000;
     -slider-active-background-color: #fff;
-    -slider-active-border-color: #000000;
-    -slider-height: 10px;
+    -slider-active-border-color: #fff;
+    -slider-height: 4px;
     -slider-border-width: 1px;
-    -slider-active-height: 10px;
+    -slider-active-height: 4px;
     -slider-active-border-width: 1px;
-    -slider-handle-height: 16px;
-    -slider-handle-width: 10px;
-    -slider-handle-color: #aaa;
-    -slider-handle-border-width: 1px;
-    -slider-handle-border-color: #000000;
+    -slider-handle-radius: 7px;
+    -slider-handle-color: #999;
+    -slider-handle-border-width: .5px;
+    -slider-handle-border-color: #999;
 }
 
 .clean-appIcon {
@@ -92,15 +95,12 @@
 }
 
 .clean-trackInfo-icon {
-    icon-size: 1.4em;
-    color: #555;
-}
-
-.clean-albumCover-box {
+    icon-size: 1.2em;
+    color: #000;
 }
 
 .clean-albumCover {
-    border: 1px solid #000000;
+    border: 1px solid #000;
     border-radius: 5px 5px 5px 5px;
     icon-size: 200px;
     width: 200px;
@@ -113,7 +113,6 @@
 
 .clean-buttonBox {
     padding: 5px 5px 5px 5px;
-    
 }
 
 .clean-soundButton-box {
@@ -132,9 +131,13 @@
     background-color: #eee;
 }
 
+.clean-soundButton:active {
+    background-color: #fff;
+}
+
 .clean-soundButton-icon {
     icon-size: 16px;
-    color: #555;
+    color: #000;
 }
 
 #clean-popup-menuitem {
@@ -152,15 +155,16 @@
     border-image: none ;
     border: none;
     text-shadow: 0px 0px 0px 0px;
-    color: #444;
+    color: #000;
     background-gradient-direction: none;
     background-color: #eee;
 }
 
 #Tooltip.clean-tooltip {
+    font-size: 12px;
     border-image: none;
-    color: #444;
-    border: 1px solid #444;
+    color: #000;
+    border: 1px solid #000;
     border-radius: 5px 5px 5px 5px;
     background-color: #ddd;
     padding: 4px 15px 4px 12px;
@@ -170,8 +174,8 @@
 #clean-popup {
     border-image: none;
     text-shadow: 0px 0px 0px 0px;
-    color: #444;
-    border: 1px solid #444;
+    color: #000;
+    border: 1px solid #000;
     border-radius: 5px 5px 5px 5px;
     background-color: #ddd;
     padding: 4px 12px 4px 12px;
@@ -192,8 +196,6 @@
 /*compact*/
 .clean-mainBox:compact {
     padding: 0px 0px 0px 0px;
-    /*border-radius: 0px 0px 0px 0px;*/
-    /*background-color: red;*/
 }
 
 .clean-buttonMenu:compact {
@@ -236,24 +238,12 @@
     -slider-handle-width: 0px;
 }
 
-.clean-appBox:compact {
-    
-}
-
-.clean-appTitleBox:compact {
-    
-}
-
 .clean-appIcon:compact {
     icon-size: 1em;
 }
 
 .clean-titleBar:compact {
     border-radius: 0px;
-}
-
-.clean-playerIcon:compact {
-    
 }
 
 .clean-trackInfoBox:compact {
@@ -294,10 +284,3 @@
 .clean-soundButton-box:compact {
     padding: 0px;
 }
-
-.clean-soundButton-icon:compact {
-    
-}
-
-
-

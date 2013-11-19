@@ -101,9 +101,6 @@
     color: #1991E8;
 }
 
-.ice-albumCover-box {
-}
-
 .ice-albumCover {
     border: 1px solid #1991E8;
     border-radius: 5px 5px 5px 5px;
@@ -165,6 +162,7 @@
 }
 
 #Tooltip.ice-tooltip {
+    font-size: 12px;
     border-image: none;
     color: #1991E8;
     border: solid 1px #1991E8;
@@ -234,24 +232,8 @@
     -slider-handle-height: 5px;
 }
 
-.ice-appBox:compact {
-    
-}
-
-.ice-appTitleBox:compact {
-    
-}
-
 .ice-appIcon:compact {
     icon-size: 1em;
-}
-
-.ice-titleBar:compact {
-    
-}
-
-.ice-playerIcon:compact {
-    
 }
 
 .ice-trackInfoBox:compact {
@@ -285,11 +267,3 @@
 .ice-soundButton-box:compact {
     padding: 0px;
 }
-
-.ice-soundButton-icon:compact {
-    
-}
-
-
-
-
