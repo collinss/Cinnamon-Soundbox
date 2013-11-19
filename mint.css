@@ -68,6 +68,7 @@
     -slider-border-width: 1px;
     -slider-handle-radius: 0.5em;
     -slider-handle-color: white;
+    -slider-handle-border-color: white;
 }
 
 .mint-appIcon {

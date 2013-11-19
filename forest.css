@@ -49,6 +49,7 @@
 .forest-slider {
     -slider-handle-radius: 7px;
     -slider-handle-color: #A04D1C;
+    -slider-handle-border-color: #A04D1C;
     -slider-handle-border-width: 0px;
     -slider-height: 6px;
     -slider-background-color: #003510;
