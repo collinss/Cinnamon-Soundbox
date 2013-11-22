@@ -1,7 +1,7 @@
 /*mint theme*/
 .mint-mainBox {
     border: 2px solid #a5a5a5;
-    padding: 5px 0px 2px 0px;
+    padding: 10px 0px 5px 0px;
     background-color: rgba(80,80,80,0.9);
     border-radius: 12px 12px 12px 12px;
 }
@@ -47,6 +47,10 @@
     color: #fff;
 }
 
+.mint-volumeBox {
+    padding: 0px 5px 0px 5px;
+}
+
 .mint-volumeButton {
     padding: 2px 3px 2px 3px;
 }
@@ -58,7 +62,7 @@
 
 .mint-slider {
     height: 1em;
-    min-width: 175px;
+    min-width: 165px;
     -slider-height: 5px;
     -slider-background-color: rgb(56, 56, 56);
     -slider-border-color: rgb(56, 56, 56);

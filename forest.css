@@ -53,8 +53,10 @@
     -slider-handle-border-width: 0px;
     -slider-height: 6px;
     -slider-background-color: #003510;
+    -slider-border-color: #003510;
     -slider-active-height: 6px;
     -slider-active-background-color: #003510;
+    -slider-active-border-color: #003510;
     height: 14px;
     min-width: 175px;
 }
