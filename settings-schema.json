@@ -34,6 +34,7 @@
         "default": "mint",
         "options": {
             "Mint": "mint",
+            "Mint-X": "mintx",
             "Clean": "clean",
             "Shadow": "shadow",
             "Ghost": "ghost",
