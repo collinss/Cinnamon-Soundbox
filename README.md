@@ -1,11 +1,11 @@
 To Do
 -----
-    Fix themes
-    Remove compact theme
-
+    Fix slider when volume > 100 selected in settings
 
 Done
 ----
+    Fix themes
+    Remove compact theme
     Make separate 'compact' mode
     Option to disable cover art
 
