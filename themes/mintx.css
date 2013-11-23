@@ -1,10 +1,10 @@
 /*mintx theme*/
 .mintx-mainBox {
-	border-image: url("bg-1.png") 6;
+    border-image: url("bg-1.png") 6;
     padding-left: 1px;
-	padding-right: 1px;
-	padding-top: 8px;
-	padding-bottom: 8px;
+    padding-right: 1px;
+    padding-top: 8px;
+    padding-bottom: 8px;
 }
 
 .mintx-buttonMenu {
@@ -36,7 +36,7 @@
 }
 
 .mintx-playerTitleText {
-	color: #fff;
+    color: #fff;
 }
 
 .mintx-volumeBox {
@@ -53,7 +53,7 @@
 }
 
 .mintx-slider {
-	border-image: url("slider.png") 10 10 9 9 stretch; 
+    border-image: url("slider.png") 10 10 9 9 stretch; 
     height: 18px;
     min-width: 15em;
     -slider-height: 4px;
@@ -79,7 +79,7 @@
 
 .mintx-titleBar {
     border-image: url("hover-2.png") 6;
-	color: #fff;
+    color: #fff;
     background-color: rgba(140, 140, 140, 0);
     background-gradient-direction: none;
     padding: 2px 0px 2px 0px;
@@ -155,7 +155,7 @@
 }
 
 #mintx-popup-menuitem:active {
-	border-image: url("hover-2.png") 6;
+    border-image: url("hover-2.png") 6;
     color: rgb(70,70,70);
     box-mintx: 0px 0px 0px 0px;
     border-width: 0px;
