@@ -162,7 +162,43 @@ let support_seek = [
     "tomahawk"
 ];
 
-let desklet_drag_object, settings;
+let inhibitor, settings;
+
+let desklet_raised = false;
+
+
+function Inhibitor(dragObject) {
+    this._init(dragObject);
+}
+
+Inhibitor.prototype = {
+    _init: function(dragObject) {
+        this.drag = dragObject;
+        
+        this.registeredInhibitors = [];
+    },
+    
+    add: function(name) {
+        this.registeredInhibitors.push(name);
+        this._updateInhibit();
+    },
+    
+    remove: function(name) {
+        try {
+        for ( let i = (this.registeredInhibitors.length - 1); i >= 0; i-- ) {
+            if ( this.registeredInhibitors[i] == name ) this.registeredInhibitors.splice(i, 1);
+        }
+        this._updateInhibit();
+        } catch(e) {
+            global.logError(e);
+        }
+    },
+    
+    _updateInhibit: function() {
+        if ( this.registeredInhibitors.length == 0 ) this.drag.inhibit = false;
+        else this.drag.inhibit = true;
+    }
+}
 
 
 function SettingsInterface(uuid, deskletId) {
@@ -175,6 +211,7 @@ SettingsInterface.prototype = {
         this.settings = new Settings.DeskletSettings(this, uuid, deskletId);
         this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this.queRebuild);
         this.settings.bindProperty(Settings.BindingDirection.IN, "showApps", "showApps", this.setAppShowState);
+        this.settings.bindProperty(Settings.BindingDirection.IN, "raiseKey", "raiseKey", this.keybindingChanged);
         this.settings.bindProperty(Settings.BindingDirection.IN, "compact", "compact", this.queRebuild);
         this.settings.bindProperty(Settings.BindingDirection.IN, "showArt", "showArt", this.setArtShowState);
         this.settings.bindProperty(Settings.BindingDirection.IN, "exceedNormVolume", "exceedNormVolume", this.updateVolume);
@@ -195,6 +232,10 @@ SettingsInterface.prototype = {
     
     setAppShowState: function() {
         this.emit("app-show-hide");
+    },
+    
+    keybindingChanged: function() {
+        this.emit("keybinding-changed");
     }
 }
 Signals.addSignalMethods(SettingsInterface.prototype);
@@ -319,6 +360,109 @@ MediaServer2Player.prototype = {
 DBus.proxifyPrototype(MediaServer2Player.prototype, MediaServer2PlayerIFace)
 
 
+function RaisedBox() {
+    this._init();
+}
+
+RaisedBox.prototype = {
+    _init: function() {
+        try {
+            
+            this.stageEventIds = [];
+            this.playerMenuEvents = [];
+            
+            this.actor = new St.Group({ visible: false, x: 0, y: 0 });
+            Main.uiGroup.add_actor(this.actor);
+            let constraint = new Clutter.BindConstraint({ source: global.stage,
+                                                          coordinate: Clutter.BindCoordinate.POSITION | Clutter.BindCoordinate.SIZE });
+            this.actor.add_constraint(constraint);
+            
+            this._backgroundBin = new St.Bin();
+            this.actor.add_actor(this._backgroundBin);
+            let monitor = Main.layoutManager.focusMonitor;
+            this._backgroundBin.set_position(monitor.x, monitor.y);
+            this._backgroundBin.set_size(monitor.width, monitor.height);
+            
+            let stack = new Cinnamon.Stack();
+            this._backgroundBin.child = stack;
+            
+            this.eventBlocker = new Clutter.Group({ reactive: true });
+            stack.add_actor(this.eventBlocker);
+            
+            this.groupContent = new St.Bin();
+            stack.add_actor(this.groupContent);
+            
+        } catch(e) {
+            global.logError(e);
+        }
+    },
+    
+    add: function(desklet) {
+        try {
+            
+            this.desklet = desklet;
+            this.playerMenu = this.desklet.playerLauncher.menu;
+            
+            this.groupContent.add_actor(this.desklet.actor);
+            
+            this.actor.show();
+            global.set_stage_input_mode(Cinnamon.StageInputMode.FULLSCREEN);
+            global.focus_manager.add_group(this.actor);
+            
+            this.stageEventIds.push(global.stage.connect("captured-event", Lang.bind(this, this.onStageEvent)));
+            this.stageEventIds.push(global.stage.connect("enter-event", Lang.bind(this, this.onStageEvent)));
+            this.stageEventIds.push(global.stage.connect("leave-event", Lang.bind(this, this.onStageEvent)));
+            this.playerMenuEvents.push(this.playerMenu.connect("activate", Lang.bind(this, function() {
+                this.emit("closed");
+            })));
+            this.playerMenuEvents.push(this.playerMenu.connect("open-state-changed", Lang.bind(this, function(menu, open) {
+                if ( !open ) {
+                    global.set_stage_input_mode(Cinnamon.StageInputMode.FULLSCREEN);
+                }
+            })));
+            
+        } catch(e) {
+            global.logError(e);
+        }
+    },
+    
+    remove: function() {
+        try {
+            
+            for ( let i = 0; i < this.stageEventIds.length; i++ ) global.stage.disconnect(this.stageEventIds[i]);
+            for ( let i = 0; i < this.playerMenuEvents.length; i++ ) this.playerMenu.disconnect(this.playerMenuEvents[i]);
+            
+            if ( this.desklet ) this.groupContent.remove_actor(this.desklet.actor);
+            
+            this.actor.destroy();
+            global.set_stage_input_mode(Cinnamon.StageInputMode.NORMAL);
+            
+        } catch(e) {
+            global.logError(e);
+        }
+    },
+    
+    onStageEvent: function(actor, event) {
+        try {
+            
+            let type = event.type();
+            if ( type == Clutter.EventType.KEY_PRESS || type == Clutter.EventType.KEY_RELEASE ) return true;
+            
+            let target = event.get_source();
+            if ( target == this.desklet.actor || this.desklet.actor.contains(target) ||
+                 target == this.playerMenu.actor || this.playerMenu.actor.contains(target) ) return false;
+            if ( type == Clutter.EventType.BUTTON_RELEASE ) this.emit("closed");
+            
+        } catch(e) {
+            global.logError(e);
+        }
+        
+        return true;
+    }
+}
+Signals.addSignalMethods(RaisedBox.prototype);
+
+
 function ButtonMenu(content) {
     this._init(content);
 }
@@ -383,10 +527,10 @@ Slider.prototype = {
             this.actor.connect("button-press-event", Lang.bind(this, this._startDragging));
             this.actor.connect("scroll-event", Lang.bind(this, this._onScrollEvent));
             this.actor.connect("enter_event", Lang.bind(this, function() {
-                desklet_drag_object.inhibit = true;
+                inhibitor.add("slider");
             }));
             this.actor.connect("leave_event", Lang.bind(this, function() {
-                desklet_drag_object.inhibit = false;
+                inhibitor.remove("slider");
             }));
             
             this._releaseId = this._motionId = 0;
@@ -510,10 +654,10 @@ Slider.prototype = {
             this.actor.disconnect(this._motionId);
             
             Clutter.ungrab_pointer();
-            global.set_stage_input_mode(Cinnamon.StageInputMode.NORMAL);
+            if ( !desklet_raised ) global.set_stage_input_mode(Cinnamon.StageInputMode.NORMAL);
             this._dragging = false;
             
-            if ( !this.actor.has_pointer ) desklet_drag_object.inhibit = false;
+            if ( !this.actor.has_pointer ) inhibitor.remove("slider");
             
             this.emit("drag-end");
         }
@@ -1270,10 +1414,13 @@ myDesklet.prototype = {
         try {
             
             Desklet.Desklet.prototype._init.call(this, metadata);
-            desklet_drag_object = this._draggable;
+            inhibitor = new Inhibitor(this._draggable);
             
             settings = new SettingsInterface(metadata["uuid"], desklet_id);
             settings.connect("que-rebuild", Lang.bind(this, this.rebuild));
+            settings.connect("keybinding-changed", Lang.bind(this, this.bindKey));
+            this.bindKey();
+            desklet_raised = false;
             
             this._menu.addSettingsAction(_("Sound Settings"), "sound");
             
@@ -1310,6 +1457,55 @@ myDesklet.prototype = {
         } catch(e) {
             global.logError(e);
         }
+    },
+    
+    bindKey: function() {
+        if ( this.keyId ) Main.keybindingManager.removeHotKey(this.keyId);
+        
+        this.keyId = "soundbox-raise";
+        Main.keybindingManager.addHotKey(this.keyId, settings.raiseKey, Lang.bind(this, this.toggleRaise));
+    },
+    
+    toggleRaise: function() {
+        try {
+            
+            if ( desklet_raised ) this.lower();
+            else this.raise();
+            
+            //throw "works";
+            
+        } catch(e) {
+            global.logError(e);
+        }
+    },
+    
+    raise: function() {
+        if ( desklet_raised || this.changingRaiseState ) return;
+        this.changingRaiseState = true;
+        
+        inhibitor.add("raisedBox");
+        this.raisedBox = new RaisedBox();
+        
+        let position = this.actor.get_position();
+        this.actor.get_parent().remove_actor(this.actor);
+        this.raisedBox.add(this);
+        
+        this.raisedBox.connect("closed", Lang.bind(this, this.lower));
+        
+        desklet_raised = true;
+        this.changingRaiseState = false;
+    },
+    
+    lower: function() {
+        if ( !desklet_raised || this.changingRaiseState ) return;
+        this.changingRaiseState = true;
+        
+        if ( this.raisedBox ) this.raisedBox.remove();
+        Main.deskletContainer.addDesklet(this.actor);
+        inhibitor.remove("raisedBox");
+        
+        desklet_raised = false;
+        this.changingRaiseState = false;
     },
     
     _build_interface: function() {

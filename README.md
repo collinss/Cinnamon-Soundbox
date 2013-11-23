@@ -8,6 +8,7 @@ Done
     Remove compact theme
     Make separate 'compact' mode
     Option to disable cover art
+    Add option to bring to front
 
 
 Wish-list

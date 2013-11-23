@@ -11,6 +11,12 @@
         "default": false
     },
     
+    "raiseKey": {
+        "type": "keybinding",
+        "description": "Raise to top shorcut key",
+        "default": "<Super>s"
+    },
+    
     "appearance": {
         "type": "header",
         "description": "Appearance"
