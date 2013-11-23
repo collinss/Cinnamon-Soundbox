@@ -1,14 +1,12 @@
 To Do
 -----
-    Fix slider when volume > 100 selected in settings
+    Add Mint-X theme
+
 
 Done
 ----
-    Fix themes
-    Remove compact theme
-    Make separate 'compact' mode
-    Option to disable cover art
     Add option to bring to front
+    Fix slider when volume > 100 selected in settings
 
 
 Wish-list

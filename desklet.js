@@ -1419,6 +1419,7 @@ myDesklet.prototype = {
             settings = new SettingsInterface(metadata["uuid"], desklet_id);
             settings.connect("que-rebuild", Lang.bind(this, this.rebuild));
             settings.connect("keybinding-changed", Lang.bind(this, this.bindKey));
+            settings.connect("volume-settings-changed", Lang.bind(this, this.updateVolume));
             this.bindKey();
             desklet_raised = false;
             
