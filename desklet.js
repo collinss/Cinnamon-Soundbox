@@ -374,6 +374,7 @@ RaisedBox.prototype = {
             
             this.stageEventIds = [];
             this.playerMenuEvents = [];
+            this.contextMenuEvents = [];
             
             this.actor = new St.Group({ visible: false, x: 0, y: 0 });
             Main.uiGroup.add_actor(this.actor);
@@ -406,6 +407,7 @@ RaisedBox.prototype = {
             
             this.desklet = desklet;
             this.playerMenu = this.desklet.playerLauncher.menu;
+            this.contextMenu = this.desklet._menu;
             
             this.groupContent.add_actor(this.desklet.actor);
             
@@ -424,6 +426,14 @@ RaisedBox.prototype = {
                     global.set_stage_input_mode(Cinnamon.StageInputMode.FULLSCREEN);
                 }
             })));
+            this.contextMenuEvents.push(this.contextMenu.connect("activate", Lang.bind(this, function() {
+                this.emit("closed");
+            })));
+            this.contextMenuEvents.push(this.contextMenu.connect("open-state-changed", Lang.bind(this, function(menu, open) {
+                if ( !open ) {
+                    global.set_stage_input_mode(Cinnamon.StageInputMode.FULLSCREEN);
+                }
+            })));
             
         } catch(e) {
             global.logError(e);
@@ -435,6 +445,7 @@ RaisedBox.prototype = {
             
             for ( let i = 0; i < this.stageEventIds.length; i++ ) global.stage.disconnect(this.stageEventIds[i]);
             for ( let i = 0; i < this.playerMenuEvents.length; i++ ) this.playerMenu.disconnect(this.playerMenuEvents[i]);
+            for ( let i = 0; i < this.contextMenuEvents.length; i++ ) this.contextMenu.disconnect(this.contextMenuEvents[i]);
             
             if ( this.desklet ) this.groupContent.remove_actor(this.desklet.actor);
             
@@ -454,7 +465,8 @@ RaisedBox.prototype = {
             
             let target = event.get_source();
             if ( target == this.desklet.actor || this.desklet.actor.contains(target) ||
-                 target == this.playerMenu.actor || this.playerMenu.actor.contains(target) ) return false;
+                 target == this.playerMenu.actor || this.playerMenu.actor.contains(target) ||
+                 target == this.contextMenu.actor || this.contextMenu.actor.contains(target) ) return false;
             if ( type == Clutter.EventType.BUTTON_RELEASE ) this.emit("closed");
             
         } catch(e) {
