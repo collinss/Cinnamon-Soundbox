@@ -1,6 +1,5 @@
 To Do
 -----
-    Finish Hot Rod theme
 
 
 Done
@@ -8,6 +7,7 @@ Done
     Add option to bring to front
     Fix slider when volume > 100 selected in settings
     Add Mint-X theme
+    Finish Hot Rod theme
 
 
 Wish-list
