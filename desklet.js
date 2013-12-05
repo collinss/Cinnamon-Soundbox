@@ -111,40 +111,40 @@ const MediaServer2PlayerIFace = {
 
 
 let supported_players = {
-    "clementine":       { seek: true },
-    "mpd":              { seek: false },
-    "exaile":           { seek: false },
+    "amarok":           { seek: true },
+    "atunes":           { seek: false },
+    "audacious":        { seek: true },
     "banshee":          { seek: true },
+    "beatbox":          { seek: false },
+    "bmp":              { seek: false },
+    "clementine":       { seek: true },
+    "deadbeef":         { seek: true },
+    "exaile":           { seek: false },
+    "gmusicbrowser":    { seek: true },
+    "gnome-mplayer":    { seek: true },
+    "googlemusicframe": { seek: false },
+    "guayadeque":       { seek: false },
+    "mpd":              { seek: false },
+    "muine":            { seek: false },
+    "musique":          { seek: false },
+    "noise":            { seek: true },
+    "nuvolaplayer":     { seek: false },
+    "pithos":           { seek: false },
+    "potamus":          { seek: false },
+    "pragha":           { seek: true },
+    "qmmp":             { seek: true },
+    "quodlibet":        { seek: true },
     "rhythmbox":        { seek: true },
     "rhythmbox3":       { seek: true },
-    "pragha":           { seek: true },
-    "quodlibet":        { seek: true },
-    "guayadeque":       { seek: false },
-    "amarok":           { seek: true },
-    "googlemusicframe": { seek: false },
-    "xbmc":             { seek: false },
-    "noise":            { seek: true },
-    "xnoise":           { seek: true },
-    "gmusicbrowser":    { seek: true },
-    "spotify":          { seek: true },
-    "audacious":        { seek: true },
-    "vlc":              { seek: true },
-    "beatbox":          { seek: false },
     "songbird":         { seek: false },
-    "pithos":           { seek: false },
-    "gnome-mplayer":    { seek: true },
-    "nuvolaplayer":     { seek: false },
-    "qmmp":             { seek: true },
-    "deadbeef":         { seek: true },
     "smplayer":         { seek: false },
+    "spotify":          { seek: true, timeIssues: true },
     "tomahawk":         { seek: false },
-    "musique":          { seek: false },
-    "potamus":          { seek: false },
-    "bmp":              { seek: false },
-    "atunes":           { seek: false },
-    "muine":            { seek: false },
+    "totem":            { seek: false },
+    "vlc":              { seek: true },
+    "xbmc":             { seek: false },
     "xmms":             { seek: false },
-    "totem":            { seek: false }
+    "xnoise":           { seek: true }
 }
 
 let inhibitor, settings;
@@ -1098,8 +1098,8 @@ Player.prototype = {
             this.compactibleElements.push(this.controls);
             
             this._prevButton = new ControlButton("media-skip-backward", Lang.bind(this, function() {
-                this._currentTime = 0;
                 this._mediaServerPlayer.PreviousRemote();
+                if ( supported_players[this._name].timeIssues ) this._currentTime = 0;
             }));
             this._prevButtonTooltip = new Tooltips.Tooltip(this._prevButton.button, _("Previous"));
             this._prevButtonTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
@@ -1120,8 +1120,8 @@ Player.prototype = {
             this.controls.add_actor(this._stopButton.getActor());
             
             this._nextButton = new ControlButton("media-skip-forward", Lang.bind(this, function() {
-                this._currentTime = 0;
                 this._mediaServerPlayer.NextRemote();
+                if ( supported_players[this._name].timeIssues ) this._currentTime = 0;
             }));
             this._nextButtonTooltip = new Tooltips.Tooltip(this._nextButton.button, _("Next"));
             this._nextButtonTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
