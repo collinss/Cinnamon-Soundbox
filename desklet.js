@@ -110,61 +110,42 @@ const MediaServer2PlayerIFace = {
 };
 
 
-let compatible_players = [
-    "clementine",
-    "mpd",
-    "exaile",
-    "banshee",
-    "rhythmbox",
-    "rhythmbox3",
-    "pragha",
-    "quodlibet",
-    "guayadeque",
-    "amarok",
-    "googlemusicframe",
-    "xbmc",
-    "noise",
-    "xnoise",
-    "gmusicbrowser",
-    "spotify",
-    "audacious",
-    "vlc",
-    "beatbox",
-    "songbird",
-    "pithos",
-    "gnome-mplayer",
-    "nuvolaplayer",
-    "qmmp",
-    "deadbeef",
-    "smplayer",
-    "tomahawk",
-    "musique",
-    "potamus", //Just launches
-    'bmp',  
-    'atunes', 
-    'muine', 
-    'xmms',
-    'totem' //Just launches
-];
-
-let support_seek = [
-    "clementine",
-    "banshee",
-    "rhythmbox",
-    "rhythmbox3",
-    "pragha",
-    "quodlibet",
-    "amarok",
-    "noise",
-    "xnoise",
-    "gmusicbrowser",
-    "spotify",
-    "vlc",
-    "gnome-mplayer",
-    "qmmp",
-    "deadbeef",
-    "audacious",
-];
+let supported_players = {
+    "clementine":       { seek: true },
+    "mpd":              { seek: false },
+    "exaile":           { seek: false },
+    "banshee":          { seek: true },
+    "rhythmbox":        { seek: true },
+    "rhythmbox3":       { seek: true },
+    "pragha":           { seek: true },
+    "quodlibet":        { seek: true },
+    "guayadeque":       { seek: false },
+    "amarok":           { seek: true },
+    "googlemusicframe": { seek: false },
+    "xbmc":             { seek: false },
+    "noise":            { seek: true },
+    "xnoise":           { seek: true },
+    "gmusicbrowser":    { seek: true },
+    "spotify":          { seek: true },
+    "audacious":        { seek: true },
+    "vlc":              { seek: true },
+    "beatbox":          { seek: false },
+    "songbird":         { seek: false },
+    "pithos":           { seek: false },
+    "gnome-mplayer":    { seek: true },
+    "nuvolaplayer":     { seek: false },
+    "qmmp":             { seek: true },
+    "deadbeef":         { seek: true },
+    "smplayer":         { seek: false },
+    "tomahawk":         { seek: false },
+    "musique":          { seek: false },
+    "potamus":          { seek: false },
+    "bmp":              { seek: false },
+    "atunes":           { seek: false },
+    "muine":            { seek: false },
+    "xmms":             { seek: false },
+    "totem":            { seek: false }
+}
 
 let inhibitor, settings;
 
@@ -1117,6 +1098,7 @@ Player.prototype = {
             this.compactibleElements.push(this.controls);
             
             this._prevButton = new ControlButton("media-skip-backward", Lang.bind(this, function() {
+                this._currentTime = 0;
                 this._mediaServerPlayer.PreviousRemote();
             }));
             this._prevButtonTooltip = new Tooltips.Tooltip(this._prevButton.button, _("Previous"));
@@ -1138,6 +1120,7 @@ Player.prototype = {
             this.controls.add_actor(this._stopButton.getActor());
             
             this._nextButton = new ControlButton("media-skip-forward", Lang.bind(this, function() {
+                this._currentTime = 0;
                 this._mediaServerPlayer.NextRemote();
             }));
             this._nextButtonTooltip = new Tooltips.Tooltip(this._nextButton.button, _("Next"));
@@ -1170,7 +1153,7 @@ Player.prototype = {
                 for ( let i = 0; i < this.compactibleElements.length; i++ ) this.compactibleElements[i].add_style_pseudo_class("compact");
             }
             
-            if ( support_seek.indexOf(this._name) == -1 ) {
+            if ( !supported_players[this._name].seek ) {
                 this.seekControlsBin.hide();
                 this.showPosition = false;
             }
@@ -1444,8 +1427,9 @@ myDesklet.prototype = {
             this.players = {};
             this.owners = [];
             this.apps = [];
-            for ( let p = 0; p < compatible_players.length; p++ ) {
-                DBus.session.watch_name("org.mpris.MediaPlayer2." + compatible_players[p], false,
+            
+            for ( let player in supported_players ) {
+                DBus.session.watch_name("org.mpris.MediaPlayer2." + player, false,
                     Lang.bind(this, this._addPlayer),
                     Lang.bind(this, this._removePlayer)
                 );
@@ -1755,8 +1739,8 @@ myDesklet.prototype = {
             let app = allApps[y];
             let entry = app.get_tree_entry();
             let path = entry.get_desktop_file_path();
-            for ( let p = 0; p < compatible_players.length; p++ ) {
-                let desktopFile = compatible_players[p] + ".desktop";
+            for ( let player in supported_players ) {
+                let desktopFile = player + ".desktop";
                 if ( path.indexOf(desktopFile) != -1 && listedDesktopFiles.indexOf(desktopFile) == -1 ) {
                     this._availablePlayers.push(app);
                     listedDesktopFiles.push(desktopFile);
