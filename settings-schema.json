@@ -40,6 +40,17 @@
         "default": true
     },
     
+    "artSize": {
+        "type": "scale",
+        "description": "Artwork size",
+        "min": 50,
+        "max": 250,
+        "default": 200,
+        "step": 10,
+        "indent": true,
+        "dependency": "showArt"
+    },
+    
     "theme": {
         "type": "combobox",
         "description": "Theme",

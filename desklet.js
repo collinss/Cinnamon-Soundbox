@@ -279,6 +279,7 @@ SettingsInterface.prototype = {
         this.settings.bindProperty(Settings.BindingDirection.IN, "raiseKey", "raiseKey", function() { this.emit("keybinding-changed"); });
         this.settings.bindProperty(Settings.BindingDirection.IN, "compact", "compact", this.queRebuild);
         this.settings.bindProperty(Settings.BindingDirection.IN, "showArt", "showArt", function() { this.emit("art-show-hide"); });
+        this.settings.bindProperty(Settings.BindingDirection.IN, "artSize", "artSize", function() { this.emit("redraw-art"); });
         this.settings.bindProperty(Settings.BindingDirection.IN, "exceedNormVolume", "exceedNormVolume", function() { this.emit("volume-settings-changed"); });
         
     },
@@ -1123,6 +1124,7 @@ Player.prototype = {
                     this.artHiddenDivider.actor.show();
                 }
             }))
+            settings.connect("redraw-art", Lang.bind(this, this._showCover))
             
             //seek controls
             this.seekControlsBin = new St.Bin({ style_class: settings.theme+"-timeBox" });
@@ -1325,7 +1327,7 @@ Player.prototype = {
         
         if ( change ) {
             if ( this.trackCoverFile ) {
-                let cover_path = "";
+                this.coverPath = "";
                 if ( this.trackCoverFile.match(/^http/) ) {
                     this._hideCover();
                     let cover = Gio.file_new_for_uri(decodeURIComponent(this.trackCoverFile));
@@ -1333,9 +1335,9 @@ Player.prototype = {
                     cover.read_async(null, null, Lang.bind(this, this._onReadCover));
                 }
                 else {
-                    cover_path = decodeURIComponent(this.trackCoverFile);
-                    cover_path = cover_path.replace("file://", "");
-                    this._showCover(cover_path);
+                    this.coverPath = decodeURIComponent(this.trackCoverFile);
+                    this.coverPath = this.coverPath.replace("file://", "");
+                    this._showCover();
                 }
             }
             else this._showCover(false);
@@ -1418,33 +1420,30 @@ Player.prototype = {
     
     _onSavedCover: function(outStream, result) {
         outStream.splice_finish(result, null);
-        let cover_path = this.trackCoverFileTmp.get_path();
-        this._showCover(cover_path);
+        this.coverPath = this.trackCoverFileTmp.get_path();
+        this._showCover(this.coverPath);
     },
     
     _hideCover: function() {
     },
     
-    _showCover: function(cover_path) {
+    _showCover: function() {
         try {
-        if ( ! cover_path || ! GLib.file_test(cover_path, GLib.FileTest.EXISTS) ) {
+        if ( ! this.coverPath || ! GLib.file_test(this.coverPath, GLib.FileTest.EXISTS) ) {
             this.trackCover.set_child(new St.Icon({ icon_name: "media-optical-cd-audio", style_class: settings.theme+"albumCover", icon_type: St.IconType.FULLCOLOR }));
         }
         else {
             let l = new Clutter.BinLayout();
             let b = new Clutter.Box();
-            let c = new Clutter.Texture({ height: 200, keep_aspect_ratio: true, filter_quality: 2, filename: cover_path });
+            let c = new Clutter.Texture({ height: settings.artSize, keep_aspect_ratio: true, filter_quality: 2, filename: this.coverPath });
             b.set_layout_manager(l);
-            b.set_width(200);
+            b.set_width(settings.artSize);
             b.add_actor(c);
             this.trackCover.set_child(b);
         }
         } catch (e) {
             global.logError(e);
         }
-    },
-    
-    setIcon: function(icon) {
     }
 }
 
