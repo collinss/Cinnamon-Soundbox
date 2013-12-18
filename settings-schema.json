@@ -11,6 +11,12 @@
         "default": false
     },
     
+    "countUp": {
+        "type": "checkbox",
+        "description": "Timer counts up",
+        "default": true
+    },
+    
     "raiseKey": {
         "type": "keybinding",
         "description": "Raise to top shorcut key",

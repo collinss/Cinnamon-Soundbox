@@ -152,6 +152,85 @@ let inhibitor, settings;
 let desklet_raised = false;
 
 
+function TimeTracker() {
+    this._init();
+}
+
+TimeTracker.prototype = {
+    _init: function() {
+        this.startCount = 0;
+        this.totalCount = 0;
+    },
+    
+    setTotal: function(total) {
+        this.totalCount = total;
+    },
+    
+    setCurrent: function(current) {
+        this.startCount = current;
+        if ( this.startTime ) this.startTime = new Date();
+    },
+    
+    start: function() {
+        if ( this.startTime ) return;
+        this.startTime = new Date();
+    },
+    
+    pause: function() {
+        if ( !this.startTime ) return;
+        this.startCount += (new Date() - this.startTime) / 1000;
+        this.startTime = null;
+    },
+    
+    stop: function() {
+        this.startCount = 0;
+        this.startTime = null;
+    },
+    
+    getTimeString: function() {
+        if ( isNaN(this.startCount) || isNaN(this.totalCount) ) return "";
+        
+        let elapsed, current;
+        if ( this.startTime ) elapsed = Math.floor((new Date() - this.startTime) / 1000) + this.startCount;
+        else elapsed = this.startCount;
+        
+        if ( settings.countUp ) current = elapsed;
+        else current = this.totalCount - elapsed;
+        
+        return this.formatTime(Math.floor(current)) + "/" + this.formatTime(this.totalCount);
+    },
+    
+    formatTime: function(seconds) {
+        let numHours = Math.floor(seconds/3600);
+        let numMins = Math.floor((seconds - (numHours * 3600)) / 60);
+        let numSecs = seconds - (numHours * 3600) - (numMins * 60);
+        if ( numSecs < 10 ) numSecs = "0" + numSecs.toString();
+        if ( numMins < 10 && numHours > 0 ) numMins = "0" + numMins.toString();
+        if ( numHours > 0 ) numHours = numHours.toString() + ":";
+        else numHours = "";
+        return numHours + numMins.toString() + ":" + numSecs.toString();
+    },
+    
+    getPercent: function() {
+        let elapsed;
+        if ( this.startTime ) elapsed = (new Date() - this.startTime) / 1000 + this.startCount;
+        else elapsed = this.startCount;
+        let percent = elapsed / this.totalCount;
+        if ( isNaN(percent) || percent < 0 ) percent = 0;
+        else if ( percent > 1 ) percent = 1;
+        
+        return percent;
+    },
+    
+    getCurrent: function() {
+        let elapsed;
+        if ( this.startTime ) elapsed = Math.floor((new Date() - this.startTime) / 1000) + this.startCount;
+        else elapsed = this.startCount;
+        return elapsed;
+    }
+}
+
+
 function Inhibitor(dragObject) {
     this._init(dragObject);
 }
@@ -196,6 +275,7 @@ SettingsInterface.prototype = {
         this.settings = new Settings.DeskletSettings(this, uuid, deskletId);
         this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this.queRebuild);
         this.settings.bindProperty(Settings.BindingDirection.IN, "showApps", "showApps", this.setAppShowState);
+        this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "countUp", "countUp", function() { this.emit("countup-changed"); });
         this.settings.bindProperty(Settings.BindingDirection.IN, "raiseKey", "raiseKey", this.keybindingChanged);
         this.settings.bindProperty(Settings.BindingDirection.IN, "compact", "compact", this.queRebuild);
         this.settings.bindProperty(Settings.BindingDirection.IN, "showArt", "showArt", this.setArtShowState);
@@ -985,13 +1065,13 @@ Player.prototype = {
         try {
             this.actor = new St.Bin();
             
-            this.countUp = true;
             this.showPosition = true;
             this.owner = owner;
             this._name = this.owner.split(".")[3];
             this._mediaServerPlayer = new MediaServer2Player(owner);
             this._mediaServer = new MediaServer2(owner);
             this._prop = new Prop(owner);
+            this._timeTracker = new TimeTracker();
             
             this._prop.connect("PropertiesChanged", Lang.bind(this, function(sender, iface, value) {
                 if ( value["PlaybackStatus"] ) this._setStatus(iface, value["PlaybackStatus"]);
@@ -1001,6 +1081,7 @@ Player.prototype = {
                     if ( value["metadata"] ) this._setMetadata(sender, value["metadata"]);
                 } 
             }));
+            settings.connect("countup-changed", Lang.bind(this, this._setTimeText));
             
             this._buildLayout();
             
@@ -1074,21 +1155,11 @@ Player.prototype = {
             this.seekControlsBox.add_actor(this._positionSlider.actor);
             
             this._time.actor.connect("clicked", Lang.bind(this, function() {
-                this.countUp = !this.countUp;
+                settings.countUp = !settings.countUp;
                 this._setTimeText();
             }));
-            this._positionSlider.connect("value-changed", Lang.bind(this, function(item, value) {
-                this._currentTime = value * this._songLength;
-                this._setTimeText();
-                this._wantedSeekValue = Math.round(this._currentTime * 1000000);
-                this._mediaServerPlayer.SetPositionRemote(this._trackObj, this._currentTime * 1000000);
-            }));
-            this._positionSlider.connect("drag-end", Lang.bind(this, function(item) {
-                this._currentTime = item._value * this._songLength;
-                this._setTimeText();
-                this._wantedSeekValue = Math.round(this._currentTime * 1000000);
-                this._mediaServerPlayer.SetPositionRemote(this._trackObj, this._currentTime * 1000000);
-            }));
+            this._positionSlider.connect("value-changed", Lang.bind(this, this.seek));
+            this._positionSlider.connect("drag-end", Lang.bind(this, this.seek));
             
             //control buttons
             this.trackControls = new St.Bin({ x_align: St.Align.MIDDLE });
@@ -1099,7 +1170,7 @@ Player.prototype = {
             
             this._prevButton = new ControlButton("media-skip-backward", Lang.bind(this, function() {
                 this._mediaServerPlayer.PreviousRemote();
-                if ( supported_players[this._name].timeIssues ) this._currentTime = 0;
+                if ( supported_players[this._name].timeIssues ) this._timeTracker.setCurrent(0);
             }));
             this._prevButtonTooltip = new Tooltips.Tooltip(this._prevButton.button, _("Previous"));
             this._prevButtonTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
@@ -1121,7 +1192,7 @@ Player.prototype = {
             
             this._nextButton = new ControlButton("media-skip-forward", Lang.bind(this, function() {
                 this._mediaServerPlayer.NextRemote();
-                if ( supported_players[this._name].timeIssues ) this._currentTime = 0;
+                if ( supported_players[this._name].timeIssues ) this._timeTracker.setCurrent(0);
             }));
             this._nextButtonTooltip = new Tooltips.Tooltip(this._nextButton.button, _("Next"));
             this._nextButtonTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
@@ -1160,7 +1231,6 @@ Player.prototype = {
             this._getStatus();
             this._trackId = {};
             this._getMetadata();
-            this._currentTime = 0;
             this._getPosition();
             this._wantedSeekValue = 0;
             this._updatePositionSlider();
@@ -1201,6 +1271,12 @@ Player.prototype = {
         this.playerTitle.setText(this._getName() + " - " + _(status));
     },
     
+    seek: function(item) {
+        this._timeTracker.setCurrent(item._value * this._songLength);
+        this._setTimeText();
+        this._mediaServerPlayer.SetPositionRemote(this._trackObj, this._timeTracker.getCurrent() * 1000000);
+    },
+    
     _updatePositionSlider: function(position) {
         this._mediaServerPlayer.getCanSeek(Lang.bind(this, function(sender, canSeek) {
             this._canSeek = canSeek;
@@ -1211,7 +1287,7 @@ Player.prototype = {
     _setPosition: function(value) {
         if ( value == null && this._playerStatus != "Stopped" ) this._updatePositionSlider(false);
         else {
-            this._currentTime = value / 1000000;
+            this._timeTracker.setCurrent(value / 1000000);
             this._updateTimer();
         }
     },
@@ -1224,13 +1300,16 @@ Player.prototype = {
     
     _setMetadata: function(sender, metadata) {
         if ( metadata["mpris:length"] ) {
-            this._songLength = metadata["mpris:length"] / 1000000;
-            if ( this._name == "quodlibet" ) this._songLength = metadata["mpris:length"] / 1000;
+            this._timeTracker.setTotal(metadata["mpris:length"] / 1000000);
+            if ( this._name == "quodlibet" ) this._timeTracker.setTotal(metadata["mpris:length"] / 1000);
             this._stopTimer();
-            if ( this._playerStatus == "Playing" ) this._runTimer();
+            if ( this._playerStatus == "Playing" ) {
+                this._runTimer();
+                this._timeTracker.start();
+            }
         }
         else {
-            this._songLength = 0;
+            this._timeTracker.setTotal(0);
             this._stopTimer();
         }
         if ( metadata["xesam:artist"] ) this._artist.setLabel(metadata["xesam:artist"].toString());
@@ -1276,15 +1355,14 @@ Player.prototype = {
     },
     
     _getMetadata: function() {
-        this._mediaServerPlayer.getMetadata(Lang.bind(this,
-            this._setMetadata
-        ));
+        this._mediaServerPlayer.getMetadata(Lang.bind(this, this._setMetadata));
     },
     
     _setStatus: function(sender, status) {
         this._updatePositionSlider();
         this._playerStatus = status;
         if ( status == "Playing" ) {
+            this._timeTracker.start();
             this._playButton.setIcon("media-playback-pause");
             this._runTimer();
         }
@@ -1313,28 +1391,24 @@ Player.prototype = {
     
     _updateTimer: function() {
         if ( this.showPosition && this._canSeek ) {
-            if ( !isNaN(this._currentTime) && !isNaN(this._songLength) && this._currentTime > 0 ) this._positionSlider.setValue(this._currentTime / this._songLength);
-            else this._positionSlider.setValue(0);
             this._setTimeText();
+            this._positionSlider.setValue(this._timeTracker.getPercent());
         }
     },
     
     _setTimeText: function() {
-        let time;
-        if ( this.countUp ) time = this._currentTime;
-        else time = this._songLength - this._currentTime;
-        this._time.setLabel(this._formatTime(time) + " / " + this._formatTime(this._songLength));
+        this._time.setLabel(this._timeTracker.getTimeString());
     },
     
     _runTimer: function() {
         if ( this._playerStatus == "Playing" ) {
             this._timeoutId = Mainloop.timeout_add_seconds(1, Lang.bind(this, this._runTimer));
-            this._currentTime += 1;
             this._updateTimer();
         }
     },
     
     _pauseTimer: function() {
+        this._timeTracker.pause();
         if ( this._timeoutId != 0 ) {
             Mainloop.source_remove(this._timeoutId);
             this._timeoutId = 0;
@@ -1343,24 +1417,9 @@ Player.prototype = {
     },
     
     _stopTimer: function() {
-        this._currentTime = 0;
         this._pauseTimer();
+        this._timeTracker.stop();
         this._updateTimer();
-    },
-    
-    _formatTime: function(s) {
-        let ms = s * 1000;
-        let msSecs = (1000);
-        let msMins = (msSecs * 60);
-        let msHours = (msMins * 60);
-        let numHours = Math.floor(ms/msHours);
-        let numMins = Math.floor((ms - (numHours * msHours)) / msMins);
-        let numSecs = Math.floor((ms - (numHours * msHours) - (numMins * msMins))/ msSecs);
-        if ( numSecs < 10 ) numSecs = "0" + numSecs.toString();
-        if ( numMins < 10 && numHours > 0 ) numMins = "0" + numMins.toString();
-        if ( numHours > 0 ) numHours = numHours.toString() + ":";
-        else numHours = "";
-        return numHours + numMins.toString() + ":" + numSecs.toString();
     },
     
     _onReadCover: function(cover, result) {
