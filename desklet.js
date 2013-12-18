@@ -274,33 +274,17 @@ SettingsInterface.prototype = {
         
         this.settings = new Settings.DeskletSettings(this, uuid, deskletId);
         this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this.queRebuild);
-        this.settings.bindProperty(Settings.BindingDirection.IN, "showApps", "showApps", this.setAppShowState);
+        this.settings.bindProperty(Settings.BindingDirection.IN, "showApps", "showApps", function() { this.emit("app-show-hide"); });
         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "countUp", "countUp", function() { this.emit("countup-changed"); });
-        this.settings.bindProperty(Settings.BindingDirection.IN, "raiseKey", "raiseKey", this.keybindingChanged);
+        this.settings.bindProperty(Settings.BindingDirection.IN, "raiseKey", "raiseKey", function() { this.emit("keybinding-changed"); });
         this.settings.bindProperty(Settings.BindingDirection.IN, "compact", "compact", this.queRebuild);
-        this.settings.bindProperty(Settings.BindingDirection.IN, "showArt", "showArt", this.setArtShowState);
-        this.settings.bindProperty(Settings.BindingDirection.IN, "exceedNormVolume", "exceedNormVolume", this.updateVolume);
+        this.settings.bindProperty(Settings.BindingDirection.IN, "showArt", "showArt", function() { this.emit("art-show-hide"); });
+        this.settings.bindProperty(Settings.BindingDirection.IN, "exceedNormVolume", "exceedNormVolume", function() { this.emit("volume-settings-changed"); });
         
     },
     
     queRebuild: function() {
         this.emit("que-rebuild");
-    },
-    
-    updateVolume: function() {
-        this.emit("volume-settings-changed");
-    },
-    
-    setArtShowState: function() {
-        this.emit("art-show-hide");
-    },
-    
-    setAppShowState: function() {
-        this.emit("app-show-hide");
-    },
-    
-    keybindingChanged: function() {
-        this.emit("keybinding-changed");
     }
 }
 Signals.addSignalMethods(SettingsInterface.prototype);
@@ -1056,15 +1040,16 @@ PlayerBar.prototype = {
 }
 
 
-function Player(system_status_button, owner) {
-    this._init(system_status_button, owner);
+function Player(parent, owner) {
+    this._init(parent, owner);
 }
 
 Player.prototype = {
-    _init: function(system_status_button, owner) {
+    _init: function(parent, owner) {
         try {
             this.actor = new St.Bin();
             
+            this.parent = parent;
             this.showPosition = true;
             this.owner = owner;
             this._name = this.owner.split(".")[3];
@@ -1201,7 +1186,8 @@ Player.prototype = {
             this._mediaServer.getRaise(Lang.bind(this, function(sender, raise) {
                 if ( raise ) {
                     this._raiseButton = new ControlButton("go-up", Lang.bind(this, function() {
-                        this._mediaServer.RaiseRemote();// this._system_status_button.menu.actor.hide();
+                        this.parent.lower();
+                        this._mediaServer.RaiseRemote();
                     }));
                     this._raiseButtonTooltip = new Tooltips.Tooltip(this._raiseButton.button, _("Open Player"));
                     this._raiseButtonTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
@@ -1212,6 +1198,7 @@ Player.prototype = {
             this._mediaServer.getQuit(Lang.bind(this, function(sender, quit) {
                 if ( quit ) {
                     this._quitButton = new ControlButton("window-close", Lang.bind(this, function() {
+                        this.parent.lower();
                         this._mediaServer.QuitRemote();
                     }));
                     this.controls.add_actor(this._quitButton.getActor());
@@ -1272,7 +1259,8 @@ Player.prototype = {
     },
     
     seek: function(item) {
-        this._timeTracker.setCurrent(item._value * this._songLength);
+        this._wantedSeekValue = item._value * this._timeTracker.totalCount;
+        this._timeTracker.setCurrent(this._wantedSeekValue);
         this._setTimeText();
         this._mediaServerPlayer.SetPositionRemote(this._trackObj, this._timeTracker.getCurrent() * 1000000);
     },
@@ -1280,7 +1268,7 @@ Player.prototype = {
     _updatePositionSlider: function(position) {
         this._mediaServerPlayer.getCanSeek(Lang.bind(this, function(sender, canSeek) {
             this._canSeek = canSeek;
-            if ( this._songLength == 0 || position == false ) this._canSeek = false;
+            if ( this._timeTracker.totalCount == 0 || position == false ) this._canSeek = false;
         }));
     },
     
