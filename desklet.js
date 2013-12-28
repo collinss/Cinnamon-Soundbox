@@ -1053,7 +1053,7 @@ Player.prototype = {
             this.parent = parent;
             this.showPosition = true;
             this.owner = owner;
-            this._name = this.owner.split(".")[3];
+            this.name = this.owner.split(".")[3];
             this._mediaServerPlayer = new MediaServer2Player(owner);
             this._mediaServer = new MediaServer2(owner);
             this._prop = new Prop(owner);
@@ -1157,7 +1157,7 @@ Player.prototype = {
             
             this._prevButton = new ControlButton("media-skip-backward", Lang.bind(this, function() {
                 this._mediaServerPlayer.PreviousRemote();
-                if ( supported_players[this._name].timeIssues ) this._timeTracker.setCurrent(0);
+                if ( supported_players[this.name].timeIssues ) this._timeTracker.setCurrent(0);
             }));
             this._prevButtonTooltip = new Tooltips.Tooltip(this._prevButton.button, _("Previous"));
             this._prevButtonTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
@@ -1179,7 +1179,7 @@ Player.prototype = {
             
             this._nextButton = new ControlButton("media-skip-forward", Lang.bind(this, function() {
                 this._mediaServerPlayer.NextRemote();
-                if ( supported_players[this._name].timeIssues ) this._timeTracker.setCurrent(0);
+                if ( supported_players[this.name].timeIssues ) this._timeTracker.setCurrent(0);
             }));
             this._nextButtonTooltip = new Tooltips.Tooltip(this._nextButton.button, _("Next"));
             this._nextButtonTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
@@ -1213,7 +1213,7 @@ Player.prototype = {
                 for ( let i = 0; i < this.compactibleElements.length; i++ ) this.compactibleElements[i].add_style_pseudo_class("compact");
             }
             
-            if ( !supported_players[this._name].seek ) {
+            if ( !supported_players[this.name].seek ) {
                 this.seekControlsBin.hide();
                 this.showPosition = false;
             }
@@ -1253,7 +1253,7 @@ Player.prototype = {
     },
     
     _getName: function() {
-        return this._name.charAt(0).toUpperCase() + this._name.slice(1);
+        return this.name.charAt(0).toUpperCase() + this.name.slice(1);
     },
     
     _setName: function(status) {
@@ -1291,7 +1291,7 @@ Player.prototype = {
     _setMetadata: function(sender, metadata) {
         if ( metadata["mpris:length"] ) {
             this._timeTracker.setTotal(metadata["mpris:length"] / 1000000);
-            if ( this._name == "quodlibet" ) this._timeTracker.setTotal(metadata["mpris:length"] / 1000);
+            if ( this.name == "quodlibet" ) this._timeTracker.setTotal(metadata["mpris:length"] / 1000);
             this._stopTimer();
             if ( this._playerStatus == "Playing" ) {
                 this._runTimer();
@@ -1329,8 +1329,10 @@ Player.prototype = {
             if ( this.trackCoverFile ) {
                 this.coverPath = "";
                 if ( this.trackCoverFile.match(/^http/) ) {
+                    let uri = this.trackCoverFile;
+                    if ( this.name == "spotify" ) uri = uri.replace("thumb", "300");
                     this._hideCover();
-                    let cover = Gio.file_new_for_uri(decodeURIComponent(this.trackCoverFile));
+                    let cover = Gio.file_new_for_uri(decodeURIComponent(uri));
                     if ( !this.trackCoverFileTmp ) this.trackCoverFileTmp = Gio.file_new_tmp("XXXXXX.mediaplayer-cover")[0];
                     cover.read_async(null, null, Lang.bind(this, this._onReadCover));
                 }
