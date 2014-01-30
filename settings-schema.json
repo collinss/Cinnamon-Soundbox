@@ -64,7 +64,7 @@
             "Ice": "ice",
             "Forest": "forest",
             "Hot Rod": "hot",
-            "Use Theme Default (not supported by all themes)": "soundbox"
+            "Camouflage (tries to blend in)": "soundbox"
         }
     }
 }
