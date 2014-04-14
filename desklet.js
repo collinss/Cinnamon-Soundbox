@@ -197,7 +197,7 @@ TimeTracker.prototype = {
         if ( settings.countUp ) current = elapsed;
         else current = this.totalCount - elapsed;
         
-        return this.formatTime(Math.floor(current)) + " / " + this.formatTime(this.totalCount);
+        return this.formatTime(Math.floor(current)) + " / " + this.formatTime(Math.floor(this.totalCount));
     },
     
     formatTime: function(seconds) {
