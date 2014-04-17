@@ -1291,7 +1291,6 @@ Player.prototype = {
     _setMetadata: function(sender, metadata) {
         if ( metadata["mpris:length"] ) {
             this._timeTracker.setTotal(metadata["mpris:length"] / 1000000);
-            if ( this.name == "quodlibet" ) this._timeTracker.setTotal(metadata["mpris:length"] / 1000);
             this._stopTimer();
             if ( this._playerStatus == "Playing" ) {
                 this._runTimer();
