@@ -543,6 +543,23 @@ ButtonMenu.prototype = {
             this.menu.actor.set_name(settings.theme+"-popup-boxPointer");
             this.menuManager.addMenu(this.menu);
             Main.uiGroup.add_actor(this.menu.actor);
+            
+            let scrollBox = new St.ScrollView();
+            this.menu.addActor(scrollBox);
+            this.content = new PopupMenu.PopupMenuSection();
+            scrollBox.add_actor(this.content.actor);
+            
+            this.menu.setMaxHeight = Lang.bind(this, function() {
+                let monitor = Main.layoutManager.findMonitorForActor(this.actor);
+                if ( monitor == Main.layoutManager.primaryMonitor && Main.panel2 !== null)
+                    panelHeight = Main.panel2.actor.height;
+                else panelHeight = 0;
+                let startY = Cinnamon.util_get_transformed_allocation(this.actor).y2;
+                let boxpointerHeight = this.menu.actor.get_theme_node().get_length('-boxpointer-gap');
+                let maxHeight = Math.round(monitor.height - startY - panelHeight - boxpointerHeight);
+                this.menu.actor.style = ('max-height: ' + maxHeight + 'px;');
+            });
+            
             this.menu.actor.hide();
             
             this.actor.connect("clicked", Lang.bind(this, this.activate));
@@ -563,11 +580,11 @@ ButtonMenu.prototype = {
         let label = new St.Label({ text: title });
         menuItem.addActor(label);
         menuItem.connect("activate", callback);
-        this.menu.addMenuItem(menuItem);
+        this.content.addMenuItem(menuItem);
     },
     
     removeAll: function() {
-        this.menu.removeAll();
+        this.content.removeAll();
     },
 }
 
