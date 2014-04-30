@@ -273,6 +273,7 @@ SettingsInterface.prototype = {
     _init: function(uuid, deskletId) {
         
         this.settings = new Settings.DeskletSettings(this, uuid, deskletId);
+        this.settings.bindProperty(Settings.BindingDirection.IN, "hideSystray", "hideSystray", function() { this.emit("systray-show-hide"); });
         this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this.queRebuild);
         this.settings.bindProperty(Settings.BindingDirection.IN, "showApps", "showApps", function() { this.emit("app-show-hide"); });
         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "countUp", "countUp", function() { this.emit("countup-changed"); });
@@ -1477,6 +1478,7 @@ myDesklet.prototype = {
     _init: function(metadata, desklet_id) {
         try {
             
+            this.metadata = metadata;
             Desklet.Desklet.prototype._init.call(this, metadata);
             inhibitor = new Inhibitor(this._draggable);
             
@@ -1484,14 +1486,22 @@ myDesklet.prototype = {
             settings.connect("que-rebuild", Lang.bind(this, this.rebuild));
             settings.connect("keybinding-changed", Lang.bind(this, this.bindKey));
             settings.connect("volume-settings-changed", Lang.bind(this, this.updateVolume));
+            settings.connect("systray-show-hide", Lang.bind(this, function() {
+                if ( settings.hideSystray ) this.registerSystrayIcons();
+                else this.unregisterSystrayIcons();
+            }))
             this.bindKey();
-            desklet_raised = false;
-            
-            this._menu.addSettingsAction(_("Sound Settings"), "sound");
+            if ( settings.hideSystray ) this.registerSystrayIcons();
             
             this.players = {};
             this.owners = [];
             this.apps = [];
+            this.playerShown = null;
+            this.volume = 0;
+            this._output = null;
+            this._outputVolumeId = 0;
+            this._outputMutedId = 0;
+            this._volumeControlShown = false;
             
             for ( let player in supported_players ) {
                 DBus.session.watch_name("org.mpris.MediaPlayer2." + player, false,
@@ -1509,20 +1519,34 @@ myDesklet.prototype = {
             this.volumeControl.connect("stream-removed", Lang.bind(this, this._reloadApps));
             this.normVolume = this.volumeControl.get_vol_max_norm();
             this.maxVolume = this.volumeControl.get_vol_max_amplified();
-            
-            this.playerShown = null;
-            this.volume = 0;
-            this._output = null;
-            this._outputVolumeId = 0;
-            this._outputMutedId = 0;
             this.volumeControl.open();
-            this._volumeControlShown = false;
+            
+            this._menu.addSettingsAction(_("Sound Settings"), "sound");
             
             this._build_interface();
             
         } catch(e) {
             global.logError(e);
         }
+    },
+    
+    on_desklet_removed: function() {
+        this.unregisterSystrayIcons();
+    },
+    
+    registerSystrayIcons: function() {
+        if ( !Main.systrayManager ) {
+            global.log("System tray icons not hidden: feature not available in your version of Cinnamon");
+            return;
+        }
+        for ( let i in supported_players ) {
+            if ( supported_players[i].seek ) Main.systrayManager.registerRole(i, this.metadata.uuid);
+        }
+    },
+    
+    unregisterSystrayIcons: function() {
+        if ( !Main.systrayManager ) return;
+        Main.systrayManager.unregisterId(this.metadata.uuid);
     },
     
     bindKey: function() {
