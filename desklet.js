@@ -197,7 +197,7 @@ TimeTracker.prototype = {
         if ( settings.countUp ) current = elapsed;
         else current = this.totalCount - elapsed;
         
-        return this.formatTime(Math.floor(current)) + " / " + this.formatTime(this.totalCount);
+        return this.formatTime(Math.floor(current)) + " / " + this.formatTime(Math.floor(this.totalCount));
     },
     
     formatTime: function(seconds) {
@@ -1309,7 +1309,6 @@ Player.prototype = {
     _setMetadata: function(sender, metadata) {
         if ( metadata["mpris:length"] ) {
             this._timeTracker.setTotal(metadata["mpris:length"] / 1000000);
-            if ( this.name == "quodlibet" ) this._timeTracker.setTotal(metadata["mpris:length"] / 1000);
             this._stopTimer();
             if ( this._playerStatus == "Playing" ) {
                 this._runTimer();
