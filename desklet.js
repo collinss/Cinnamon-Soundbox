@@ -549,6 +549,7 @@ ButtonMenu.prototype = {
             this.menu.addActor(scrollBox);
             this.content = new PopupMenu.PopupMenuSection();
             scrollBox.add_actor(this.content.actor);
+            this.menu._connectSubMenuSignals(this.content, this.content);
             
             this.menu.setMaxHeight = Lang.bind(this, function() {
                 let monitor = Main.layoutManager.findMonitorForActor(this.actor);
@@ -1535,7 +1536,7 @@ myDesklet.prototype = {
     
     registerSystrayIcons: function() {
         if ( !Main.systrayManager ) {
-            global.log("System tray icons not hidden: feature not available in your version of Cinnamon");
+            global.log("Soundbox: system tray icons were not hidden - this feature is not available in your version of Cinnamon");
             return;
         }
         for ( let i in supported_players ) {
