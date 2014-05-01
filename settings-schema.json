@@ -34,6 +34,12 @@
         "description": "Appearance"
     },
     
+    "centerRaised": {
+        "type": "checkbox",
+        "description": "Center Soundbox on the screen in raised mode",
+        "default": true
+    },
+    
     "compact": {
         "type": "checkbox",
         "description": "Use compact layout",

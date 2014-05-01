@@ -1,4 +1,5 @@
 const Desklet = imports.ui.desklet;
+const DeskletManager = imports.ui.deskletManager;
 const Main = imports.ui.main;
 const ModalDialog = imports.ui.modalDialog;
 const PopupMenu = imports.ui.popupMenu;
@@ -280,6 +281,7 @@ SettingsInterface.prototype = {
         this.settings.bindProperty(Settings.BindingDirection.IN, "showApps", "showApps", function() { this.emit("app-show-hide"); });
         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "countUp", "countUp", function() { this.emit("countup-changed"); });
         this.settings.bindProperty(Settings.BindingDirection.IN, "raiseKey", "raiseKey", function() { this.emit("keybinding-changed"); });
+        this.settings.bindProperty(Settings.BindingDirection.IN, "centerRaised", "centerRaised");
         this.settings.bindProperty(Settings.BindingDirection.IN, "compact", "compact", this.queRebuild);
         this.settings.bindProperty(Settings.BindingDirection.IN, "showArt", "showArt", function() { this.emit("art-show-hide"); });
         this.settings.bindProperty(Settings.BindingDirection.IN, "artSize", "artSize", function() { this.emit("redraw-art"); });
@@ -582,9 +584,17 @@ RaisedBox.prototype = {
             
             this.groupContent.add_actor(this.desklet.actor);
             
+            if ( !settings.centerRaised ) {
+                let allocation = Cinnamon.util_get_transformed_allocation(desklet.actor);
+                let monitor = Main.layoutManager.findMonitorForActor(desklet.actor);
+                let x = Math.floor((monitor.width - allocation.x1 - allocation.x2) / 2);
+                let y = Math.floor((monitor.height - allocation.y1 - allocation.y2) / 2);
+                
+                this.actor.set_anchor_point(x,y);
+            }
+            
+            Main.pushModal(this.actor);
             this.actor.show();
-            global.set_stage_input_mode(Cinnamon.StageInputMode.FULLSCREEN);
-            global.focus_manager.add_group(this.actor);
             
             this.stageEventIds.push(global.stage.connect("captured-event", Lang.bind(this, this.onStageEvent)));
             this.stageEventIds.push(global.stage.connect("enter-event", Lang.bind(this, this.onStageEvent)));
@@ -592,18 +602,8 @@ RaisedBox.prototype = {
             this.playerMenuEvents.push(this.playerMenu.connect("activate", Lang.bind(this, function() {
                 this.emit("closed");
             })));
-            this.playerMenuEvents.push(this.playerMenu.connect("open-state-changed", Lang.bind(this, function(menu, open) {
-                if ( !open ) {
-                    global.set_stage_input_mode(Cinnamon.StageInputMode.FULLSCREEN);
-                }
-            })));
             this.contextMenuEvents.push(this.contextMenu.connect("activate", Lang.bind(this, function() {
                 this.emit("closed");
-            })));
-            this.contextMenuEvents.push(this.contextMenu.connect("open-state-changed", Lang.bind(this, function(menu, open) {
-                if ( !open ) {
-                    global.set_stage_input_mode(Cinnamon.StageInputMode.FULLSCREEN);
-                }
             })));
             
         } catch(e) {
@@ -620,8 +620,8 @@ RaisedBox.prototype = {
             
             if ( this.desklet ) this.groupContent.remove_actor(this.desklet.actor);
             
+            Main.popModal(this.actor);
             this.actor.destroy();
-            global.set_stage_input_mode(Cinnamon.StageInputMode.NORMAL);
             
         } catch(e) {
             global.logError(e);
@@ -632,7 +632,11 @@ RaisedBox.prototype = {
         try {
             
             let type = event.type();
-            if ( type == Clutter.EventType.KEY_PRESS || type == Clutter.EventType.KEY_RELEASE ) return true;
+            if ( type == Clutter.EventType.KEY_PRESS ) return true;
+            if ( type == Clutter.EventType.KEY_RELEASE ) {
+                if ( event.get_key_symbol() == Clutter.KEY_Escape ) this.emit("closed");
+                return true;
+            }
             
             let target = event.get_source();
             if ( target == this.desklet.actor || this.desklet.actor.contains(target) ||
@@ -1725,6 +1729,9 @@ myDesklet.prototype = {
         if ( this.raisedBox ) this.raisedBox.remove();
         Main.deskletContainer.addDesklet(this.actor);
         inhibitor.remove("raisedBox");
+        
+        DeskletManager.mouseTrackEnabled = -1;
+        DeskletManager.checkMouseTracking();
         
         desklet_raised = false;
         this.changingRaiseState = false;
