@@ -278,6 +278,7 @@ SettingsInterface.prototype = {
         this.settings = new Settings.DeskletSettings(this, uuid, deskletId);
         this.settings.bindProperty(Settings.BindingDirection.IN, "hideSystray", "hideSystray", function() { this.emit("systray-show-hide"); });
         this.settings.bindProperty(Settings.BindingDirection.IN, "theme", "theme", this.queRebuild);
+        this.settings.bindProperty(Settings.BindingDirection.IN, "showInput", "showInput", this.queRebuild);
         this.settings.bindProperty(Settings.BindingDirection.IN, "showApps", "showApps", function() { this.emit("app-show-hide"); });
         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "countUp", "countUp", function() { this.emit("countup-changed"); });
         this.settings.bindProperty(Settings.BindingDirection.IN, "raiseKey", "raiseKey", function() { this.emit("keybinding-changed"); });
@@ -1787,6 +1788,7 @@ myDesklet.prototype = {
             this.volumeControl = new Gvc.MixerControl({ name: "Cinnamon Volume Control" });
             this.volumeControl.connect("state-changed", Lang.bind(this, this._onControlStateChanged));
             this.volumeControl.connect("default-sink-changed", Lang.bind(this, this.readOutput));
+            this.volumeControl.connect("default-source-changed", Lang.bind(this, this.readInput));
             this.volumeControl.connect("card-added", Lang.bind(this, this._onControlStateChanged));
             this.volumeControl.connect("card-removed", Lang.bind(this, this._onControlStateChanged));
             this.volumeControl.connect("stream-added", Lang.bind(this, this._reloadApps));
@@ -1800,6 +1802,12 @@ myDesklet.prototype = {
             this.outputDevices = new PopupMenu.PopupMenuSection();
             this._menu.addMenuItem(this.outputDevices);
             this._menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+            
+            this._menu.addMenuItem(new PopupMenu.PopupMenuItem(_("Input Devices"), { reactive: false }));
+            this.inputDevices = new PopupMenu.PopupMenuSection();
+            this._menu.addMenuItem(this.inputDevices);
+            this._menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+            
             this._menu.addSettingsAction(_("Sound Settings"), "sound");
             this._menu.addAction(_("About..."), Lang.bind(this, this.openAbout));
             
@@ -1911,6 +1919,14 @@ myDesklet.prototype = {
         this.outputVolumeDisplay = new SystemVolumeDisplay("Volume: ", this.normVolume, this.maxVolume);
         this.mainBox.add_actor(this.outputVolumeDisplay.actor);
         
+        if ( settings.showInput ) {
+            let divider = new Divider();
+            this.mainBox.add_actor(divider.actor);
+            
+            this.inputVolumeDisplay = new SystemVolumeDisplay("Input Volume: ", this.normVolume, this.maxVolume);
+            this.mainBox.add_actor(this.inputVolumeDisplay.actor);
+        }
+        
         //application volume controls
         this.appBox = new St.BoxLayout({ vertical: true });
         this.mainBox.add_actor(this.appBox);
@@ -1982,6 +1998,8 @@ myDesklet.prototype = {
             this.playersBox.set_child(null);
             this.playerTitle.set_child(null);
             this._build_interface();
+            this.readOutput();
+            this.readInput();
             this._reloadApps();
             for ( let i = 0; i < this.owners.length; i++ ) {
                 let owner = this.owners[i];
@@ -2001,7 +2019,10 @@ myDesklet.prototype = {
     },
     
     _onControlStateChanged: function() {
-        if ( this.volumeControl.get_state() == Gvc.MixerControlState.READY ) this.readOutput();
+        if ( this.volumeControl.get_state() == Gvc.MixerControlState.READY ) {
+            this.readOutput();
+            this.readInput();
+        }
     },
     
     readOutput: function() {
@@ -2022,6 +2043,27 @@ myDesklet.prototype = {
                 this.volumeControl.set_default_sink(sink);
             }));
             this.outputDevices.addMenuItem(deviceItem);
+        }
+    },
+    
+    readInput: function() {
+        this.input = this.volumeControl.get_default_source();
+        if ( settings.showInput ) this.inputVolumeDisplay.setControl(this.input);
+        
+        //add input devices to context menu
+        let sources = this.volumeControl.get_sources();
+        this.inputDevices.removeAll();
+        for ( let i = 0; i < sources.length; i++ ) {
+            let source = sources[i];
+            let deviceItem = new PopupMenu.PopupMenuItem(source.get_description());
+            if ( sources[i].get_id() == this.input.get_id() ) {
+                deviceItem.setShowDot(true);
+            }
+            deviceItem.connect("activate", Lang.bind(this, function() {
+                global.log("Default input set as " + source.get_description());
+                this.volumeControl.set_default_source(source);
+            }));
+            this.inputDevices.addMenuItem(deviceItem);
         }
     },
     

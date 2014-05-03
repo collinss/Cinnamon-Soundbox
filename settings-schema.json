@@ -5,6 +5,12 @@
         "default": true
     },
     
+    "showInput": {
+        "type": "checkbox",
+        "description": "Show input volume controls",
+        "default": false
+    },
+    
     "showApps": {
         "type": "checkbox",
         "description": "Show application volume controls",
