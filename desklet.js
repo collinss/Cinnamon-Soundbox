@@ -1626,9 +1626,9 @@ myDesklet.prototype = {
             this.apps = [];
             this.playerShown = null;
             this.volume = 0;
-            this._output = null;
-            this._outputVolumeId = 0;
-            this._outputMutedId = 0;
+            this.output = null;
+            this.outputVolumeId = 0;
+            this.outputMutedId = 0;
             this._volumeControlShown = false;
             
             for ( let player in supported_players ) {
@@ -1640,7 +1640,7 @@ myDesklet.prototype = {
             
             this.volumeControl = new Gvc.MixerControl({ name: "Cinnamon Volume Control" });
             this.volumeControl.connect("state-changed", Lang.bind(this, this._onControlStateChanged));
-            this.volumeControl.connect("default-sink-changed", Lang.bind(this, this._readOutput));
+            this.volumeControl.connect("default-sink-changed", Lang.bind(this, this.readOutput));
             this.volumeControl.connect("card-added", Lang.bind(this, this._onControlStateChanged));
             this.volumeControl.connect("card-removed", Lang.bind(this, this._onControlStateChanged));
             this.volumeControl.connect("stream-added", Lang.bind(this, this._reloadApps));
@@ -1649,6 +1649,11 @@ myDesklet.prototype = {
             this.maxVolume = this.volumeControl.get_vol_max_amplified();
             this.volumeControl.open();
             
+            //context menu
+            this._menu.addMenuItem(new PopupMenu.PopupMenuItem(_("Output Devices"), { reactive: false }));
+            this.outputDevices = new PopupMenu.PopupMenuSection();
+            this._menu.addMenuItem(this.outputDevices);
+            this._menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
             this._menu.addSettingsAction(_("Sound Settings"), "sound");
             this._menu.addAction(_("About..."), Lang.bind(this, this.openAbout));
             
@@ -1694,8 +1699,6 @@ myDesklet.prototype = {
             
             if ( desklet_raised ) this.lower();
             else this.raise();
-            
-            //throw "works";
             
         } catch(e) {
             global.logError(e);
@@ -1866,7 +1869,7 @@ myDesklet.prototype = {
             this.playersBox.set_child(null);
             this.playerTitle.set_child(null);
             this._build_interface();
-            this._mutedChanged();
+            this.updateMute();
             this.updateVolume();
             this._reloadApps();
             for ( let i = 0; i < this.owners.length; i++ ) {
@@ -1886,8 +1889,8 @@ myDesklet.prototype = {
         else this.appBox.hide();
     },
     
-    _mutedChanged: function(object, param_spec) {
-        let muted = this._output.is_muted;
+    updateMute: function(object, param_spec) {
+        let muted = this.output.is_muted;
         if ( muted ) {
             this.volumeSlider.setValue(0);
             this.volumeValueText.text = "0%";
@@ -1895,8 +1898,8 @@ myDesklet.prototype = {
             this.muteTooltip.set_text(_("Unmute"));
         }
         else {
-            this.volume = this._output.volume / this.normVolume;
-            if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this._output.volume/this.maxVolume);
+            this.volume = this.output.volume / this.normVolume;
+            if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this.output.volume/this.maxVolume);
             else this.volumeSlider.setValue(this.volume);
             this.volumeValueText.text = Math.floor(100 * this.volume) + "%";
             this.volumeIcon.icon_name = null;
@@ -1913,12 +1916,12 @@ myDesklet.prototype = {
     },
     
     updateVolume: function(object, param_spec) {
-        if ( !this._output.is_muted ) {
-            this.volume = this._output.volume / this.normVolume;
+        if ( !this.output.is_muted ) {
+            this.volume = this.output.volume / this.normVolume;
             
             this.volumeValueText.text = Math.floor(100 * this.volume) + "%";
             this.volumeIcon.icon_name = null;
-            if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this._output.volume/this.maxVolume);
+            if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this.output.volume/this.maxVolume);
             else this.volumeSlider.setValue(this.volume);
             
             if ( this.volume <= 0 ) this.volumeIcon.icon_name = "audio-volume-muted";
@@ -1932,22 +1935,38 @@ myDesklet.prototype = {
     },
     
     _onControlStateChanged: function() {
-        if (this.volumeControl.get_state() == Gvc.MixerControlState.READY) this._readOutput();
+        if ( this.volumeControl.get_state() == Gvc.MixerControlState.READY ) this.readOutput();
     },
     
-    _readOutput: function() {
-        if ( this._outputVolumeId ) {
-            this._output.disconnect(this._outputVolumeId);
-            this._output.disconnect(this._outputMutedId);
-            this._outputVolumeId = 0;
-            this._outputMutedId = 0;
+    readOutput: function() {
+        if ( this.outputVolumeId ) {
+            this.output.disconnect(this.outputVolumeId);
+            this.output.disconnect(this.outputMutedId);
+            this.outputVolumeId = 0;
+            this.outputMutedId = 0;
         }
-        this._output = this.volumeControl.get_default_sink();
-        if ( this._output ) {
-            this._outputMutedId = this._output.connect("notify::is-muted", Lang.bind(this, this._mutedChanged));
-            this._outputVolumeId = this._output.connect("notify::volume", Lang.bind(this, this.updateVolume));
-            this._mutedChanged(null, null, "_output");
+        this.output = this.volumeControl.get_default_sink();
+        if ( this.output ) {
+            this.outputMutedId = this.output.connect("notify::is-muted", Lang.bind(this, this.updateMute));
+            this.outputVolumeId = this.output.connect("notify::volume", Lang.bind(this, this.updateVolume));
+            this.updateMute();
             this.updateVolume();
+            
+            //add output devices to context menu
+            let sinks = this.volumeControl.get_sinks();
+            this.outputDevices.removeAll();
+            for ( let i = 0; i < sinks.length; i++ ) {
+                let sink = sinks[i];
+                let deviceItem = new PopupMenu.PopupMenuItem(sink.get_description());
+                if ( sinks[i].get_id() == this.output.get_id() ) {
+                    deviceItem.setShowDot(true);
+                }
+                deviceItem.connect("activate", Lang.bind(this, function() {
+                    global.log("Default output set as " + sink.get_description());
+                    this.volumeControl.set_default_sink(sink);
+                }));
+                this.outputDevices.addMenuItem(deviceItem);
+            }
         }
         else {
             this.volumeSlider.setValue(0);
@@ -1988,21 +2007,21 @@ myDesklet.prototype = {
         let volume;
         if ( settings.exceedNormVolume ) volume = value * this.maxVolume;
         else volume = value * this.normVolume;
-        let prev_muted = this._output.is_muted;
+        let prev_muted = this.output.is_muted;
         if ( volume < 1 ) {
-            this._output.volume = 0;
-            if ( !prev_muted ) this._output.change_is_muted(true);
+            this.output.volume = 0;
+            if ( !prev_muted ) this.output.change_is_muted(true);
         }
         else {
-            this._output.volume = volume;
-            if ( prev_muted ) this._output.change_is_muted(false);
+            this.output.volume = volume;
+            if ( prev_muted ) this.output.change_is_muted(false);
         }
-        this._output.push_volume();
+        this.output.push_volume();
     },
     
     _toggleMute: function() {
-        if ( this._output.is_muted ) this._output.change_is_muted(false);
-        else this._output.change_is_muted(true);
+        if ( this.output.is_muted ) this.output.change_is_muted(false);
+        else this.output.change_is_muted(true);
     },
     
     _addPlayer: function(owner) {
