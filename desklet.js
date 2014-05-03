@@ -751,10 +751,14 @@ Slider.prototype = {
     },
     
     setValue: function(value) {
-        if (isNaN(value)) throw TypeError("The slider value must be a number");
-        
-        this._value = Math.max(Math.min(value, 1), 0);
-        this.actor.queue_repaint();
+        try {
+            if (isNaN(value)) throw TypeError("The slider value must be a number");
+            
+            this._value = Math.max(Math.min(value, 1), 0);
+            this.actor.queue_repaint();
+        } catch(e) {
+            global.logError(e);
+        }
     },
     
     _sliderRepaint: function(area) {
@@ -930,6 +934,150 @@ Slider.prototype = {
     }
 }
 Signals.addSignalMethods(Slider.prototype);
+
+
+function SystemVolumeDisplay(title, normVolume, maxVolume) {
+    this._init(title, normVolume, maxVolume);
+}
+
+SystemVolumeDisplay.prototype = {
+    _init: function(title, normVolume, maxVolume) {
+        
+        this.normVolume = normVolume;
+        this.maxVolume = maxVolume;
+        this.volume = 0;
+        this.compactibleElements = [];
+        
+        this.actor = new St.Bin({ x_align: St.Align.MIDDLE });
+        let volumeBox = new St.BoxLayout({ vertical: true, style_class: settings.theme+"-volumeBox" });
+        this.actor.add_actor(volumeBox);
+        this.compactibleElements.push(volumeBox);
+        
+        //volume text
+        let volumeTextBin = new St.Bin({ x_align: St.Align.MIDDLE });
+        volumeBox.add_actor(volumeTextBin);
+        let volumeTitleBox = new St.BoxLayout({ vertical: false, style_class: settings.theme+"-volumeTextBox" });
+        volumeTextBin.add_actor(volumeTitleBox);
+        
+        let volumeLabel = new St.Label({ text: title, style_class: settings.theme+"-text" });
+        volumeTitleBox.add_actor(volumeLabel);
+        this.volumeValueText = new St.Label({ text: Math.floor(100*this.volume) + "%", style_class: settings.theme+"-text" });
+        volumeTitleBox.add_actor(this.volumeValueText);
+        
+        //volume slider
+        let volumeSliderBox = new St.BoxLayout({ vertical: false });
+        volumeBox.add_actor(volumeSliderBox);
+        let volumeButton = new St.Button({ style_class: settings.theme+"-volumeButton" });
+        volumeSliderBox.add_actor(volumeButton);
+        this.volumeIcon = new St.Icon({ icon_name: "audio-volume-high", style_class: settings.theme+"-volumeIcon" });
+        volumeButton.set_child(this.volumeIcon);
+        this.compactibleElements.push(volumeButton, this.volumeIcon);
+        this.muteTooltip = new Tooltips.Tooltip(volumeButton);
+        this.muteTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
+        
+        let volumeSliderBin = new St.Bin();
+        volumeSliderBox.add_actor(volumeSliderBin);
+        this.volumeSlider = new Slider(this.volume);
+        volumeSliderBin.add_actor(this.volumeSlider.actor);
+        
+        volumeButton.connect("clicked", Lang.bind(this, this.toggleMute));
+        this.volumeSlider.connect("value-changed", Lang.bind(this, this.onSliderChanged));
+        settings.connect("volume-settings-changed", Lang.bind(this, this.updateVolume));
+        
+        if ( settings.compact ) {
+            for ( let i = 0; i < this.compactibleElements.length; i++ ) this.compactibleElements[i].add_style_pseudo_class("compact");
+        }
+    },
+    
+    setControl: function(control) {
+        if ( this.control ) {
+            this.control.disconnect(this.volumeEventId);
+            this.control.disconnect(this.mutedEventId);
+            this.volumeEventId = 0;
+            this.mutedEventId = 0;
+        }
+        
+        this.control = control;
+        
+        if ( control ) {
+            this.volumeEventId = this.control.connect("notify::volume", Lang.bind(this, this.updateVolume));
+            this.mutedEventId = this.control.connect("notify::is-muted", Lang.bind(this, this.updateMute));
+            this.updateMute();
+            this.updateVolume();
+        }
+        else {
+            this.volumeSlider.setValue(0);
+            this.volumeValueText.text = "0%";
+            this.volumeIcon.icon_name = "audio-volume-muted-symbolic";
+        }
+    },
+    
+    updateVolume: function(object, param_spec) {
+        if ( !this.control.is_muted ) {
+            this.volume = this.control.volume / this.normVolume;
+            
+            this.volumeValueText.text = Math.floor(100 * this.volume) + "%";
+            this.volumeIcon.icon_name = null;
+            if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this.control.volume/this.maxVolume);
+            else this.volumeSlider.setValue(this.volume);
+            
+            if ( this.volume <= 0 ) this.volumeIcon.icon_name = "audio-volume-muted";
+            else {
+                let n = Math.floor(3 * this.volume) + 1;
+                if (n < 2) this.volumeIcon.icon_name = "audio-volume-low";
+                else if (n >= 3) this.volumeIcon.icon_name = "audio-volume-high";
+                else this.volumeIcon.icon_name = "audio-volume-medium";
+            }
+        }
+    },
+    
+    updateMute: function(object, param_spec) {
+        let muted = this.control.is_muted;
+        if ( muted ) {
+            this.volumeSlider.setValue(0);
+            this.volumeValueText.text = "0%";
+            this.volumeIcon.icon_name = "audio-volume-muted-symbolic";
+            this.muteTooltip.set_text(_("Unmute"));
+        }
+        else {
+            this.volume = this.control.volume / this.normVolume;
+            if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this.control.volume/this.maxVolume);
+            else this.volumeSlider.setValue(this.volume);
+            this.volumeValueText.text = Math.floor(100 * this.volume) + "%";
+            this.volumeIcon.icon_name = null;
+            this.muteTooltip.set_text(_("Mute"));
+            
+            if ( this.volume <= 0 ) this.volumeIcon.icon_name = "audio-volume-muted";
+            else {
+                let n = Math.floor(3 * this.volume) + 1;
+                if ( n < 2 ) this.volumeIcon.icon_name = "audio-volume-low";
+                else if ( n >= 3 ) this.volumeIcon.icon_name = "audio-volume-high";
+                else this.volumeIcon.icon_name = "audio-volume-medium";
+            }
+        }
+    },
+    
+    onSliderChanged: function(slider, value) {
+        let volume;
+        if ( settings.exceedNormVolume ) volume = value * this.maxVolume;
+        else volume = value * this.normVolume;
+        let prev_muted = this.control.is_muted;
+        if ( volume < 1 ) {
+            this.control.volume = 0;
+            if ( !prev_muted ) this.control.change_is_muted(true);
+        }
+        else {
+            this.control.volume = volume;
+            if ( prev_muted ) this.control.change_is_muted(false);
+        }
+        this.control.push_volume();
+    },
+    
+    toggleMute: function() {
+        if ( this.control.is_muted ) this.control.change_is_muted(false);
+        else this.control.change_is_muted(true);
+    }
+}
 
 
 function AppControl(app, maxVol) {
@@ -1613,7 +1761,6 @@ myDesklet.prototype = {
             settings = new SettingsInterface(metadata["uuid"], desklet_id);
             settings.connect("que-rebuild", Lang.bind(this, this.rebuild));
             settings.connect("keybinding-changed", Lang.bind(this, this.bindKey));
-            settings.connect("volume-settings-changed", Lang.bind(this, this.updateVolume));
             settings.connect("systray-show-hide", Lang.bind(this, function() {
                 if ( settings.hideSystray ) this.registerSystrayIcons();
                 else this.unregisterSystrayIcons();
@@ -1625,7 +1772,6 @@ myDesklet.prototype = {
             this.owners = [];
             this.apps = [];
             this.playerShown = null;
-            this.volume = 0;
             this.output = null;
             this.outputVolumeId = 0;
             this.outputMutedId = 0;
@@ -1758,45 +1904,12 @@ myDesklet.prototype = {
         this.playerLauncher = new ButtonMenu(new St.Label({ text: _("Launch Player"), style_class: settings.theme+"-buttonText" }));
         topBox.add_actor(this.playerLauncher.actor);
         
+        //volume controls
         let divider = new Divider();
         this.mainBox.add_actor(divider.actor);
         
-        //volume controls
-        let volumeBin = new St.Bin({ x_align: St.Align.MIDDLE });
-        this.mainBox.add_actor(volumeBin);
-        let volumeBox = new St.BoxLayout({ vertical: true, style_class: settings.theme+"-volumeBox" });
-        volumeBin.add_actor(volumeBox);
-        this.compactibleElements.push(volumeBox);
-        
-        //volume text
-        let volumeTextBin = new St.Bin({ x_align: St.Align.MIDDLE });
-        volumeBox.add_actor(volumeTextBin);
-        let volumeTitleBox = new St.BoxLayout({ vertical: false, style_class: settings.theme+"-volumeTextBox" });
-        volumeTextBin.add_actor(volumeTitleBox);
-        
-        let volumeLabel = new St.Label({ text: _("Volume: "), style_class: settings.theme+"-text" });
-        volumeTitleBox.add_actor(volumeLabel);
-        this.volumeValueText = new St.Label({ text: Math.floor(100*this.volume) + "%", style_class: settings.theme+"-text" });
-        volumeTitleBox.add_actor(this.volumeValueText);
-        
-        //volume slider
-        let volumeSliderBox = new St.BoxLayout({ vertical: false });
-        volumeBox.add_actor(volumeSliderBox);
-        let volumeButton = new St.Button({ style_class: settings.theme+"-volumeButton" });
-        volumeSliderBox.add_actor(volumeButton);
-        this.volumeIcon = new St.Icon({ icon_name: "audio-volume-high", style_class: settings.theme+"-volumeIcon" });
-        volumeButton.set_child(this.volumeIcon);
-        this.compactibleElements.push(volumeButton, this.volumeIcon);
-        this.muteTooltip = new Tooltips.Tooltip(volumeButton);
-        this.muteTooltip._tooltip.add_style_class_name(settings.theme+"-tooltip");
-        
-        let volumeSliderBin = new St.Bin();
-        volumeSliderBox.add_actor(volumeSliderBin);
-        this.volumeSlider = new Slider(this.volume);
-        volumeSliderBin.add_actor(this.volumeSlider.actor);
-        
-        volumeButton.connect("clicked", Lang.bind(this, this._toggleMute));
-        this.volumeSlider.connect("value-changed", Lang.bind(this, this._sliderChanged));
+        this.outputVolumeDisplay = new SystemVolumeDisplay("Volume: ", this.normVolume, this.maxVolume);
+        this.mainBox.add_actor(this.outputVolumeDisplay.actor);
         
         //application volume controls
         this.appBox = new St.BoxLayout({ vertical: true });
@@ -1869,8 +1982,6 @@ myDesklet.prototype = {
             this.playersBox.set_child(null);
             this.playerTitle.set_child(null);
             this._build_interface();
-            this.updateMute();
-            this.updateVolume();
             this._reloadApps();
             for ( let i = 0; i < this.owners.length; i++ ) {
                 let owner = this.owners[i];
@@ -1889,89 +2000,28 @@ myDesklet.prototype = {
         else this.appBox.hide();
     },
     
-    updateMute: function(object, param_spec) {
-        let muted = this.output.is_muted;
-        if ( muted ) {
-            this.volumeSlider.setValue(0);
-            this.volumeValueText.text = "0%";
-            this.volumeIcon.icon_name = "audio-volume-muted-symbolic";
-            this.muteTooltip.set_text(_("Unmute"));
-        }
-        else {
-            this.volume = this.output.volume / this.normVolume;
-            if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this.output.volume/this.maxVolume);
-            else this.volumeSlider.setValue(this.volume);
-            this.volumeValueText.text = Math.floor(100 * this.volume) + "%";
-            this.volumeIcon.icon_name = null;
-            this.muteTooltip.set_text(_("Mute"));
-            
-            if ( this.volume <= 0 ) this.volumeIcon.icon_name = "audio-volume-muted";
-            else {
-                let n = Math.floor(3 * this.volume) + 1;
-                if ( n < 2 ) this.volumeIcon.icon_name = "audio-volume-low";
-                else if ( n >= 3 ) this.volumeIcon.icon_name = "audio-volume-high";
-                else this.volumeIcon.icon_name = "audio-volume-medium";
-            }
-        }
-    },
-    
-    updateVolume: function(object, param_spec) {
-        if ( !this.output.is_muted ) {
-            this.volume = this.output.volume / this.normVolume;
-            
-            this.volumeValueText.text = Math.floor(100 * this.volume) + "%";
-            this.volumeIcon.icon_name = null;
-            if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this.output.volume/this.maxVolume);
-            else this.volumeSlider.setValue(this.volume);
-            
-            if ( this.volume <= 0 ) this.volumeIcon.icon_name = "audio-volume-muted";
-            else {
-                let n = Math.floor(3 * this.volume) + 1;
-                if (n < 2) this.volumeIcon.icon_name = "audio-volume-low";
-                else if (n >= 3) this.volumeIcon.icon_name = "audio-volume-high";
-                else this.volumeIcon.icon_name = "audio-volume-medium";
-            }
-        }
-    },
-    
     _onControlStateChanged: function() {
         if ( this.volumeControl.get_state() == Gvc.MixerControlState.READY ) this.readOutput();
     },
     
     readOutput: function() {
-        if ( this.outputVolumeId ) {
-            this.output.disconnect(this.outputVolumeId);
-            this.output.disconnect(this.outputMutedId);
-            this.outputVolumeId = 0;
-            this.outputMutedId = 0;
-        }
         this.output = this.volumeControl.get_default_sink();
-        if ( this.output ) {
-            this.outputMutedId = this.output.connect("notify::is-muted", Lang.bind(this, this.updateMute));
-            this.outputVolumeId = this.output.connect("notify::volume", Lang.bind(this, this.updateVolume));
-            this.updateMute();
-            this.updateVolume();
-            
-            //add output devices to context menu
-            let sinks = this.volumeControl.get_sinks();
-            this.outputDevices.removeAll();
-            for ( let i = 0; i < sinks.length; i++ ) {
-                let sink = sinks[i];
-                let deviceItem = new PopupMenu.PopupMenuItem(sink.get_description());
-                if ( sinks[i].get_id() == this.output.get_id() ) {
-                    deviceItem.setShowDot(true);
-                }
-                deviceItem.connect("activate", Lang.bind(this, function() {
-                    global.log("Default output set as " + sink.get_description());
-                    this.volumeControl.set_default_sink(sink);
-                }));
-                this.outputDevices.addMenuItem(deviceItem);
+        this.outputVolumeDisplay.setControl(this.output);
+        
+        //add output devices to context menu
+        let sinks = this.volumeControl.get_sinks();
+        this.outputDevices.removeAll();
+        for ( let i = 0; i < sinks.length; i++ ) {
+            let sink = sinks[i];
+            let deviceItem = new PopupMenu.PopupMenuItem(sink.get_description());
+            if ( sinks[i].get_id() == this.output.get_id() ) {
+                deviceItem.setShowDot(true);
             }
-        }
-        else {
-            this.volumeSlider.setValue(0);
-            this.volumeValueText.text = "0%";
-            this.volumeIcon.icon_name = "audio-volume-muted-symbolic";
+            deviceItem.connect("activate", Lang.bind(this, function() {
+                global.log("Default output set as " + sink.get_description());
+                this.volumeControl.set_default_sink(sink);
+            }));
+            this.outputDevices.addMenuItem(deviceItem);
         }
     },
     
@@ -2001,27 +2051,6 @@ myDesklet.prototype = {
                 playerApp.open_new_window(-1);
             }));
         }
-    },
-    
-    _sliderChanged: function(slider, value) {
-        let volume;
-        if ( settings.exceedNormVolume ) volume = value * this.maxVolume;
-        else volume = value * this.normVolume;
-        let prev_muted = this.output.is_muted;
-        if ( volume < 1 ) {
-            this.output.volume = 0;
-            if ( !prev_muted ) this.output.change_is_muted(true);
-        }
-        else {
-            this.output.volume = volume;
-            if ( prev_muted ) this.output.change_is_muted(false);
-        }
-        this.output.push_volume();
-    },
-    
-    _toggleMute: function() {
-        if ( this.output.is_muted ) this.output.change_is_muted(false);
-        else this.output.change_is_muted(true);
     },
     
     _addPlayer: function(owner) {
