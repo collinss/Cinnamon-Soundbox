@@ -20,7 +20,8 @@
     "exceedNormVolume": {
         "type": "checkbox",
         "description": "Allow volume control to exceed 100% volume",
-        "default": false
+        "default": false,
+        "tooltip": "Note: some applications don't sound good over 100% volume"
     },
     
     "countUp": {
@@ -43,7 +44,7 @@
     "centerRaised": {
         "type": "checkbox",
         "description": "Center Soundbox on the screen in raised mode",
-        "default": true
+        "default": false
     },
     
     "compact": {
