@@ -1815,11 +1815,13 @@ myDesklet.prototype = {
             //context menu
             this._menu.addMenuItem(new PopupMenu.PopupMenuItem(_("Output Devices"), { reactive: false }));
             this.outputDevices = new PopupMenu.PopupMenuSection();
+            this.outputDevices.actor.add_style_class_name("soundBox-contextMenuSection");
             this._menu.addMenuItem(this.outputDevices);
             this._menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
             
             this._menu.addMenuItem(new PopupMenu.PopupMenuItem(_("Input Devices"), { reactive: false }));
             this.inputDevices = new PopupMenu.PopupMenuSection();
+            this.inputDevices.actor.add_style_class_name("soundBox-contextMenuSection");
             this._menu.addMenuItem(this.inputDevices);
             this._menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
             

@@ -33,3 +33,7 @@
 .soundbox-playerIcon {
     icon-size: 16px;
 }
+
+.soundBox-contextMenuSection {
+    padding-left: 15px;
+}
