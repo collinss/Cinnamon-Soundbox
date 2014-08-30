@@ -1,6 +1,7 @@
 Soundbox is an attractive and easy-to-use Desklet designed to control your volume and media players. It was originally forked from the Cinnamon sound applet, but has grown and evolved over time.
 
 To use this desklet run (must have git installed):
+
     cd ~/.local/share/cinnamon/desklets/
     git clone https://github.com/collinss/Cinnamon-Soundbox.git soundBox@scollins
 
