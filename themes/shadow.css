@@ -6,18 +6,22 @@
     background-color: rgba(69, 76, 94, 0.75);
 }
 
-.shadow-buttonMenu {
+.shadow-mainBox .soundbox-buttonMenu {
+    background-gradient-direction: none;
+    background: none;
+    box-shadow: 0px 0px 0px 0px;
     border: 1px solid #021544;
     border-radius: 5px 5px 5px 5px;
     color: #021544;
     padding: 7px;
 }
 
-.shadow-buttonMenu:hover {
+.shadow-mainBox .soundbox-buttonMenu:hover {
+    background-gradient-direction: none;
     background-color: rgba(32, 58, 119, 0.25);
 }
 
-.shadow-divider {
+.shadow-mainBox .soundbox-divider {
     background-color: #021544;
     border-radius: 5px;
     box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.15);
@@ -25,25 +29,25 @@
     height: 1px;
 }
 
-.shadow-divider-box {
+.shadow-mainBox .soundbox-divider-box {
     color: #021544;
     padding: 10px 30px 10px 30px;
 }
 
-.shadow-text, .shadow-buttonText, .shadow-appTitle, .shadow-playerTitleText, .shadow-trackInfo-text {
+.shadow-mainBox .soundbox-text, .shadow-mainBox .soundbox-buttonText, .shadow-mainBox .soundbox-appTitle, .shadow-mainBox .soundbox-playerTitleText, .shadow-mainBox .soundbox-trackInfo-text {
     color: #021544;
 }
 
-.shadow-volumeButton {
+.shadow-mainBox .soundbox-volumeButton {
     padding: 2px 3px 2px 3px;
 }
 
-.shadow-volumeIcon {
+.shadow-mainBox .soundbox-volumeIcon {
     icon-size: 16px;
     color: #021544;
 }
 
-.shadow-slider {
+.shadow-mainBox .soundbox-slider {
     -slider-handle-radius: 0px;
     -slider-handle-height: 10px;
     -slider-handle-width: 10px;
@@ -60,43 +64,53 @@
     min-width: 175px;
 }
 
-.shadow-appIcon {
+.shadow-mainBox .soundbox-appIcon {
     icon-size: 20px;
     padding: 0px 4px 4px 4px;
 }
 
-.shadow-appTitleBox {
+.shadow-mainBox .soundbox-appTitleBox {
     padding: 0px 0px 2px 0px;
 }
 
-.shadow-titleBox {
+.shadow-mainBox .soundbox-titleBox {
     border: 1px solid #021544;
     border-top: none;
     border-left: none;
     border-right: none;
 }
 
-.shadow-playerIcon {
+.shadow-mainBox .soundbox-titleBar {
+    background: none;
+    border-image: none;
+    border: none;
+}
+
+.shadow-mainBox .soundbox-playerIcon {
     icon_size: 16px;
     width: 16px;
 }
 
-.shadow-trackInfoBox {
+.shadow-mainBox .soundbox-trackInfoBox {
     padding: 5px 0px 5px 0px;
     margin-top: 5px;
     width: 200px;
 }
 
-.shadow-trackInfo {
+.shadow-mainBox .soundbox-trackInfo {
     padding: 3px 0px 5px 0px;
 }
 
-.shadow-trackInfo-icon {
+.shadow-mainBox .soundbox-trackInfo-icon {
     icon-size: 1em;
     color: #021544;
 }
 
-.shadow-albumCover {
+.shadow-mainBox .soundbox-albumCover-box {
+    background: none;
+}
+
+.shadow-mainBox .soundbox-albumCover {
     border: 1px solid #021544;
     border-radius: 10px 10px 10px 10px;
     icon_size: 200px;
@@ -104,50 +118,32 @@
     height: 200px;
 }
 
-.shadow-buttonBox {
+.shadow-mainBox .soundbox-buttonBox {
     padding: 5px 5px 5px 5px;
-    
 }
 
-.shadow-soundButton-box {
+.shadow-mainBox .soundbox-soundButton-box {
     padding: 3px 3px 3px 3px;
 }
 
-.shadow-soundButton {
+.shadow-mainBox .soundbox-soundButton {
     border: 1px solid #021544;
     border-radius: 5px 5px 5px 5px;
     width: 25px;
     height: 20px;
     padding: 3px 3px 3px 3px;
+    background-gradient-direction: none;
+    background: none;
+    box-shadow: 0px 0px 0px 0px;
 }
 
-.shadow-soundButton:hover {
+.shadow-mainBox .soundbox-soundButton:hover {
     background-color: rgba(32, 58, 119, 0.25);
 }
 
-.shadow-soundButton-icon {
+.shadow-mainBox .soundbox-soundButton-icon {
     icon-size: 16px;
     color: #021544;
-}
-
-#shadow-popup-menuitem {
-    border-image: none;
-    border: solid 1px rgba(0,0,0,0);
-    text-shadow: 0px 0px 0px 0px;
-    color: #021544;
-    border-radius: 5px 5px 5px 5px;
-    padding: .4em 1em;
-    spacing: 1em;
-}
-
-#shadow-popup-menuitem:active {
-    box-shadow: 0px 0px 0px 0px;
-    border-image: none;
-    border: solid 1px #021544;
-    text-shadow: 0px 0px 0px 0px;
-    color: #021544;
-    background-color: rgba(0,0,0,0);
-    background-gradient-direction: none;
 }
 
 #Tooltip.shadow-tooltip {
@@ -163,16 +159,6 @@
 
 #shadow-popup {
     border-image: none;
-    text-shadow: 0px 0px 0px 0px;
-    color: #021544;
-    border: solid 1px #021544;
-    border-radius: 5px 5px 5px 5px;
-    background-color: rgba(136, 146, 170, 0.9);
-    padding: 4px 12px 4px 12px;
-}
-
-#shadow-popup-boxPointer {
-    border-image: none;
     border: none;
     -arrow-border-width: 0px;
     -arrow-base: 0px;
@@ -183,12 +169,42 @@
     -arrow-background-color: rgba(0,0,0,0);
 }
 
+#shadow-popup .popup-menu-content {
+    border-image: none;
+    text-shadow: 0px 0px 0px 0px;
+    color: #021544;
+    border: solid 1px #021544;
+    border-radius: 5px 5px 5px 5px;
+    background-color: rgba(136, 146, 170, 0.9);
+    padding: 4px 12px 4px 12px;
+}
+
+#shadow-popup .popup-menu-item {
+    border-image: none;
+    border: solid 1px rgba(0,0,0,0);
+    text-shadow: 0px 0px 0px 0px;
+    color: #021544;
+    border-radius: 5px 5px 5px 5px;
+    padding: .4em 1em;
+    spacing: 1em;
+}
+
+#shadow-popup .popup-menu-item:active {
+    box-shadow: 0px 0px 0px 0px;
+    border-image: none;
+    border: solid 1px #021544;
+    text-shadow: 0px 0px 0px 0px;
+    color: #021544;
+    background-color: rgba(0,0,0,0);
+    background-gradient-direction: none;
+}
+
 /*compact*/
 .shadow-mainBox:compact {
     padding: 0px 0px 0px 0px;
 }
 
-.shadow-buttonMenu:compact {
+.shadow-mainBox:compact .soundbox-buttonMenu {
     border-top: none;
     border-left: none;
     border-right: none;
@@ -196,48 +212,48 @@
     border-radius: 0px;
 }
 
-.shadow-divider:compact {
+.shadow-mainBox:compact .soundbox-divider {
     background-color: transparent;
     height: 0px;
 }
 
-.shadow-divider-box:compact {
+.shadow-mainBox:compact .soundbox-divider-box {
     padding: 0px;
 }
 
-.shadow-volumeButton:compact {
+.shadow-mainBox:compact .soundbox-volumeButton {
     padding: 0px 2px 2px 2px;
 }
 
-.shadow-volumeIcon:compact {
+.shadow-mainBox:compact .soundbox-volumeIcon {
     icon-size: 14px;
 }
 
-.shadow-appIcon:compact {
+.shadow-mainBox:compact .soundbox-appIcon {
     icon-size: 1em;
 }
 
-.shadow-trackInfoBox:compact {
+.shadow-mainBox:compact .soundbox-trackInfoBox {
     padding: 0px;
 }
 
-.shadow-trackInfo:compact {
+.shadow-mainBox:compact .soundbox-trackInfo {
     padding: 0px;
 }
 
-.shadow-trackInfo-icon:compact {
+.shadow-mainBox:compact .soundbox-trackInfo-icon {
     icon-size: 1em;
 }
 
-.shadow-buttonBox:compact{
+.shadow-mainBox:compact .soundbox-buttonBox:compact{
     padding: 0px;
 }
 
-.shadow-soundButton:compact {
+.shadow-mainBox:compact .soundbox-soundButton {
     height: 14px;
     width: 16px;
 }
 
-.shadow-soundButton-box:compact {
+.shadow-mainBox:compact .soundbox-soundButton-box {
     padding: 2px;
 }

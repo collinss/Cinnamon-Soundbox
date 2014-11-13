@@ -7,8 +7,17 @@
 @import url("themes/mintx.css");
 @import url("themes/hot.css");
 
-.soundbox-volumeIcon {
-    icon-size: 16px;
+/*general items*/
+.soundbox-mainBox {
+    
+}
+
+.soundbox-text, .soundbox-buttonText, .soundbox-playerTitleText, .soundbox-appTitle, .soundbox-trackInfo-text {
+    
+}
+
+.soundbox-buttonMenu {
+    
 }
 
 .soundbox-slider {
@@ -18,22 +27,112 @@
     min-width: 150px;
 }
 
+.soundbox-divider-box {
+    
+}
+
+.soundbox-divider {
+    
+}
+
+/*volume area*/
+.soundbox-volumeBox {
+    
+}
+
+.soundbox-volumeTextBox {
+    
+}
+
+.soundbox-volumeButton {
+    
+}
+
+.soundbox-volumeIcon {
+    icon-size: 16px;
+}
+
+.soundbox-appBox {
+    
+}
+
+.soundbox-appTitleBox {
+    
+}
+
 .soundbox-appIcon {
     icon-size: 20px;
 }
 
-.soundbox-trackInfo-icon {
-    icon-size: 1em;
+/*player area*/
+.soundbox-playerBox {
+    
 }
 
-.soundbox-soundButton-icon {
-    icon-size: 24px;
+.soundbox-titleBar {
+    
+}
+
+.soundbox-playerSelectButton {
+    
+}
+
+.soundbox-titleBox {
+    
+}
+
+.soundbox-playerInfoBar {
+    
 }
 
 .soundbox-playerIcon {
     icon-size: 16px;
 }
 
+.soundbox-timeBox {
+    
+}
+
+/*track info*/
+.soundbox-trackInfoBox {
+    
+}
+
+.soundbox-trackInfo {
+    
+}
+
+.soundbox-trackInfo-icon {
+    icon-size: 1em;
+}
+
+/*album cover*/
+.soundbox-albumCover-box {
+    
+}
+
+.soundbox-albumCover {
+    
+}
+
+/*media controls*/
+.soundbox-buttonBox {
+    
+}
+
+.soundbox-soundButton-box {
+    
+}
+
+.soundbox-soundButton {
+    
+}
+
+.soundbox-soundButton-icon {
+    icon-size: 24px;
+}
+
 .soundBox-contextMenuSection {
     padding-left: 15px;
 }
+

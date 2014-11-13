@@ -6,48 +6,51 @@
     background-color: #0A161E;
 }
 
-.ice-buttonMenu {
+.ice-mainBox .soundbox-buttonMenu {
+    background-gradient-direction: none;
+    background: none;
+    box-shadow: 0px 0px 0px 0px;
     border: 1px solid #1991E8;
     border-radius: 5px 5px 5px 5px;
     padding: 7px;
 }
 
-.ice-buttonMenu:hover {
+.ice-mainBox .soundbox-buttonMenu:hover {
     background-gradient-direction: vertical;
     background-gradient-start: #214B66;
     background-gradient-end: #112430;
 }
 
-.ice-divider {
+.ice-mainBox .soundbox-divider {
     background-color: #1991E8;
     border-radius: 5px;
     -margin-horizontal: 14px;
     height: 1px;
 }
 
-.ice-divider-box {
+.ice-mainBox .soundbox-divider-box {
     color: #000000;
     padding: 10px 5px 10px 5px;
 }
 
-.ice-text, .ice-buttonText, .ice-playerTitleText, .ice-appTitle, .ice-trackInfo-text {
+.ice-mainBox .soundbox-text, .ice-mainBox .soundbox-buttonText, .ice-mainBox .soundbox-playerTitleText, .ice-mainBox .soundbox-appTitle, .ice-mainBox .soundbox-trackInfo-text {
     color: #1991E8;
 }
 
-.ice-trackInfo-text {
+.ice-mainBox .soundbox-trackInfo-text {
     padding: 0px 3px;
 }
 
-.ice-volumeButton {
+.ice-mainBox .soundbox-volumeButton {
     padding: 2px 3px 2px 3px;
 }
 
-.ice-volumeIcon {
+.ice-mainBox .soundbox-volumeIcon {
     icon-size: 16px;
     color: #1991E8;
 }
 
-.ice-slider {
+.ice-mainBox .soundbox-slider {
     height: 20px;
     min-width: 185px;
     -slider-background-color: #01538E;
@@ -65,44 +68,53 @@
     -slider-handle-border-width: 0px;
 }
 
-.ice-appIcon {
+.ice-mainBox .soundbox-slider:hover {
+    -slider-handle-color: #57AEED;
+}
+
+.ice-mainBox .soundbox-appIcon {
     icon-size: 20px;
     padding: 0px 4px 2px 4px;
 }
 
-.ice-titleBar {
+.ice-mainBox .soundbox-titleBar {
     background-gradient-direction: vertical;
     background-gradient-start: #0e4b77;
     background-gradient-end: #01365b;
     border: solid 1px #1991E8;
     border-radius: 2px 2px 2px 2px;
     width: 200px;
+    border-image: none;
 }
 
-.ice-playerSelectButton {
+.ice-mainBox .soundbox-playerSelectButton {
     color: #1991E8;
 }
 
-.ice-playerIcon {
+.ice-mainBox .soundbox-playerIcon {
     icon_size: 16px;
     width: 16px;
 }
 
-.ice-trackInfoBox {
+.ice-mainBox .soundbox-trackInfoBox {
     padding: 3px 0px 5px 0px;
     width: 200px;
 }
 
-.ice-trackInfo {
+.ice-mainBox .soundbox-trackInfo {
     padding: 3px 0px 3px 0px;
 }
 
-.ice-trackInfo-icon {
+.ice-mainBox .soundbox-trackInfo-icon {
     icon-size: 1.4em;
     color: #1991E8;
 }
 
-.ice-albumCover {
+.ice-mainBox .soundbox-albumCover-box {
+    background: none;
+}
+
+.ice-mainBox .soundbox-albumCover {
     border: 1px solid #1991E8;
     border-radius: 5px 5px 5px 5px;
     icon-size: 200px;
@@ -110,56 +122,38 @@
     height: 200px;
 }
 
-.ice-timeBox {
+.ice-mainBox .soundbox-timeBox {
     padding: 4px;
 }
 
-.ice-buttonBox {
+.ice-mainBox .soundbox-buttonBox {
     padding: 5px 5px 5px 5px;
 }
 
-.ice-soundButton-box {
+.ice-mainBox .soundbox-soundButton-box {
     padding: 3px 3px 3px 3px;
 }
 
-.ice-soundButton {
+.ice-mainBox .soundbox-soundButton {
     border: 1px solid #1991E8;
     border-radius: 5px 5px 5px 5px;
     width: 25px;
     height: 20px;
     padding: 3px 3px 3px 3px;
+    background-gradient-direction: none;
+    background: none;
+    box-shadow: 0px 0px 0px 0px;
 }
 
-.ice-soundButton:hover {
+.ice-mainBox .soundbox-soundButton:hover {
     background-gradient-direction: vertical;
     background-gradient-start: #214B66;
     background-gradient-end: #112430;
 }
 
-.ice-soundButton-icon {
+.ice-mainBox .soundbox-soundButton-icon {
     icon-size: 16px;
     color: #1991E8;
-}
-
-#ice-popup-menuitem {
-    border-image: none;
-    border: none;
-    text-shadow: 0px 0px 0px 0px;
-    color: #1991E8;
-    border-radius: 5px 5px 5px 5px;
-    padding: .4em 1em;
-    spacing: 1em;
-}
-
-#ice-popup-menuitem:active {
-    box-shadow: 0px 0px 0px 0px;
-    border-image: none;
-    border: none;
-    text-shadow: 0px 0px 0px 0px;
-    color: #1991E8;
-    background-gradient-direction: vertical;
-    background-gradient-start: #214B66;
-    background-gradient-end: #112430;
 }
 
 #Tooltip.ice-tooltip {
@@ -175,16 +169,6 @@
 
 #ice-popup {
     border-image: none;
-    text-shadow: 0px 0px 0px 0px;
-    color: #1991E8;
-    border: solid 1px #1991E8;
-    border-radius: 5px 5px 5px 5px;
-    background-color: #0A161E;
-    padding: 4px 12px 4px 12px;
-}
-
-#ice-popup-boxPointer {
-    border-image: none;
     border: none;
     -arrow-border-width: 0px;
     -arrow-base: 0px;
@@ -195,12 +179,43 @@
     -arrow-background-color: rgba(0,0,0,0);
 }
 
+#ice-popup .popup-menu-content {
+    border-image: none;
+    text-shadow: 0px 0px 0px 0px;
+    color: #1991E8;
+    border: solid 1px #1991E8;
+    border-radius: 5px 5px 5px 5px;
+    background-color: #0A161E;
+    padding: 4px 12px 4px 12px;
+}
+
+#ice-popup .popup-menu-item {
+    border-image: none;
+    border: none;
+    text-shadow: 0px 0px 0px 0px;
+    color: #1991E8;
+    border-radius: 5px 5px 5px 5px;
+    padding: .4em 1em;
+    spacing: 1em;
+}
+
+#ice-popup .popup-menu-item:active {
+    box-shadow: 0px 0px 0px 0px;
+    border-image: none;
+    border: none;
+    text-shadow: 0px 0px 0px 0px;
+    color: #1991E8;
+    background-gradient-direction: vertical;
+    background-gradient-start: #214B66;
+    background-gradient-end: #112430;
+}
+
 /*compact*/
 .ice-mainBox:compact {
     padding: 0px 0px 0px 0px;
 }
 
-.ice-buttonMenu:compact {
+.ice-mainBox:compact .soundbox-buttonMenu {
     border-top: none;
     border-left: none;
     border-right: none;
@@ -208,24 +223,24 @@
     border-radius: 0px;
 }
 
-.ice-divider:compact {
+.ice-mainBox:compact .soundbox-divider {
     background-color: transparent;
     height: 0px;
 }
 
-.ice-divider-box:compact {
+.ice-mainBox:compact .soundbox-divider-box {
     padding: 0px;
 }
 
-.ice-volumeButton:compact {
+.ice-mainBox:compact .soundbox-volumeButton {
     padding: 0px 2px 2px 2px;
 }
 
-.ice-volumeIcon:compact {
+.ice-mainBox:compact .soundbox-volumeIcon {
     icon-size: 14px;
 }
 
-.ice-slider:compact {
+.ice-mainBox:compact .soundbox-slider {
     height: 10px;
     min-width: 175px;
     -slider-height: 2px;
@@ -233,38 +248,38 @@
     -slider-handle-height: 5px;
 }
 
-.ice-appIcon:compact {
+.ice-mainBox:compact .soundbox-appIcon {
     icon-size: 1em;
 }
 
-.ice-trackInfoBox:compact {
+.ice-mainBox:compact .soundbox-trackInfoBox {
     padding: 0px;
 }
 
-.ice-trackInfo:compact {
+.ice-mainBox:compact .soundbox-trackInfo {
     padding: 0px;
 }
 
-.ice-trackInfo-icon:compact {
+.ice-mainBox:compact .soundbox-trackInfo-icon {
     icon-size: 1em;
 }
 
-.ice-timeBox:compact {
+.ice-mainBox:compact .soundbox-timeBox {
     padding: 0px;
 }
 
-.ice-buttonBox:compact{
+.ice-mainBox:compact .soundbox-buttonBox:compact{
     padding: 0px 2px 0px 2px;
     border: solid 1px #1991E8;
     border-radius: 5px 5px 5px 5px;
 }
 
-.ice-soundButton:compact {
+.ice-mainBox:compact .soundbox-soundButton {
     border: none;
     height: 16px;
     width: 16px;
 }
 
-.ice-soundButton-box:compact {
+.ice-mainBox:compact .soundbox-soundButton-box {
     padding: 0px;
 }

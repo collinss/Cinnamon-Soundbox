@@ -6,7 +6,10 @@
     background-color: rgba(21, 150, 23, 0.7);
 }
 
-.forest-buttonMenu {
+.forest-mainBox .soundbox-buttonMenu {
+    background-gradient-direction: none;
+    background: none;
+    box-shadow: 0px 0px 0px 0px;
     background-gradient-direction: vertical;
     background-gradient-start: #B76E2A;
     background-gradient-end: #873E11;
@@ -16,11 +19,11 @@
     padding: 7px;
 }
 
-.forest-buttonMenu:hover {
+.forest-mainBox .soundbox-buttonMenu:hover {
     border: 1px solid #003510;
 }
 
-.forest-divider {
+.forest-mainBox .soundbox-divider {
     background-color: #003510;
     border-radius: 5px;
     box-shadow: 0px 1px 0px 0px rgba(255,255,255,0.15);
@@ -28,25 +31,25 @@
     height: 1px;
 }
 
-.forest-divider-box {
+.forest-mainBox .soundbox-divider-box {
     color: #003510;
     padding: 10px 30px 10px 30px;
 }
 
-.forest-text, .forest-buttonText, .forest-appTitle, .forest-playerTitleText, .forest-trackInfo-text {
+.forest-mainBox .soundbox-text, .forest-mainBox .soundbox-buttonText, .forest-mainBox .soundbox-appTitle, .forest-mainBox .soundbox-playerTitleText, .forest-mainBox .soundbox-trackInfo-text {
     color: #003510;
 }
 
-.forest-volumeButton {
+.forest-mainBox .soundbox-volumeButton {
     padding: 2px 3px 2px 3px;
 }
 
-.forest-volumeIcon {
+.forest-mainBox .soundbox-volumeIcon {
     icon-size: 16px;
     color: #003510;
 }
 
-.forest-slider {
+.forest-mainBox .soundbox-slider {
     -slider-handle-radius: 7px;
     -slider-handle-color: #A04D1C;
     -slider-handle-border-color: #A04D1C;
@@ -61,44 +64,49 @@
     min-width: 175px;
 }
 
-.forest-appIcon {
+.forest-mainBox .soundbox-appIcon {
     icon-size: 20px;
     padding: 0px 4px 4px 4px;
 }
 
-.forest-appTitleBox {
+.forest-mainBox .soundbox-appTitleBox {
     padding: 0px 0px 2px 0px;
 }
 
-.forest-titleBar {
+.forest-mainBox .soundbox-titleBar {
     background-gradient-direction: vertical;
     background-gradient-start: #B76E2A;
     background-gradient-end: #873E11;
     padding: 2px;
     border-radius: 3px;
+    border-image: none;
 }
 
-.forest-playerIcon {
+.forest-mainBox .soundbox-playerIcon {
     icon_size: 16px;
     width: 16px;
 }
 
-.forest-trackInfoBox {
+.forest-mainBox .soundbox-trackInfoBox {
     padding: 5px 0px 5px 0px;
     margin-top: 5px;
     width: 200px;
 }
 
-.forest-trackInfo {
+.forest-mainBox .soundbox-trackInfo {
     padding: 3px 0px 5px 0px;
 }
 
-.forest-trackInfo-icon {
+.forest-mainBox .soundbox-trackInfo-icon {
     icon-size: 1em;
     color: #003510;
 }
 
-.forest-albumCover {
+.forest-mainBox .soundbox-albumCover-box {
+    background: none;
+}
+
+.forest-mainBox .soundbox-albumCover {
     border: 1px solid #003510;
     border-radius: 10px 10px 10px 10px;
     icon_size: 200px;
@@ -106,15 +114,15 @@
     height: 200px;
 }
 
-.forest-buttonBox {
+.forest-mainBox .soundbox-buttonBox {
     padding: 5px 0px 0px 0px;
 }
 
-.forest-soundButton-box {
+.forest-mainBox .soundbox-soundButton-box {
     padding: 3px 3px 3px 3px;
 }
 
-.forest-soundButton {
+.forest-mainBox .soundbox-soundButton {
     background-gradient-direction: vertical;
     background-gradient-start: #B76E2A;
     background-gradient-end: #873E11;
@@ -123,35 +131,15 @@
     width: 25px;
     height: 20px;
     padding: 3px 3px 3px 3px;
+    box-shadow: 0px 0px 0px 0px;
 }
 
-.forest-soundButton:hover {
+.forest-mainBox .soundbox-soundButton:hover {
     border: 1px solid #003510;
 }
 
-.forest-soundButton-icon {
+.forest-mainBox .soundbox-soundButton-icon {
     icon-size: 16px;
-    color: #003510;
-}
-
-#forest-popup-menuitem {
-    border-image: none;
-    border: solid 1px rgba(0,0,0,0);
-    text-shadow: 0px 0px 0px 0px;
-    color: #003510;
-    border-radius: 5px 5px 5px 5px;
-    padding: .4em 1em;
-    spacing: 1em;
-}
-
-#forest-popup-menuitem:active {
-    background-gradient-direction: vertical;
-    background-gradient-start: #B76E2A;
-    background-gradient-end: #873E11;
-    box-shadow: 0px 0px 0px 0px;
-    border-image: none;
-    border: solid 1px rgba(0,0,0,0);
-    text-shadow: 0px 0px 0px 0px;
     color: #003510;
 }
 
@@ -168,16 +156,6 @@
 
 #forest-popup {
     border-image: none;
-    text-shadow: 0px 0px 0px 0px;
-    color: #003510;
-    border: 2px solid #003510;
-    border-radius: 5px 5px 5px 5px;
-    background-color: rgb(64, 178, 64);
-    padding: 4px 12px 4px 12px;
-}
-
-#forest-popup-boxPointer {
-    border-image: none;
     border: none;
     -arrow-border-width: 0px;
     -arrow-base: 0px;
@@ -188,61 +166,92 @@
     -arrow-background-color: rgba(0,0,0,0);
 }
 
+#forest-popup .popup-menu-content {
+    border-image: none;
+    text-shadow: 0px 0px 0px 0px;
+    color: #003510;
+    border: 2px solid #003510;
+    border-radius: 5px 5px 5px 5px;
+    background-color: rgb(64, 178, 64);
+    padding: 4px 12px 4px 12px;
+}
+
+#forest-popup .popup-menu-item {
+    border-image: none;
+    border: solid 1px rgba(0,0,0,0);
+    text-shadow: 0px 0px 0px 0px;
+    color: #003510;
+    border-radius: 5px 5px 5px 5px;
+    padding: .4em 1em;
+    spacing: 1em;
+}
+
+#forest-popup .popup-menu-item:active {
+    background-gradient-direction: vertical;
+    background-gradient-start: #B76E2A;
+    background-gradient-end: #873E11;
+    box-shadow: 0px 0px 0px 0px;
+    border-image: none;
+    border: solid 1px rgba(0,0,0,0);
+    text-shadow: 0px 0px 0px 0px;
+    color: #003510;
+}
+
 /*compact*/
 .forest-mainBox:compact {
     padding: 0px 0px 0px 0px;
 }
 
-.forest-buttonMenu:compact {
+.forest-mainBox:compact .soundbox-buttonMenu {
     padding: 2px 4px 2px 4px;
 }
 
-.forest-divider:compact {
+.forest-mainBox:compact .soundbox-divider {
     background-color: transparent;
     height: 0px;
 }
 
-.forest-divider-box:compact {
+.forest-mainBox:compact .soundbox-divider-box {
     padding: 0px;
 }
 
-.forest-volumeButton:compact {
+.forest-mainBox:compact .soundbox-volumeButton {
     padding: 0px 2px 2px 2px;
 }
 
-.forest-volumeIcon:compact {
+.forest-mainBox:compact .soundbox-volumeIcon {
     icon-size: 14px;
 }
 
-.forest-appIcon:compact {
+.forest-mainBox:compact .soundbox-appIcon {
     icon-size: 1em;
 }
 
-.forest-titleBar:compact {
+.forest-mainBox:compact .soundbox-titleBar {
     border-radius: 0px;
 }
 
-.forest-trackInfoBox:compact {
+.forest-mainBox:compact .soundbox-trackInfoBox {
     padding: 0px;
 }
 
-.forest-trackInfo:compact {
+.forest-mainBox:compact .soundbox-trackInfo {
     padding: 0px;
 }
 
-.forest-trackInfo-icon:compact {
+.forest-mainBox:compact .soundbox-trackInfo-icon {
     icon-size: 1em;
 }
 
-.forest-buttonBox:compact{
+.forest-mainBox:compact .soundbox-buttonBox:compact{
     padding: 0px;
 }
 
-.forest-soundButton:compact {
+.forest-mainBox:compact .soundbox-soundButton {
     height: 14px;
     width: 20px;
 }
 
-.forest-soundButton-box:compact {
+.forest-mainBox:compact .soundbox-soundButton-box {
     padding: 2px;
 }

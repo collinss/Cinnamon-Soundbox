@@ -6,26 +6,29 @@
     background-color: #090909;
 }
 
-.hot-buttonMenu {
+.hot-mainBox .soundbox-buttonMenu {
+    background-gradient-direction: none;
+    background: none;
+    box-shadow: 0px 0px 0px 0px;
     border: 1px solid #CE0000;
     border-radius: 5px 5px 5px 5px;
     color: #021544;
     padding: 7px;
 }
 
-.hot-buttonMenu:hover {
+.hot-mainBox .soundbox-buttonMenu:hover {
     background-gradient-direction: vertical;
     background-gradient-start: rgba(206, 0, 0, 0.75);
     background-gradient-end: rgba(206, 0, 0, 0.25);
 }
 
-.hot-buttonMenu:active {
+.hot-mainBox .soundbox-buttonMenu:active {
     background-gradient-direction: vertical;
     background-gradient-start: rgba(206, 0, 0, 1);
     background-gradient-end: rgba(206, 0, 0, 0.5);
 }
 
-.hot-divider {
+.hot-mainBox .soundbox-divider {
     background-color: #CE0000;
     border-radius: 5px;
     box-shadow: 0px 1px 0px 0px rgba(193, 0, 0, 0.15);
@@ -33,29 +36,29 @@
     height: 1px;
 }
 
-.hot-divider-box {
+.hot-mainBox .soundbox-divider-box {
     color: #CE0000;
     padding: 10px 30px 10px 30px;
 }
 
-.hot-text, .hot-buttonText, .hot-appTitle, .hot-trackInfo-text {
+.hot-mainBox .soundbox-text, .hot-mainBox .soundbox-buttonText, .hot-mainBox .soundbox-appTitle, .hot-mainBox .soundbox-trackInfo-text {
     color: #F6E325;
 }
 
-.hot-playerTitleText {
+.hot-mainBox .soundbox-playerTitleText {
     color: #F6E325;
 }
 
-.hot-volumeButton {
+.hot-mainBox .soundbox-volumeButton {
     padding: 2px 3px 2px 3px;
 }
 
-.hot-volumeIcon {
+.hot-mainBox .soundbox-volumeIcon {
     icon-size: 16px;
     color: #CE0000;
 }
 
-.hot-slider {
+.hot-mainBox .soundbox-slider {
     -slider-handle-radius: 0px;
     -slider-handle-height: 12px;
     -slider-handle-width: 10px;
@@ -72,44 +75,49 @@
     min-width: 175px;
 }
 
-.hot-appIcon {
+.hot-mainBox .soundbox-appIcon {
     icon-size: 20px;
     padding: 0px 4px 4px 4px;
 }
 
-.hot-appTitleBox {
+.hot-mainBox .soundbox-appTitleBox {
     padding: 0px 0px 2px 0px;
 }
 
-.hot-titleBar {
+.hot-mainBox .soundbox-titleBar {
     background-gradient-direction: vertical;
     background-gradient-start: #CE0000;
     background-gradient-end: rgba(206, 0, 0, 0.25);
     padding: 3px;
     border-radius: 2px;
+    border-image: none;
 }
 
-.hot-playerIcon {
+.hot-mainBox .soundbox-playerIcon {
     icon_size: 16px;
     width: 16px;
 }
 
-.hot-trackInfoBox {
+.hot-mainBox .soundbox-trackInfoBox {
     padding: 5px 0px 5px 0px;
     margin-top: 5px;
     width: 200px;
 }
 
-.hot-trackInfo {
+.hot-mainBox .soundbox-trackInfo {
     padding: 3px 0px 5px 0px;
 }
 
-.hot-trackInfo-icon {
+.hot-mainBox .soundbox-trackInfo-icon {
     icon-size: 1em;
     color: #CE0000;
 }
 
-.hot-albumCover {
+.hot-mainBox .soundbox-albumCover-box {
+    background: none;
+}
+
+.hot-mainBox .soundbox-albumCover {
     border: 1px solid #CE0000;
     border-radius: 10px 10px 10px 10px;
     icon_size: 200px;
@@ -117,60 +125,41 @@
     height: 200px;
 }
 
-.hot-buttonBox {
+.hot-mainBox .soundbox-buttonBox {
     padding: 5px 5px 5px 5px;
     
 }
 
-.hot-soundButton-box {
+.hot-mainBox .soundbox-soundButton-box {
     padding: 3px 3px 3px 3px;
 }
 
-.hot-soundButton {
+.hot-mainBox .soundbox-soundButton {
     border: 1px solid #CE0000;
     border-radius: 5px 5px 5px 5px;
     width: 25px;
     height: 20px;
     padding: 3px 3px 3px 3px;
+    background-gradient-direction: none;
+    background: none;
+    box-shadow: 0px 0px 0px 0px;
 }
 
-.hot-soundButton:hover {
+.hot-mainBox .soundbox-soundButton:hover {
     background-gradient-direction: vertical;
     background-gradient-start: rgba(206, 0, 0, 0.75);
     background-gradient-end: rgba(206, 0, 0, 0.25);
 }
 
-.hot-soundButton:active {
+.hot-mainBox .soundbox-soundButton:active {
     background-gradient-direction: vertical;
     background-gradient-start: rgba(206, 0, 0, 1);
     background-gradient-end: rgba(206, 0, 0, 0.5);
 }
 
-.hot-soundButton-icon {
+.hot-mainBox .soundbox-soundButton-icon {
     icon-size: 16px;
     color: #F6E325;
-}
-
-#hot-popup-menuitem {
-    border-image: none;
-    border: solid 1px rgba(0,0,0,0);
-    text-shadow: 0px 0px 0px 0px;
-    color: #F6E325;
-    border-radius: 5px 5px 5px 5px;
-    padding: .4em 1em;
-    spacing: 1em;
-}
-
-#hot-popup-menuitem:active {
-    box-shadow: 0px 0px 0px 0px;
-    border-image: none;
-    border: solid 1px rgba(0,0,0,0);
-    text-shadow: 0px 0px 0px 0px;
-    color: #F6E325;
-    background-color: rgba(0,0,0,0);
-    background-gradient-direction: vertical;
-    background-gradient-start: rgba(206, 0, 0, 1);
-    background-gradient-end: rgba(206, 0, 0, 0.5);
 }
 
 #Tooltip.hot-tooltip {
@@ -186,16 +175,6 @@
 
 #hot-popup {
     border-image: none;
-    text-shadow: 0px 0px 0px 0px;
-    color: #CE0000;
-    border: 2px solid #CE0000;
-    border-radius: 8px 8px 8px 8px;
-    padding: 10px;
-    background-color: #090909;
-}
-
-#hot-popup-boxPointer {
-    border-image: none;
     border: none;
     -arrow-border-width: 0px;
     -arrow-base: 0px;
@@ -206,12 +185,44 @@
     -arrow-background-color: rgba(0,0,0,0);
 }
 
+#hot-popup .popup-menu-content {
+    border-image: none;
+    text-shadow: 0px 0px 0px 0px;
+    color: #CE0000;
+    border: 2px solid #CE0000;
+    border-radius: 8px 8px 8px 8px;
+    padding: 10px;
+    background-color: #090909;
+}
+
+#hot-popup .popup-menu-item {
+    border-image: none;
+    border: solid 1px rgba(0,0,0,0);
+    text-shadow: 0px 0px 0px 0px;
+    color: #F6E325;
+    border-radius: 5px 5px 5px 5px;
+    padding: .4em 1em;
+    spacing: 1em;
+}
+
+#hot-popup .popup-menu-item:active {
+    box-shadow: 0px 0px 0px 0px;
+    border-image: none;
+    border: solid 1px rgba(0,0,0,0);
+    text-shadow: 0px 0px 0px 0px;
+    color: #F6E325;
+    background-color: rgba(0,0,0,0);
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(206, 0, 0, 1);
+    background-gradient-end: rgba(206, 0, 0, 0.5);
+}
+
 /*compact*/
 .hot-mainBox:compact {
     padding: 0px 0px 0px 0px;
 }
 
-.hot-buttonMenu:compact {
+.hot-mainBox:compact .soundbox-buttonMenu {
     border-top: none;
     border-left: none;
     border-right: none;
@@ -219,48 +230,48 @@
     border-radius: 0px;
 }
 
-.hot-divider:compact {
+.hot-mainBox:compact .soundbox-divider {
     background-color: transparent;
     height: 0px;
 }
 
-.hot-divider-box:compact {
+.hot-mainBox:compact .soundbox-divider-box {
     padding: 0px;
 }
 
-.hot-volumeButton:compact {
+.hot-mainBox:compact .soundbox-volumeButton {
     padding: 0px 2px 2px 2px;
 }
 
-.hot-volumeIcon:compact {
+.hot-mainBox:compact .soundbox-volumeIcon {
     icon-size: 14px;
 }
 
-.hot-appIcon:compact {
+.hot-mainBox:compact .soundbox-appIcon {
     icon-size: 1em;
 }
 
-.hot-trackInfoBox:compact {
+.hot-mainBox:compact .soundbox-trackInfoBox {
     padding: 0px;
 }
 
-.hot-trackInfo:compact {
+.hot-mainBox:compact .soundbox-trackInfo {
     padding: 0px;
 }
 
-.hot-trackInfo-icon:compact {
+.hot-mainBox:compact .soundbox-trackInfo-icon {
     icon-size: 1em;
 }
 
-.hot-buttonBox:compact{
+.hot-mainBox:compact .soundbox-buttonBox:compact{
     padding: 0px;
 }
 
-.hot-soundButton:compact {
+.hot-mainBox:compact .soundbox-soundButton {
     height: 14px;
     width: 16px;
 }
 
-.hot-soundButton-box:compact {
+.hot-mainBox:compact .soundbox-soundButton-box {
     padding: 2px;
 }
