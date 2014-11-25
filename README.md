@@ -11,6 +11,7 @@ To Do
 -----
     Split into multiple files to ease transion into applet and sidebar extension.
     Create applet and sidebar versions
+    Raised mode DnD
 
 Done
 ----
