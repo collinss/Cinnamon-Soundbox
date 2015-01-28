@@ -422,15 +422,16 @@ Slider.prototype = {
 Signals.addSignalMethods(Slider.prototype);
 
 
-function SystemVolumeDisplay(title, normVolume, maxVolume) {
-    this._init(title, normVolume, maxVolume);
+function SystemVolumeDisplay(title, normVolume, maxVolume, iconPrefix) {
+    this._init(title, normVolume, maxVolume, iconPrefix);
 }
 
 SystemVolumeDisplay.prototype = {
-    _init: function(title, normVolume, maxVolume) {
+    _init: function(title, normVolume, maxVolume, iconPrefix) {
         
         this.normVolume = normVolume;
         this.maxVolume = maxVolume;
+        this.iconPrefix = iconPrefix;
         this.volume = 0;
         
         this.actor = new St.Bin({ x_align: St.Align.MIDDLE });
@@ -453,7 +454,7 @@ SystemVolumeDisplay.prototype = {
         volumeBox.add_actor(volumeSliderBox);
         let volumeButton = new St.Button({ style_class: "soundbox-volumeButton" });
         volumeSliderBox.add_actor(volumeButton);
-        this.volumeIcon = new St.Icon({ icon_name: "audio-volume-high", style_class: "soundbox-volumeIcon" });
+        this.volumeIcon = new St.Icon({ icon_name: this.iconPrefix+"high", icon_type: St.IconType.SYMBOLIC, style_class: "soundbox-volumeIcon" });
         volumeButton.set_child(this.volumeIcon);
         this.muteTooltip = new SoundboxTooltip(volumeButton);
         
@@ -490,7 +491,7 @@ SystemVolumeDisplay.prototype = {
         else {
             this.volumeSlider.setValue(0);
             this.volumeValueText.text = "0%";
-            this.volumeIcon.icon_name = "audio-volume-muted-symbolic";
+            this.volumeIcon.icon_name = this.iconPrefix + "muted";
         }
     },
     
@@ -503,12 +504,12 @@ SystemVolumeDisplay.prototype = {
             if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this.control.volume/this.maxVolume);
             else this.volumeSlider.setValue(this.volume);
             
-            if ( this.volume <= 0 ) this.volumeIcon.icon_name = "audio-volume-muted";
+            if ( this.volume <= 0 ) this.volumeIcon.icon_name = this.iconPrefix + "muted";
             else {
                 let n = Math.floor(3 * this.volume) + 1;
-                if (n < 2) this.volumeIcon.icon_name = "audio-volume-low";
-                else if (n >= 3) this.volumeIcon.icon_name = "audio-volume-high";
-                else this.volumeIcon.icon_name = "audio-volume-medium";
+                if (n < 2) this.volumeIcon.icon_name = this.iconPrefix + "low";
+                else if (n >= 3) this.volumeIcon.icon_name = this.iconPrefix + "high";
+                else this.volumeIcon.icon_name = this.iconPrefix + "medium";
             }
         }
     },
@@ -518,7 +519,7 @@ SystemVolumeDisplay.prototype = {
         if ( muted ) {
             this.volumeSlider.setValue(0);
             this.volumeValueText.text = "0%";
-            this.volumeIcon.icon_name = "audio-volume-muted-symbolic";
+            this.volumeIcon.icon_name = this.iconPrefix + "muted";
             this.muteTooltip.set_text(_("Unmute"));
         }
         else {
@@ -529,12 +530,12 @@ SystemVolumeDisplay.prototype = {
             this.volumeIcon.icon_name = null;
             this.muteTooltip.set_text(_("Mute"));
             
-            if ( this.volume <= 0 ) this.volumeIcon.icon_name = "audio-volume-muted";
+            if ( this.volume <= 0 ) this.volumeIcon.icon_name = this.iconPrefix + "muted";
             else {
                 let n = Math.floor(3 * this.volume) + 1;
-                if ( n < 2 ) this.volumeIcon.icon_name = "audio-volume-low";
-                else if ( n >= 3 ) this.volumeIcon.icon_name = "audio-volume-high";
-                else this.volumeIcon.icon_name = "audio-volume-medium";
+                if ( n < 2 ) this.volumeIcon.icon_name = this.iconPrefix + "low";
+                else if ( n >= 3 ) this.volumeIcon.icon_name = this.iconPrefix + "high";
+                else this.volumeIcon.icon_name = this.iconPrefix + "medium";
             }
         }
     },
@@ -1351,14 +1352,14 @@ SoundboxLayout.prototype = {
         let divider = new Divider();
         this.volumeContent.add_actor(divider.actor);
         
-        this.outputVolumeDisplay = new SystemVolumeDisplay("Volume: ", this.normVolume, this.maxVolume);
+        this.outputVolumeDisplay = new SystemVolumeDisplay("Volume: ", this.normVolume, this.maxVolume, "audio-volume-");
         this.volumeContent.add_actor(this.outputVolumeDisplay.actor);
         
         if ( settings.showInput ) {
             let divider = new Divider();
             this.volumeContent.add_actor(divider.actor);
             
-            this.inputVolumeDisplay = new SystemVolumeDisplay("Input Volume: ", this.normVolume, this.maxVolume);
+            this.inputVolumeDisplay = new SystemVolumeDisplay("Input Volume: ", this.normVolume, this.maxVolume, "microphone-sensitivity-");
             this.volumeContent.add_actor(this.inputVolumeDisplay.actor);
         }
         
