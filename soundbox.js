@@ -25,43 +25,25 @@ const MEDIA_PLAYER_2_PATH = "/org/mpris/MediaPlayer2";
 const MEDIA_PLAYER_2_NAME = "org.mpris.MediaPlayer2";
 const MEDIA_PLAYER_2_PLAYER_NAME = "org.mpris.MediaPlayer2.Player";
 
+const SUPPORT_SEEK = [
+    "amarok",
+    "audacious",
+    "banshee",
+    "clementine",
+    "deadbeef",
+    "gmusicbrowser",
+    "gnome-mplayer",
+    "noise",
+    "pragha",
+    "qmmp",
+    "quodlibet",
+    "rhythmbox",
+    "rhythmbox3",
+    "spotify",
+    "vlc",
+    "xnoise"
+]
 
-let supported_players = {
-    "amarok":           { seek: true },
-    "atunes":           { seek: false },
-    "audacious":        { seek: true },
-    "banshee":          { seek: true },
-    "beatbox":          { seek: false },
-    "bmp":              { seek: false },
-    "clementine":       { seek: true },
-    "deadbeef":         { seek: true },
-    "exaile":           { seek: false },
-    "gmusicbrowser":    { seek: true },
-    "gnome-mplayer":    { seek: true },
-    "googlemusicframe": { seek: false },
-    "guayadeque":       { seek: false },
-    "mpd":              { seek: false },
-    "muine":            { seek: false },
-    "musique":          { seek: false },
-    "noise":            { seek: true },
-    "nuvolaplayer":     { seek: false },
-    "pithos":           { seek: false },
-    "potamus":          { seek: false },
-    "pragha":           { seek: true },
-    "qmmp":             { seek: true },
-    "quodlibet":        { seek: true },
-    "rhythmbox":        { seek: true },
-    "rhythmbox3":       { seek: true },
-    "songbird":         { seek: false },
-    "smplayer":         { seek: false },
-    "spotify":          { seek: true, timeIssues: true },
-    "tomahawk":         { seek: false },
-    "totem":            { seek: false },
-    "vlc":              { seek: true },
-    "xbmc":             { seek: false },
-    "xmms":             { seek: false },
-    "xnoise":           { seek: true }
-}
 
 let settings, actionManager;
 
@@ -71,9 +53,7 @@ function registerSystrayIcons(uuid) {
         global.log("Soundbox: system tray icons were not hidden - this feature is not available in your version of Cinnamon");
         return;
     }
-    for ( let i in supported_players ) {
-        if ( supported_players[i].seek ) Main.systrayManager.registerRole(i, uuid);
-    }
+    for ( let player in SUPPORT_SEEK ) Main.systrayManager.registerRole(player, uuid);
 }
 
 function unregisterSystrayIcons(uuid) {
@@ -928,6 +908,7 @@ Player.prototype = {
             this.owner = owner;
             this.busName = name;
             this.name = name.split(".")[3];
+            this.checkName();
             
             //player bar
             this.playerTitle = new PlayerBar(this.getTitle(), "player-stopped");
@@ -1046,7 +1027,7 @@ Player.prototype = {
             
             this._prevButton = new ControlButton("media-skip-backward", _("Previous"), Lang.bind(this, function() {
                 this._mediaServerPlayer.PreviousRemote();
-                if ( supported_players[this.name].timeIssues ) this._timeTracker.setElapsed(0);
+                if ( this.name == "spotify" ) this._timeTracker.setElapsed(0);
             }));
             this.controls.add_actor(this._prevButton.getActor());
             
@@ -1062,7 +1043,7 @@ Player.prototype = {
             
             this._nextButton = new ControlButton("media-skip-forward", _("Next"), Lang.bind(this, function() {
                 this._mediaServerPlayer.NextRemote();
-                if ( supported_players[this.name].timeIssues ) this._timeTracker.setElapsed(0);
+                if ( this.name == "spotify" ) this._timeTracker.setElapsed(0);
             }));
             this.controls.add_actor(this._nextButton.getActor());
             
@@ -1082,7 +1063,7 @@ Player.prototype = {
                 this.controls.add_actor(this._quitButton.getActor());
             }
             
-            if ( !supported_players[this.name].seek ) {
+            if ( SUPPORT_SEEK.indexOf(this.name) == -1 ) {
                 this.timeControls.actor.hide();
             }
             
@@ -1237,6 +1218,14 @@ Player.prototype = {
             b.set_width(settings.artSize);
             b.add_actor(c);
             this.trackCover.set_child(b);
+        }
+    },
+
+    checkName: function() {
+        if ( settings.compatiblePlayers.indexOf(this.name) == -1 ) {
+            global.log("Soundbox: Adding "+this.name+" to list of supported players");
+            settings.compatiblePlayers.push(this.name);
+            settings.compatiblePlayers.save();
         }
     }
 }
@@ -1486,8 +1475,8 @@ SoundboxLayout.prototype = {
             let app = allApps[y];
             let entry = app.get_tree_entry();
             let path = entry.get_desktop_file_path();
-            for ( let player in supported_players ) {
-                let desktopFile = player + ".desktop";
+            for ( let i in settings.compatiblePlayers ) {
+                let desktopFile = settings.compatiblePlayers[i] + ".desktop";
                 if ( path.indexOf(desktopFile) != -1 && listedDesktopFiles.indexOf(desktopFile) == -1 ) {
                     this._availablePlayers.push(app);
                     listedDesktopFiles.push(desktopFile);

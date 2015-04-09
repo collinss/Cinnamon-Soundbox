@@ -85,5 +85,45 @@
         "step": 10,
         "indent": true,
         "dependency": "showArt"
+    },
+    
+    "compatiblePlayers": {
+        "type": "generic",
+        "default": [
+            "amarok",
+            "atunes",
+            "audacious",
+            "banshee",
+            "beatbox",
+            "bmp",
+            "clementine",
+            "deadbeef",
+            "exaile",
+            "gmusicbrowser",
+            "gnome-mplayer",
+            "googlemusicframe",
+            "guayadeque",
+            "mpd",
+            "muine",
+            "musique",
+            "noise",
+            "nuvolaplayer",
+            "pithos",
+            "potamus",
+            "pragha",
+            "qmmp",
+            "quodlibet",
+            "rhythmbox",
+            "rhythmbox3",
+            "songbird",
+            "smplayer",
+            "spotify",
+            "tomahawk",
+            "totem",
+            "vlc",
+            "xbmc",
+            "xmms",
+            "xnoise"
+        ]
     }
 }

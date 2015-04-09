@@ -90,6 +90,7 @@ SettingsInterface.prototype = {
         }
         
         this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "countUp", "countUp");
+        this.settings.bindProperty(Settings.BindingDirection.BIDIRECTIONAL, "compatiblePlayers", "compatiblePlayers");
     }
 }
 
