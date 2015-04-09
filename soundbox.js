@@ -53,7 +53,7 @@ function registerSystrayIcons(uuid) {
         global.log("Soundbox: system tray icons were not hidden - this feature is not available in your version of Cinnamon");
         return;
     }
-    for ( let player in SUPPORT_SEEK ) Main.systrayManager.registerRole(player, uuid);
+    for ( let player in SUPPORT_SEEK ) Main.systrayManager.registerRole(SUPPORT_SEEK[player], uuid);
 }
 
 function unregisterSystrayIcons(uuid) {
