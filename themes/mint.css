@@ -97,6 +97,10 @@
     width: 16px;
 }
 
+.mint-mainBox .soundbox-quitButton {
+    color: #fff;
+}
+
 .mint-mainBox .soundbox-trackInfoBox {
     padding: 5px 0px 5px 0px;
     margin-top: 5px;

@@ -98,6 +98,10 @@
     width: 16px;
 }
 
+.hot-mainBox .soundbox-quitButton {
+    color: #F6E325;
+}
+
 .hot-mainBox .soundbox-trackInfoBox {
     padding: 5px 0px 5px 0px;
     margin-top: 5px;

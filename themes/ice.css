@@ -96,6 +96,10 @@
     width: 16px;
 }
 
+.ice-mainBox .soundbox-quitButton {
+    color: #1991E8;
+}
+
 .ice-mainBox .soundbox-trackInfoBox {
     padding: 3px 0px 5px 0px;
     width: 200px;

@@ -91,6 +91,10 @@
     width: 16px;
 }
 
+.shadow-mainBox .soundbox-quitButton {
+    color: #021544;
+}
+
 .shadow-mainBox .soundbox-trackInfoBox {
     padding: 5px 0px 5px 0px;
     margin-top: 5px;

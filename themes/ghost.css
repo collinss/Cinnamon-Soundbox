@@ -99,6 +99,10 @@
     width: 16px;
 }
 
+.ghost-mainBox .soundbox-quitButton {
+    color: #222;
+}
+
 .ghost-mainBox .soundbox-trackInfoBox {
     padding: 3px 0px 5px 0px;
     width: 200px;

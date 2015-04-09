@@ -87,6 +87,10 @@
     width: 16px;
 }
 
+.forest-mainBox .soundbox-quitButton {
+    color: #003510;
+}
+
 .forest-mainBox .soundbox-trackInfoBox {
     padding: 5px 0px 5px 0px;
     margin-top: 5px;

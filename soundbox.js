@@ -863,23 +863,54 @@ ControlButton.prototype = {
 }
 
 
-function PlayerBar(title, image) {
-    this._init(title, image);
+function TitleBar(title, server) {
+    this._init(title, server);
 }
 
-PlayerBar.prototype = {
-    _init: function(title, image) {
-        
+TitleBar.prototype = {
+    _init: function(name, server) {
+        this.name = name;
+        this.server = server;
         this.actor = new St.BoxLayout({ style_class: "soundbox-playerInfoBar", vertical: false });
         this.icon = new St.Icon({ icon_type: St.IconType.FULLCOLOR, style_class: "soundbox-playerIcon" });
         this.actor.add_actor(this.icon);
-        this.setImage(image);
-        this.title = new St.Label({ text: title, style_class: "soundbox-playerTitleText" });
-        this.actor.add_actor(this.title);
+        this.setImage("player-stopped");
+        this.title = new St.Label({ text: this.getTitle(), style_class: "soundbox-playerTitleText" });
+        
+        if ( this.server.CanRaise ) {
+            let raiseButton = new St.Button({ style_class: "soundbox-raiseButton" });
+            this.actor.add_actor(raiseButton);
+            raiseButton.add_actor(this.title);
+            raiseButton.connect("clicked", Lang.bind(this, function() {
+                actionManager.close();
+                this.server.RaiseRemote();
+            }));
+        }
+        else this.actor.add_actor(this.title);
+        
+        if ( this.server.CanQuit ) {
+            let quitButton = new St.Button({ style_class: "soundbox-quitButton" });
+            this.actor.add_actor(quitButton);
+            let quitIcon = new St.Icon({ icon_name: "window-close", icon_type: St.IconType.SYMBOLIC, icon_size: 16 });
+            quitButton.add_actor(quitIcon);
+            quitButton.connect("clicked", Lang.bind(this, function() {
+                actionManager.close();
+                this.server.QuitRemote();
+            }));
+        }
     },
     
-    setText: function(text) {
-        this.title.text = text;
+    setStatus: function(status) {
+        this.setImage("player-" + status.toLowerCase());
+        this.setTitle(status);
+    },
+    
+    getTitle: function() {
+        return this.name.charAt(0).toUpperCase() + this.name.slice(1);
+    },
+    
+    setTitle: function(status) {
+        this.title.text = this.getTitle() + " - " + _(status);
     },
     
     setImage: function(image) {
@@ -911,7 +942,7 @@ Player.prototype = {
             this.checkName();
             
             //player bar
-            this.playerTitle = new PlayerBar(this.getTitle(), "player-stopped");
+            this.title = new St.Bin();
             
             Interfaces.getDBusProxyWithOwnerAsync(MEDIA_PLAYER_2_NAME, this.busName, Lang.bind(this, function(proxy, error) {
                 if ( error ) {
@@ -952,6 +983,8 @@ Player.prototype = {
         try {
             if (!this._prop || !this._mediaServerPlayer || !this._mediaServer) return;
             this._timeTracker = new TimeTracker(this._mediaServerPlayer, this._prop, this.name);
+            this.titleBar = new TitleBar(this.name, this._mediaServer);
+            this.title.add_actor(this.titleBar.actor);
             this._buildLayout();
             
             this.setStatus(this._mediaServerPlayer.PlaybackStatus);
@@ -1047,22 +1080,6 @@ Player.prototype = {
             }));
             this.controls.add_actor(this._nextButton.getActor());
             
-            if (this._mediaServer.CanRaise) {
-                this._raiseButton = new ControlButton("go-up", _("Open Player"), Lang.bind(this, function() {
-                    actionManager.close();
-                    this._mediaServer.RaiseRemote();
-                }));
-                this.controls.add_actor(this._raiseButton.getActor());
-            }
-            
-            if (this._mediaServer.CanQuit) {
-                this._quitButton = new ControlButton("window-close", _("Quit Player"), Lang.bind(this, function() {
-                    actionManager.close();
-                    this._mediaServer.QuitRemote();
-                }));
-                this.controls.add_actor(this._quitButton.getActor());
-            }
-            
             if ( SUPPORT_SEEK.indexOf(this.name) == -1 ) {
                 this.timeControls.actor.hide();
             }
@@ -1074,17 +1091,9 @@ Player.prototype = {
     
     destroy: function() {
         this.actor.destroy();
-        this.playerTitle.actor.destroy();
+        this.title.destroy();
         if ( this._timeTracker ) this._timeTracker.destroy();
         if ( this._propChangedId ) this._prop.disconnectSignal(this._propChangedId);
-    },
-    
-    getTitle: function() {
-        return this.name.charAt(0).toUpperCase() + this.name.slice(1);
-    },
-    
-    setTitle: function(status) {
-        this.playerTitle.setText(this.getTitle() + " - " + _(status));
     },
     
     updateSeekable: function(position) {
@@ -1190,8 +1199,7 @@ Player.prototype = {
             this._playButton.setIcon("media-playback-start");
         }
         
-        this.playerTitle.setImage("player-" + status.toLowerCase());
-        this.setTitle(status);
+        this.titleBar.setStatus(status);
     },
     
     _onReadCover: function(cover, result) {
@@ -1367,17 +1375,15 @@ SoundboxLayout.prototype = {
         this.playerContent.hide();
         
         //player title
-        let titleBin = new St.Bin({ x_align: St.Align.MIDDLE, style_class: "soundbox-titleBar" });
-        this.playerContent.add_actor(titleBin);
-        this.playerTitleBox = new St.BoxLayout({ vertical: false });
-        titleBin.add_actor(this.playerTitleBox);
+        this.playerTitleBox = new St.BoxLayout({ vertical: false, style_class: "soundbox-titleBar" });
+        this.playerContent.add_actor(this.playerTitleBox);
         
         this.playerBack = new St.Button({ style_class: "soundbox-playerSelectButton", child: new St.Icon({ icon_name: "media-playback-start-rtl", icon_size: 16 }) });
         this.playerTitleBox.add_actor(this.playerBack);
         this.playerBack.hide();
         
         this.playerTitle = new St.Bin({ style_class: "soundbox-titleBox" });
-        this.playerTitleBox.add_actor(this.playerTitle);
+        this.playerTitleBox.add(this.playerTitle, { expand: true });
         this.playerTitle.set_alignment(St.Align.MIDDLE, St.Align.MIDDLE);
         
         this.playerForward = new St.Button({ style_class: "soundbox-playerSelectButton", child: new St.Icon({ icon_name: "media-playback-start", icon_size: 16 }) });
@@ -1561,7 +1567,7 @@ SoundboxLayout.prototype = {
         if ( player == null ) return;
         this.playerShown = player.owner;
         this.playersBox.set_child(player.actor);
-        this.playerTitle.set_child(player.playerTitle.actor);
+        this.playerTitle.set_child(player.title);
         this.playerContent.show();
         if ( this.owners.length > 1 ) {
             this.playerBack.show();
