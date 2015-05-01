@@ -985,20 +985,20 @@ Player.prototype = {
     
     _onGetDBus: function() {
         try {
-            if (!this._prop || !this._mediaServerPlayer || !this._mediaServer) return;
+            if ( !this._prop || !this._mediaServerPlayer || !this._mediaServer ) return;
             this._timeTracker = new TimeTracker(this._mediaServerPlayer, this._prop, this.name);
             this.titleBar = new TitleBar(this.name, this._mediaServer);
             this.title.add_actor(this.titleBar.actor);
             this._buildLayout();
             
-            this.setStatus(this._mediaServerPlayer.PlaybackStatus);
+            this.updateStatus(this._mediaServerPlayer.PlaybackStatus);
             this.setMetadata(this._mediaServerPlayer.Metadata);
             this.updateSeekable();
             this.updateRepeat();
             this.updateShuffle();
             
             this._propChangedId = this._prop.connectSignal("PropertiesChanged", Lang.bind(this, function(proxy, sender, [iface, props]) {
-                if ( props.PlaybackStatus ) this.setStatus(props.PlaybackStatus.unpack());
+                if ( props.PlaybackStatus ) this.updateStatus(props.PlaybackStatus.unpack());
                 if ( props.Metadata ) this.setMetadata(props.Metadata.deep_unpack());
                 if ( props.CanGoNext || props.CanGoPrevious ) this.updateControls();
                 if ( props.LoopStatus ) this.updateRepeat();
@@ -1131,7 +1131,6 @@ Player.prototype = {
     
     _toggleLoopStatus: function() {
         let mapping = { "None": "Playlist", "Playlist": "Track", "Track": "None" };
-
         this._mediaServerPlayer.LoopStatus = mapping[this._mediaServerPlayer.LoopStatus];
         this.updateRepeat(this._mediaServerPlayer.LoopStatus);
     },
@@ -1241,20 +1240,23 @@ Player.prototype = {
         }
     },
     
-    setStatus: function(status) {
+    updateStatus: function(status) {
         this.updateSeekable();
         this._playerStatus = status;
         if ( status == "Playing" ) {
             this._timeTracker.start();
             this._playButton.setIcon("media-playback-pause");
+            this._playButton.tooltip = _("Pause");
         }
         else if ( status == "Paused" ) {
             this._timeTracker.pause();
             this._playButton.setIcon("media-playback-start");
+            this._playButton.tooltip = _("Play");
         }
         else if ( status == "Stopped" ) {
             this._timeTracker.stop();
             this._playButton.setIcon("media-playback-start");
+            this._playButton.tooltip = _("Play");
         }
         
         this.titleBar.setStatus(status);
