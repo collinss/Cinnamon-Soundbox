@@ -838,7 +838,7 @@ ControlButton.prototype = {
         this.button.connect("clicked", callback);
         this.icon = new St.Icon({ icon_type: St.IconType.SYMBOLIC, icon_name: icon, style_class: "soundbox-soundButton-icon" });
         this.button.set_child(this.icon);
-        this.tooltip = new SoundboxTooltip(this.button, text);
+        this._tooltip = new SoundboxTooltip(this.button, text);
     },
     
     getActor: function() {
@@ -847,6 +847,10 @@ ControlButton.prototype = {
     
     setIcon: function(icon) {
         this.icon.icon_name = icon;
+    },
+
+    set tooltip(text) {
+        this._tooltip.set_text(text);
     },
     
     enable: function() {
@@ -990,11 +994,15 @@ Player.prototype = {
             this.setStatus(this._mediaServerPlayer.PlaybackStatus);
             this.setMetadata(this._mediaServerPlayer.Metadata);
             this.updateSeekable();
+            this.updateRepeat();
+            this.updateShuffle();
             
             this._propChangedId = this._prop.connectSignal("PropertiesChanged", Lang.bind(this, function(proxy, sender, [iface, props]) {
                 if ( props.PlaybackStatus ) this.setStatus(props.PlaybackStatus.unpack());
                 if ( props.Metadata ) this.setMetadata(props.Metadata.deep_unpack());
                 if ( props.CanGoNext || props.CanGoPrevious ) this.updateControls();
+                if ( props.LoopStatus ) this.updateRepeat();
+                if ( props.Shuffle ) this.updateShuffle();
             }));
             
         } catch(e) {
@@ -1079,7 +1087,17 @@ Player.prototype = {
                 if ( this.name == "spotify" ) this._timeTracker.setElapsed(0);
             }));
             this.controls.add_actor(this._nextButton.getActor());
-            
+
+            if ( this._mediaServerPlayer.LoopStatus ) {
+                this._repeatButton = new ControlButton("playlist-repeat-none", _("Repeat"), Lang.bind(this, this._toggleLoopStatus));
+                this.controls.add_actor(this._repeatButton.getActor());
+            }
+
+            if ( this._mediaServerPlayer.Shuffle !== undefined ) {
+                this._shuffleButton = new ControlButton("playlist-shuffle-off", _("Shuffle"), Lang.bind(this, this._toggleShuffle));
+                this.controls.add_actor(this._shuffleButton.getActor());
+            }
+
             if ( SUPPORT_SEEK.indexOf(this.name) == -1 ) {
                 this.timeControls.actor.hide();
             }
@@ -1111,6 +1129,46 @@ Player.prototype = {
         return can_seek;
     },
     
+    _toggleLoopStatus: function() {
+        let mapping = { "None": "Playlist", "Playlist": "Track", "Track": "None" };
+
+        this._mediaServerPlayer.LoopStatus = mapping[this._mediaServerPlayer.LoopStatus];
+        this.updateRepeat(this._mediaServerPlayer.LoopStatus);
+    },
+
+    updateRepeat: function() {
+        switch ( this._mediaServerPlayer.LoopStatus ) {
+            case "None":
+                this._repeatButton.setIcon("playlist-repeat-none");
+                this._repeatButton.tooltip = _("Repeat: Off");
+                break;
+            case "Track":
+                this._repeatButton.setIcon("playlist-repeat-track");
+                this._repeatButton.tooltip = _("Repeat: Track");
+                break;
+            case "Playlist":
+                this._repeatButton.setIcon("playlist-repeat-all");
+                this._repeatButton.tooltip = _("Repeat: All");
+                break;
+        }
+    },
+
+    _toggleShuffle: function() {
+        this._mediaServerPlayer.Shuffle = !this._mediaServerPlayer.Shuffle;
+        this.updateShuffle();
+    },
+
+    updateShuffle: function() {
+        if ( this._mediaServerPlayer.Shuffle ) {
+            this._shuffleButton.setIcon("playlist-shuffle-on");
+            this._shuffleButton.tooltip = _("Shuffle: On");
+        }
+        else {
+            this._shuffleButton.setIcon("playlist-shuffle-off");
+            this._shuffleButton.tooltip = _("Shuffle: Off");
+        }
+    },
+
     _updateControls: function() {
         this._prop.GetRemote(MEDIA_PLAYER_2_PLAYER_NAME, "CanGoNext", Lang.bind(this, function(value, error) {
             let canGoNext = true;
