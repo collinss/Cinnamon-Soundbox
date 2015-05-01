@@ -1089,12 +1089,19 @@ Player.prototype = {
             this.controls.add_actor(this._nextButton.getActor());
 
             if ( this._mediaServerPlayer.LoopStatus ) {
-                this._repeatButton = new ControlButton("playlist-repeat-none", _("Repeat"), Lang.bind(this, this._toggleLoopStatus));
+                this._repeatButton = new ControlButton("playlist-repeat-none", _("Repeat"), Lang.bind(this, function() {
+                    let mapping = { "None": "Playlist", "Playlist": "Track", "Track": "None" };
+                    this._mediaServerPlayer.LoopStatus = mapping[this._mediaServerPlayer.LoopStatus];
+                    this.updateRepeat(this._mediaServerPlayer.LoopStatus);
+                }));
                 this.controls.add_actor(this._repeatButton.getActor());
             }
 
             if ( this._mediaServerPlayer.Shuffle !== undefined ) {
-                this._shuffleButton = new ControlButton("playlist-shuffle-off", _("Shuffle"), Lang.bind(this, this._toggleShuffle));
+                this._shuffleButton = new ControlButton("playlist-shuffle-off", _("Shuffle"), Lang.bind(this, function() {
+                    this._mediaServerPlayer.Shuffle = !this._mediaServerPlayer.Shuffle;
+                    this.updateShuffle();
+                }));
                 this.controls.add_actor(this._shuffleButton.getActor());
             }
 
@@ -1129,12 +1136,6 @@ Player.prototype = {
         return can_seek;
     },
     
-    _toggleLoopStatus: function() {
-        let mapping = { "None": "Playlist", "Playlist": "Track", "Track": "None" };
-        this._mediaServerPlayer.LoopStatus = mapping[this._mediaServerPlayer.LoopStatus];
-        this.updateRepeat(this._mediaServerPlayer.LoopStatus);
-    },
-
     updateRepeat: function() {
         switch ( this._mediaServerPlayer.LoopStatus ) {
             case "None":
@@ -1150,11 +1151,6 @@ Player.prototype = {
                 this._repeatButton.tooltip = _("Repeat: All");
                 break;
         }
-    },
-
-    _toggleShuffle: function() {
-        this._mediaServerPlayer.Shuffle = !this._mediaServerPlayer.Shuffle;
-        this.updateShuffle();
     },
 
     updateShuffle: function() {
@@ -1190,7 +1186,7 @@ Player.prototype = {
         if ( metadata["mpris:length"] ) {
             this._timeTracker.setTotal(metadata["mpris:length"].unpack() / 1000000);
             this._timeTracker.fetchPosition();
-            if ( this._playerStatus == "Playing" ) {
+            if ( this._mediaServerPlayer.PlaybackStatus == "Playing" ) {
                 this._timeTracker.start();
             }
         }
@@ -1242,21 +1238,22 @@ Player.prototype = {
     
     updateStatus: function(status) {
         this.updateSeekable();
-        this._playerStatus = status;
-        if ( status == "Playing" ) {
-            this._timeTracker.start();
-            this._playButton.setIcon("media-playback-pause");
-            this._playButton.tooltip = _("Pause");
-        }
-        else if ( status == "Paused" ) {
-            this._timeTracker.pause();
-            this._playButton.setIcon("media-playback-start");
-            this._playButton.tooltip = _("Play");
-        }
-        else if ( status == "Stopped" ) {
-            this._timeTracker.stop();
-            this._playButton.setIcon("media-playback-start");
-            this._playButton.tooltip = _("Play");
+        switch ( this._mediaServerPlayer.PlaybackStatus ) {
+            case "Playing":
+                this._timeTracker.start();
+                this._playButton.setIcon("media-playback-pause");
+                this._playButton.tooltip = _("Pause");
+                break;
+            case "Paused":
+                this._timeTracker.pause();
+                this._playButton.setIcon("media-playback-start");
+                this._playButton.tooltip = _("Play");
+                break;
+            case "Stopped":
+                this._timeTracker.stop();
+                this._playButton.setIcon("media-playback-start");
+                this._playButton.tooltip = _("Play");
+                break;
         }
         
         this.titleBar.setStatus(status);
