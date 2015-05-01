@@ -889,6 +889,7 @@ TitleBar.prototype = {
                 actionManager.close();
                 this.server.RaiseRemote();
             }));
+            new SoundboxTooltip(raiseButton, _("Show player"));
         }
         else this.actor.add_actor(this.title);
         
@@ -901,6 +902,7 @@ TitleBar.prototype = {
                 actionManager.close();
                 this.server.QuitRemote();
             }));
+            new SoundboxTooltip(quitButton, _("Close player"));
         }
     },
     
