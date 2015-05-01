@@ -708,11 +708,13 @@ TimeControls.prototype = {
             this.setTimeLabel();
         }));
         this._time.actor.connect("clicked", Lang.bind(this, function() {
-            settings[key] = newVal;
+            settings.countUp = !settings.countUp;
             this.setTimeLabel();
         }));
         this._positionSlider.connect("value-changed", Lang.bind(this, this.onSliderDrag));
         this._positionSlider.connect("drag-end", Lang.bind(this, this.onDragEnd));
+
+        Mainloop.timeout_add(1000, Lang.bind(this, this.setTimeLabel));
     },
     
     //sets the slider value to the current percent
