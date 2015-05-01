@@ -941,7 +941,7 @@ Player.prototype = {
             this.name = name.split(".")[3];
             this.checkName();
             
-            //player bar
+            //player title bar
             this.title = new St.Bin();
             
             Interfaces.getDBusProxyWithOwnerAsync(MEDIA_PLAYER_2_NAME, this.busName, Lang.bind(this, function(proxy, error) {
