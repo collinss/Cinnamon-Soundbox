@@ -6,6 +6,6 @@
     "website": "https://github.com/collinss/Cinnamon-Soundbox",
     "version": "1.9.1",
     "contributors": "Stephen Collins - Author,Bernard(zagortenay333) - Mint-x theme,Corbin(RavetcoFX) - Bugfix",
-    "prevent-decorations": true
+    "prevent-decorations": true,
+    "multiversion": true
 }
-
