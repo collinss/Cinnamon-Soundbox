@@ -46,14 +46,9 @@ ButtonMenu.prototype = {
             
             this.menu.setMaxHeight = Lang.bind(this, function() {
                 let monitor = Main.layoutManager.findMonitorForActor(this.actor);
-                let i = Main.layoutManager.monitors.indexOf(monitor);
-                let panels = Main.panelManager.getPanelsInMonitor(i);
-                let panelHeight = 0;
-                for ( let i = 0; i < panels.length; i++ ) {
-                    if ( panels[i].bottomPosition && !panels[i]._hidden ) {
-                        panelHeight += panels[i].actor.height;
-                    }
-                }
+                if ( monitor == Main.layoutManager.primaryMonitor && Main.panel2 !== null)
+                    panelHeight = Main.panel2.actor.height;
+                else panelHeight = 0;
                 let startY = Cinnamon.util_get_transformed_allocation(this.actor).y2;
                 let boxpointerHeight = this.menu.actor.get_theme_node().get_length('-boxpointer-gap');
                 let maxHeight = Math.round(monitor.height - startY - panelHeight - boxpointerHeight);
