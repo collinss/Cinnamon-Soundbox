@@ -557,12 +557,10 @@ AppControl.prototype = {
         this.volumeId = app.connect("notify::volume", Lang.bind(this, this.updateVolume));
         
         this.actor = new St.BoxLayout({ vertical: true, style_class: "soundbox-appBox" });
-        let divider = new Divider();
-        this.actor.add_actor(divider.actor);
         
-        let titleBin = new St.Bin({ style_class: "soundbox-appTitleBox" });
+        let titleBin = new St.Bin({  });
         this.actor.add_actor(titleBin);
-        let titleBox = new St.BoxLayout({ vertical: false });
+        let titleBox = new St.BoxLayout({ vertical: false, style_class: "soundbox-appTitleBox" });
         titleBin.add_actor(titleBox);
         
         let iconBin = new St.Bin({ y_align: St.Align.MIDDLE });
@@ -689,8 +687,8 @@ TimeControls.prototype = {
     _init: function(timeTracker) {
         this.timeTracker = timeTracker;
         
-        this.actor = new St.Bin({ style_class: "soundbox-timeBox" });
-        this.seekControlsBox = new St.BoxLayout({ vertical: true });
+        this.actor = new St.Bin({  });
+        this.seekControlsBox = new St.BoxLayout({ vertical: true, style_class: "soundbox-timeBox" });
         this.actor.set_child(this.seekControlsBox);
         
         let timeBin = new St.Bin({ x_align: St.Align.MIDDLE });
@@ -898,7 +896,7 @@ TitleBar.prototype = {
         if ( this.server.CanQuit ) {
             let quitButton = new St.Button({ style_class: "soundbox-quitButton" });
             this.actor.add_actor(quitButton);
-            let quitIcon = new St.Icon({ icon_name: "window-close", icon_type: St.IconType.SYMBOLIC, icon_size: 16 });
+            let quitIcon = new St.Icon({ icon_name: "close", icon_type: St.IconType.SYMBOLIC, icon_size: 16 });
             quitButton.add_actor(quitIcon);
             quitButton.connect("clicked", Lang.bind(this, function() {
                 actionManager.close();
@@ -1406,17 +1404,13 @@ SoundboxLayout.prototype = {
         
         this.volumeContent.destroy_all_children();
         
-        //volume controls
-        let divider = new Divider();
-        this.volumeContent.add_actor(divider.actor);
-        
+        //system volume controls
         this.outputVolumeDisplay = new SystemVolumeDisplay("Volume: ", this.normVolume, this.maxVolume, "audio-volume-");
         this.volumeContent.add_actor(this.outputVolumeDisplay.actor);
         
         if ( settings.showInput ) {
             let divider = new Divider();
             this.volumeContent.add_actor(divider.actor);
-            
             this.inputVolumeDisplay = new SystemVolumeDisplay("Input Volume: ", this.normVolume, this.maxVolume, "microphone-sensitivity-");
             this.volumeContent.add_actor(this.inputVolumeDisplay.actor);
         }
@@ -1637,16 +1631,17 @@ SoundboxLayout.prototype = {
     },
     
     _reloadApps: function () {
-        
-        for ( let i = 0; i < this.apps.length; i++ ) {
-            this.apps[i].destroy();
-        }
+        for ( let i = 0; i < this.apps.length; i++ ) this.apps[i].destroy();
+        this.appBox.destroy_all_children();
         this.apps = [];
         
         let streams = this.volumeControl.get_sink_inputs();
         for ( let i = 0; i < streams.length; i++ ) {
             let output = streams[i]
             if ( output.get_application_id() != "org.Cinnamon" ) {
+                let divider = new Divider();
+                this.appBox.add_actor(divider.actor);
+                
                 let app = new AppControl(output, this.normVolume);
                 this.appBox.add_actor(app.actor);
                 this.apps.push(app);

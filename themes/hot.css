@@ -1,18 +1,16 @@
 /*hot theme*/
 .hot-mainBox {
     border: 2px solid #CE0000;
-    border-radius: 8px 8px 8px 8px;
+    border-radius: 8px;
     padding: 10px;
     background-color: #090909;
+    min-width: 250px;
+    color: #F6E325;
 }
 
 .hot-mainBox .soundbox-buttonMenu {
-    background-gradient-direction: none;
-    background: none;
-    box-shadow: 0px 0px 0px 0px;
     border: 1px solid #CE0000;
-    border-radius: 5px 5px 5px 5px;
-    color: #021544;
+    border-radius: 5px;
     padding: 7px;
 }
 
@@ -38,19 +36,17 @@
 
 .hot-mainBox .soundbox-divider-box {
     color: #CE0000;
-    padding: 10px 30px 10px 30px;
+    padding: 0px 30px;
 }
 
-.hot-mainBox .soundbox-text, .hot-mainBox .soundbox-buttonText, .hot-mainBox .soundbox-appTitle, .hot-mainBox .soundbox-trackInfo-text {
-    color: #F6E325;
-}
-
-.hot-mainBox .soundbox-playerTitleText {
-    color: #F6E325;
+.hot-mainBox .soundbox-volumeBox,
+.hot-mainBox .soundbox-appBox {
+    padding: 10px 15px;
+    spacing: 2px;
 }
 
 .hot-mainBox .soundbox-volumeButton {
-    padding: 2px 3px 2px 3px;
+    padding: 0px 3px;
 }
 
 .hot-mainBox .soundbox-volumeIcon {
@@ -77,7 +73,7 @@
 
 .hot-mainBox .soundbox-appIcon {
     icon-size: 20px;
-    padding: 0px 4px 4px 4px;
+    padding-right: 4px;
 }
 
 .hot-mainBox .soundbox-appTitleBox {
@@ -91,6 +87,11 @@
     padding: 3px;
     border-radius: 2px;
     border-image: none;
+    color: #F6E325;
+}
+
+.hot-mainBox .soundbox-playerSelectButton {
+    padding: 1px;
 }
 
 .hot-mainBox .soundbox-playerIcon {
@@ -98,18 +99,31 @@
     width: 16px;
 }
 
+.hot-mainBox .soundbox-raiseButton {
+    padding: 0px 4px;
+    border-radius: 4px;
+}
+
 .hot-mainBox .soundbox-quitButton {
-    color: #F6E325;
+    padding: 1px;
+    border-radius: 4px;
+}
+
+.hot-mainBox .soundbox-playerSelectButton:hover,
+.hot-mainBox .soundbox-raiseButton:hover,
+.hot-mainBox .soundbox-quitButton:hover {
+    background-color: black;
 }
 
 .hot-mainBox .soundbox-trackInfoBox {
-    padding: 5px 0px 5px 0px;
+    padding: 8px 0px 12px 0px;
     margin-top: 5px;
     width: 200px;
+    spacing: 6px;
 }
 
 .hot-mainBox .soundbox-trackInfo {
-    padding: 3px 0px 5px 0px;
+    spacing: 4px;
 }
 
 .hot-mainBox .soundbox-trackInfo-icon {
@@ -123,30 +137,27 @@
 
 .hot-mainBox .soundbox-albumCover {
     border: 1px solid #CE0000;
-    border-radius: 10px 10px 10px 10px;
+    border-radius: 10px;
     icon_size: 200px;
     width: 200px;
     height: 200px;
 }
 
-.hot-mainBox .soundbox-buttonBox {
-    padding: 5px 5px 5px 5px;
-    
+.hot-mainBox .soundbox-timeBox {
+    padding: 10px 0px 12px 0px;
+    spacing: 3px;
 }
 
-.hot-mainBox .soundbox-soundButton-box {
-    padding: 3px 3px 3px 3px;
+.hot-mainBox .soundbox-buttonBox {
+    spacing: 6px;
 }
 
 .hot-mainBox .soundbox-soundButton {
     border: 1px solid #CE0000;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     width: 25px;
     height: 20px;
-    padding: 3px 3px 3px 3px;
-    background-gradient-direction: none;
-    background: none;
-    box-shadow: 0px 0px 0px 0px;
+    padding: 3px;
 }
 
 .hot-mainBox .soundbox-soundButton:hover {
@@ -163,7 +174,6 @@
 
 .hot-mainBox .soundbox-soundButton-icon {
     icon-size: 16px;
-    color: #F6E325;
 }
 
 #Tooltip.hot-tooltip {

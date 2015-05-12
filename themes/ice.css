@@ -1,17 +1,15 @@
 /*ice theme*/
 .ice-mainBox {
     border: 2px solid #1991E8;
-    border-radius: 10px 10px 10px 10px;
-    padding: 10px;
+    border-radius: 10px;
+    padding: 15px;
     background-color: #0A161E;
+    color: #1991E8;
 }
 
 .ice-mainBox .soundbox-buttonMenu {
-    background-gradient-direction: none;
-    background: none;
-    box-shadow: 0px 0px 0px 0px;
     border: 1px solid #1991E8;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     padding: 7px;
 }
 
@@ -30,19 +28,16 @@
 
 .ice-mainBox .soundbox-divider-box {
     color: #000000;
-    padding: 10px 5px 10px 5px;
+    padding: 0px 5px;
 }
 
-.ice-mainBox .soundbox-text, .ice-mainBox .soundbox-buttonText, .ice-mainBox .soundbox-playerTitleText, .ice-mainBox .soundbox-appTitle, .ice-mainBox .soundbox-trackInfo-text {
-    color: #1991E8;
-}
-
-.ice-mainBox .soundbox-trackInfo-text {
-    padding: 0px 3px;
+.ice-mainBox .soundbox-volumeBox,
+.ice-mainBox .soundbox-appBox {
+    padding: 10px 15px;
 }
 
 .ice-mainBox .soundbox-volumeButton {
-    padding: 2px 3px 2px 3px;
+    padding: 2px 3px;
 }
 
 .ice-mainBox .soundbox-volumeIcon {
@@ -69,7 +64,7 @@
 }
 
 .ice-mainBox .soundbox-slider:hover {
-    -slider-handle-color: #57AEED;
+    -slider-handle-color: #49c1E8;
 }
 
 .ice-mainBox .soundbox-appIcon {
@@ -82,13 +77,12 @@
     background-gradient-start: #0e4b77;
     background-gradient-end: #01365b;
     border: solid 1px #1991E8;
-    border-radius: 2px 2px 2px 2px;
+    border-radius: 2px;
     width: 200px;
-    border-image: none;
 }
 
 .ice-mainBox .soundbox-playerSelectButton {
-    color: #1991E8;
+    padding: 1px;
 }
 
 .ice-mainBox .soundbox-playerIcon {
@@ -96,17 +90,29 @@
     width: 16px;
 }
 
+.ice-mainBox .soundbox-raiseButton {
+    padding: 0px 3px;
+}
+
 .ice-mainBox .soundbox-quitButton {
     color: #1991E8;
+    padding: 0px 2px;
+}
+
+.ice-mainBox .soundbox-playerSelectButton:hover,
+.ice-mainBox .soundbox-raiseButton:hover,
+.ice-mainBox .soundbox-quitButton:hover StIcon {
+    color: #49c1E8;
 }
 
 .ice-mainBox .soundbox-trackInfoBox {
-    padding: 3px 0px 5px 0px;
+    padding: 10px 0px 12px 0px;
     width: 200px;
+    spacing: 7px;
 }
 
 .ice-mainBox .soundbox-trackInfo {
-    padding: 3px 0px 3px 0px;
+    spacing: 5px;
 }
 
 .ice-mainBox .soundbox-trackInfo-icon {
@@ -114,39 +120,29 @@
     color: #1991E8;
 }
 
-.ice-mainBox .soundbox-albumCover-box {
-    background: none;
-}
-
 .ice-mainBox .soundbox-albumCover {
     border: 1px solid #1991E8;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     icon-size: 200px;
     width: 200px;
     height: 200px;
 }
 
 .ice-mainBox .soundbox-timeBox {
-    padding: 4px;
+    padding: 10px 0px 3px 0px;
 }
 
 .ice-mainBox .soundbox-buttonBox {
-    padding: 5px 5px 5px 5px;
-}
-
-.ice-mainBox .soundbox-soundButton-box {
-    padding: 3px 3px 3px 3px;
+    padding: 5px 0px;
+    spacing: 6px;
 }
 
 .ice-mainBox .soundbox-soundButton {
     border: 1px solid #1991E8;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     width: 25px;
     height: 20px;
-    padding: 3px 3px 3px 3px;
-    background-gradient-direction: none;
-    background: none;
-    box-shadow: 0px 0px 0px 0px;
+    padding: 3px;
 }
 
 .ice-mainBox .soundbox-soundButton:hover {
@@ -165,7 +161,7 @@
     border-image: none;
     color: #1991E8;
     border: solid 1px #1991E8;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     background-color: #0A161E;
     padding: 4px 15px 4px 12px;
     background-gradient-direction: none;
@@ -185,29 +181,29 @@
 
 #ice-popup .popup-menu-content {
     border-image: none;
-    text-shadow: 0px 0px 0px 0px;
+    text-shadow: 0px;
     color: #1991E8;
     border: solid 1px #1991E8;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     background-color: #0A161E;
-    padding: 4px 12px 4px 12px;
+    padding: 4px 12px;
 }
 
 #ice-popup .popup-menu-item {
     border-image: none;
     border: none;
-    text-shadow: 0px 0px 0px 0px;
+    text-shadow: 0px;
     color: #1991E8;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     padding: .4em 1em;
     spacing: 1em;
 }
 
 #ice-popup .popup-menu-item:active {
-    box-shadow: 0px 0px 0px 0px;
+    box-shadow: 0px;
     border-image: none;
     border: none;
-    text-shadow: 0px 0px 0px 0px;
+    text-shadow: 0px;
     color: #1991E8;
     background-gradient-direction: vertical;
     background-gradient-start: #214B66;
@@ -216,14 +212,14 @@
 
 /*compact*/
 .ice-mainBox:compact {
-    padding: 0px 0px 0px 0px;
+    padding: 0px;
 }
 
 .ice-mainBox:compact .soundbox-buttonMenu {
     border-top: none;
     border-left: none;
     border-right: none;
-    padding: 1px 0px 1px 0px;
+    padding: 1px 0px;
     border-radius: 0px;
 }
 
@@ -273,9 +269,9 @@
 }
 
 .ice-mainBox:compact .soundbox-buttonBox:compact{
-    padding: 0px 2px 0px 2px;
+    padding: 0px 2px;
     border: solid 1px #1991E8;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
 }
 
 .ice-mainBox:compact .soundbox-soundButton {

@@ -40,15 +40,16 @@
 
 .mint-mainBox .soundbox-divider-box {
     color: #fff;
-    padding: 10px 30px 10px 30px;
+    padding: 0px 30px 0px 30px;
 }
 
 .mint-mainBox .soundbox-text, .mint-mainBox .soundbox-buttonText, .mint-mainBox .soundbox-appTitle, .mint-mainBox .soundbox-playerTitleText, .mint-mainBox .soundbox-trackInfo-text {
     color: #fff;
 }
 
-.mint-mainBox .soundbox-volumeBox {
-    padding: 0px 5px 0px 5px;
+.mint-mainBox .soundbox-volumeBox,
+.mint-mainBox .soundbox-appBox {
+    padding: 10px 15px 10px 15px;
 }
 
 .mint-mainBox .soundbox-volumeButton {
@@ -81,14 +82,13 @@
 }
 
 .mint-mainBox .soundbox-appTitleBox {
-    padding: 0px 0px 2px 0px;
+    padding-bottom: 2px;
 }
 
 .mint-mainBox .soundbox-titleBar {
     color: #fff;
     background-color: rgb(140, 140, 140);
     background-gradient-direction: none;
-    padding: 2px 0px 2px 0px;
     border-image: none;
 }
 
@@ -97,8 +97,19 @@
     width: 16px;
 }
 
+.mint-mainBox .soundbox-raiseButton {
+    padding: 2px 5px;
+}
+
 .mint-mainBox .soundbox-quitButton {
     color: #fff;
+    padding: 0px 3px;
+}
+
+.mint-mainBox .soundbox-playerSelectButton:hover,
+.mint-mainBox .soundbox-raiseButton:hover,
+.mint-mainBox .soundbox-quitButton:hover {
+    background-color: #666;
 }
 
 .mint-mainBox .soundbox-trackInfoBox {
@@ -115,6 +126,7 @@
 .mint-mainBox .soundbox-trackInfo-icon {
     icon-size: 1em;
     color: #fff;
+    padding: 3px;
 }
 
 .mint-mainBox .soundbox-albumCover-box {
@@ -128,8 +140,12 @@
     height: 200px;
 }
 
+.mint-mainBox .soundbox-timeBox {
+    padding: 3px 0px;
+}
+
 .mint-mainBox .soundbox-buttonBox {
-    padding: 5px 5px 5px 5px;
+    padding: 5px;
 }
 
 .mint-mainBox .soundbox-soundButton-box {

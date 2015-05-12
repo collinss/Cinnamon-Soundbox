@@ -1,17 +1,18 @@
 /*clean theme*/
 .clean-mainBox {
     border: 1px solid #000;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     padding: 10px;
     background-color: #ddd;
+    color: #000;
 }
 
 .clean-mainBox .soundbox-buttonMenu {
     background-gradient-direction: none;
     background: none;
-    box-shadow: 0px 0px 0px 0px;
+    box-shadow: 0px;
     border: 1px solid #444;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     padding: 7px;
 }
 
@@ -32,25 +33,20 @@
 }
 
 .clean-mainBox .soundbox-divider-box {
-    color: #000;
-    padding: 10px 5px 10px 5px;
+    padding: 0px 5px;
 }
 
-.clean-mainBox .soundbox-text, .clean-mainBox .soundbox-buttonText, .clean-mainBox .soundbox-appTitle, .clean-mainBox .soundbox-playerTitleText, .clean-mainBox .soundbox-trackInfo-text {
-    color: #000;
-}
-
-.clean-mainBox .soundbox-trackInfo-text {
-    padding: 0px 3px 0px 0px;
+.clean-mainBox .soundbox-volumeBox,
+.clean-mainBox .soundbox-appBox {
+    padding: 10px 15px;
 }
 
 .clean-mainBox .soundbox-volumeButton {
-    padding: 2px 3px 2px 3px;
+    padding: 2px 3px;
 }
 
 .clean-mainBox .soundbox-volumeIcon {
     icon-size: 16px;
-    color: #000;
 }
 
 .clean-mainBox .soundbox-slider {
@@ -79,9 +75,9 @@
     background-gradient-direction: vertical;
     background-gradient-start: rgba(100,100,255,.65);
     background-gradient-end: rgba(100,100,255,.5);
-    border-radius: 2px 2px 2px 2px;
+    border-radius: 2px;
     width: 200px;
-    border-image: none;
+    padding: 0px 3px;
 }
 
 .clean-mainBox .soundbox-playerIcon {
@@ -89,17 +85,30 @@
     width: 16px;
 }
 
+.clean-mainBox .soundbox-raiseButton {
+    padding: 2px 3px;
+    border-radius: 2px;
+}
+
 .clean-mainBox .soundbox-quitButton {
-    color: #000;
+    padding: 2px;
+    border-radius: 2px;
+}
+
+.clean-mainBox .soundbox-playerSelectButton:hover,
+.clean-mainBox .soundbox-quitButton:hover,
+.clean-mainBox .soundbox-raiseButton:hover {
+    background-color: rgba(255,255,255,.3);
 }
 
 .clean-mainBox .soundbox-trackInfoBox {
-    padding: 3px 0px 5px 0px;
+    padding: 8px 0px 10px 0px;
+    spacing: 6px;
     width: 200px;
 }
 
 .clean-mainBox .soundbox-trackInfo {
-    padding: 3px 0px 3px 0px;
+    spacing: 6px;
 }
 
 .clean-mainBox .soundbox-trackInfo-icon {
@@ -113,33 +122,33 @@
 
 .clean-mainBox .soundbox-albumCover {
     border: 1px solid #000;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     icon-size: 200px;
     width: 200px;
     height: 200px;
 }
 
 .clean-mainBox .soundbox-timeBox {
-    padding: 4px;
+    padding: 8px 0px 5px 0px;
 }
 
 .clean-mainBox .soundbox-buttonBox {
-    padding: 5px 5px 5px 5px;
+    padding: 5px;
 }
 
 .clean-mainBox .soundbox-soundButton-box {
-    padding: 3px 3px 3px 3px;
+    padding: 3px;
 }
 
 .clean-mainBox .soundbox-soundButton {
     border: 1px solid #000000;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     width: 25px;
     height: 20px;
-    padding: 3px 3px 3px 3px;
+    padding: 3px;
     background-gradient-direction: none;
     background: none;
-    box-shadow: 0px 0px 0px 0px;
+    box-shadow: 0px;
 }
 
 .clean-mainBox .soundbox-soundButton:hover {
@@ -160,7 +169,7 @@
     border-image: none;
     color: #000;
     border: 1px solid #000;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     background-color: #ddd;
     padding: 4px 15px 4px 12px;
     background-gradient-direction: none;
@@ -180,29 +189,29 @@
 
 #clean-popup .popup-menu-content {
     border-image: none;
-    text-shadow: 0px 0px 0px 0px;
+    text-shadow: 0px;
     color: #000;
     border: 1px solid #000;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     background-color: #ddd;
-    padding: 4px 12px 4px 12px;
+    padding: 4px 12px;
 }
 
 #clean-popup .popup-menu-item {
     border-image: none;
     border: none;
-    text-shadow: 0px 0px 0px 0px;
+    text-shadow: 0px;
     color: #444;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     padding: .4em 1em;
     spacing: 1em;
 }
 
 #clean-popup .popup-menu-item:active {
-    box-shadow: 0px 0px 0px 0px;
+    box-shadow: 0px;
     border-image: none ;
     border: none;
-    text-shadow: 0px 0px 0px 0px;
+    text-shadow: 0px;
     color: #000;
     background-gradient-direction: none;
     background-color: #eee;
@@ -210,14 +219,14 @@
 
 /*compact*/
 .clean-mainBox:compact {
-    padding: 0px 0px 0px 0px;
+    padding: 0px;
 }
 
 .clean-mainBox:compact .soundbox-buttonMenu {
     border-top: none;
     border-left: none;
     border-right: none;
-    padding: 1px 0px 1px 0px;
+    padding: 1px 0px;
     border-radius: 0px;
 }
 
