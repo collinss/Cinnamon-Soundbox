@@ -1436,6 +1436,7 @@ SoundboxLayout.prototype = {
         this.playerBack = new St.Button({ style_class: "soundbox-playerSelectButton", child: new St.Icon({ icon_name: "media-playback-start-rtl", icon_size: 16 }) });
         this.playerTitleBox.add_actor(this.playerBack);
         this.playerBack.hide();
+        new SoundboxTooltip(this.playerBack, _("Previous Player"));
         
         this.playerTitle = new St.Bin({ style_class: "soundbox-titleBox" });
         this.playerTitleBox.add(this.playerTitle, { expand: true });
@@ -1444,6 +1445,7 @@ SoundboxLayout.prototype = {
         this.playerForward = new St.Button({ style_class: "soundbox-playerSelectButton", child: new St.Icon({ icon_name: "media-playback-start", icon_size: 16 }) });
         this.playerTitleBox.add_actor(this.playerForward);
         this.playerForward.hide();
+        new SoundboxTooltip(this.playerForward, _("Next Player"));
         
         this.playerBack.connect("clicked", Lang.bind(this, function() {
             for ( let i = 0; i < this.owners.length; i++ ) {
