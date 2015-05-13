@@ -876,9 +876,9 @@ TitleBar.prototype = {
         this.name = name;
         this.server = server;
         this.actor = new St.BoxLayout({ style_class: "soundbox-playerInfoBar", vertical: false });
-        this.icon = new St.Icon({ icon_type: St.IconType.FULLCOLOR, style_class: "soundbox-playerIcon" });
+
+        this.icon = new St.Icon({ icon_name: "media-status-stoped", icon_type: St.IconType.SYMBOLIC, style_class: "soundbox-playerIcon" });
         this.actor.add_actor(this.icon);
-        this.setImage("player-stopped");
         this.title = new St.Label({ text: this.getTitle(), style_class: "soundbox-playerTitleText" });
         
         if ( this.server.CanRaise ) {
@@ -907,7 +907,7 @@ TitleBar.prototype = {
     },
     
     setStatus: function(status) {
-        this.setImage("player-" + status.toLowerCase());
+        this.icon.set_icon_name("media-status-" + status.toLowerCase());
         this.setTitle(status);
     },
     
@@ -917,15 +917,6 @@ TitleBar.prototype = {
     
     setTitle: function(status) {
         this.title.text = this.getTitle() + " - " + _(status);
-    },
-    
-    setImage: function(image) {
-        if ( Gtk.IconTheme.get_default().has_icon(image) ) this.icon.icon_name = image;
-        else {
-            let file = Gio.file_new_for_path("/usr/share/cinnamon/theme/" + image + ".svg");
-            let gicon = new Gio.FileIcon({ file: file });
-            this.icon.gicon = gicon;
-        }
     }
 }
 
