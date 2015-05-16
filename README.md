@@ -9,7 +9,6 @@ or download and extract contents to ~/.local/share/cinnamon/desklets/soundBox@sc
 
 To Do
 -----
-    Split into multiple files to ease transion into applet and sidebar extension.
     Create applet and sidebar versions
     Raised mode DnD
 
@@ -17,6 +16,14 @@ Done
 ----
     Switch to Gio dbus for Cinnamon 2.3+
     Remove about dialog (provided by Cinnamon 2.3+)
+    Split into multiple files to ease transion into applet and sidebar extension.
+    Switch icon for microphone volume
+    Changes for Cinnamon 2.5+ (Backwards compatible with 2.4)
+    Switch supported players to settings and make dynamic
+    Move raise and close functionality to the title bar
+    Add repeat and shuffle toggles
+    Added new player status icons for the title bar (old ones were removed from Cinnamon default theme)
+    Theme tweaks
 
 Wish-list
 ---------
