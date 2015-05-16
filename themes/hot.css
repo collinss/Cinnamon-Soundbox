@@ -99,8 +99,11 @@
     width: 16px;
 }
 
-.hot-mainBox .soundbox-raiseButton {
+.hot-mainBox .soundbox-playerTitle {
     padding: 0px 4px;
+}
+
+.hot-mainBox .soundbox-raiseButton {
     border-radius: 4px;
 }
 

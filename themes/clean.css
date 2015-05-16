@@ -85,8 +85,11 @@
     width: 16px;
 }
 
-.clean-mainBox .soundbox-raiseButton {
+.clean-mainBox .soundbox-playerTitle {
     padding: 2px 3px;
+}
+
+.clean-mainBox .soundbox-raiseButton {
     border-radius: 2px;
 }
 

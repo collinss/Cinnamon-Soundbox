@@ -86,9 +86,12 @@
     width: 16px;
 }
 
+.forest-mainBox .soundbox-playerTitle {
+    padding: 2px 4px;
+}
+
 .forest-mainBox .soundbox-raiseButton {
     border-radius: 3px;
-    padding: 2px 4px;
 }
 
 .forest-mainBox .soundbox-quitButton {

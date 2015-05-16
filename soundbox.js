@@ -886,7 +886,7 @@ TitleBar.prototype = {
 
         this.icon = new St.Icon({ icon_name: "media-status-stoped", icon_type: St.IconType.SYMBOLIC, style_class: "soundbox-playerIcon" });
         this.actor.add_actor(this.icon);
-        this.title = new St.Label({ text: this.getTitle(), style_class: "soundbox-playerTitleText" });
+        this.title = new St.Label({ text: this.getTitle(), style_class: "soundbox-playerTitle" });
         
         if ( this.server.CanRaise ) {
             let raiseButton = new St.Button({ style_class: "soundbox-raiseButton" });
