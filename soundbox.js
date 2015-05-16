@@ -549,7 +549,6 @@ function AppControl(app, maxVol) {
 
 AppControl.prototype = {
     _init: function(app, maxVol) {
-        
         this.app = app;
         this.maxVol = maxVol;
         
@@ -563,9 +562,18 @@ AppControl.prototype = {
         let titleBox = new St.BoxLayout({ vertical: false, style_class: "soundbox-appTitleBox" });
         titleBin.add_actor(titleBox);
         
+        // some applications don't give a valid icon so we try to guess it, and fall back to a default
+        let iconName;
+        if ( Gtk.IconTheme.get_default().has_icon(app.icon_name) ) iconName = app.icon_name;
+        else {
+            let testName = app.name.split(" ")[0].toLowerCase();
+            if ( Gtk.IconTheme.get_default().has_icon(testName) ) iconName = testName;
+            else iconName = "preferences-sound";
+        }
+
         let iconBin = new St.Bin({ y_align: St.Align.MIDDLE });
         titleBox.add_actor(iconBin);
-        let icon = new St.Icon({ icon_name: app.icon_name, icon_type: St.IconType.FULLCOLOR, style_class: "soundbox-appIcon" });
+        let icon = new St.Icon({ icon_name: iconName, icon_type: St.IconType.FULLCOLOR, style_class: "soundbox-appIcon" });
         iconBin.add_actor(icon);
         let labelBin = new St.Bin({ y_align: St.Align.MIDDLE });
         titleBox.add_actor(labelBin);
@@ -593,7 +601,6 @@ AppControl.prototype = {
         
         this.updateMute();
         this.updateVolume();
-        
     },
     
     updateVolume: function() {
@@ -1630,7 +1637,7 @@ SoundboxLayout.prototype = {
         
         let streams = this.volumeControl.get_sink_inputs();
         for ( let i = 0; i < streams.length; i++ ) {
-            let output = streams[i]
+            let output = streams[i];
             if ( output.get_application_id() != "org.Cinnamon" ) {
                 let divider = new Divider();
                 this.appBox.add_actor(divider.actor);
