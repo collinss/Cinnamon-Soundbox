@@ -1634,17 +1634,20 @@ SoundboxLayout.prototype = {
         for ( let i = 0; i < this.apps.length; i++ ) this.apps[i].destroy();
         this.appBox.destroy_all_children();
         this.apps = [];
+        let ids = [];
         
         let streams = this.volumeControl.get_sink_inputs();
         for ( let i = 0; i < streams.length; i++ ) {
             let output = streams[i];
-            if ( output.get_application_id() != "org.Cinnamon" ) {
+            let id = output.get_application_id();
+            if ( id != "org.Cinnamon" && ids.indexOf(id) == -1 ) {
                 let divider = new Divider();
                 this.appBox.add_actor(divider.actor);
                 
                 let app = new AppControl(output, this.normVolume);
                 this.appBox.add_actor(app.actor);
                 this.apps.push(app);
+                ids.push(id);
             }
         }
         
