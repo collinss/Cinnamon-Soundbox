@@ -1341,12 +1341,8 @@ SoundboxLayout.prototype = {
                 // watch players
                 this._ownerChangedId = this._dbus.connectSignal("NameOwnerChanged", Lang.bind(this, function(proxy, sender, [name, old_owner, new_owner]) {
                     if ( name_regex.test(name) ) {
-                        if ( new_owner && !old_owner )
-                            this._addPlayer(name, new_owner);
-                        else if ( old_owner && !new_owner && this.players[old_owner] )
-                            this._removePlayer(name, old_owner);
-                        else
-                            this._changePlayerOwner(name, old_owner, new_owner);
+                        if ( old_owner && this.players[old_owner] ) this._removePlayer(name, old_owner);
+                        if ( new_owner && !this.players[new_owner] ) this._addPlayer(name, new_owner);
                     }
                 }));
             }));
