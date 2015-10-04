@@ -1502,6 +1502,7 @@ SoundboxLayout.prototype = {
     
     readInput: function() {
         this.input = this.volumeControl.get_default_source();
+        if ( this.input == null ) return;
         if ( settings.showInput ) this.inputVolumeDisplay.setControl(this.input);
         
         //add input devices to context menu
