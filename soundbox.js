@@ -46,6 +46,7 @@ const SUPPORT_SEEK = [
 
 
 let settings, actionManager;
+let normVolume, maxVolume;
 
 
 function registerSystrayIcons(uuid) {
@@ -167,6 +168,111 @@ TimeTracker.prototype = {
     }
 }
 Signals.addSignalMethods(TimeTracker.prototype);
+
+
+function GVCHandler(parent) {
+    this._init(parent);
+}
+
+GVCHandler.prototype = {
+    _init: function(parent) {
+        this.parent = parent;
+        this.apps = [];
+        
+        this.volumeControl = new Gvc.MixerControl({ name: "Cinnamon Volume Control" });
+        this.volumeControl.connect("state-changed", Lang.bind(this, this._onControlStateChanged));
+        this.volumeControl.connect("default-sink-changed", Lang.bind(this, this.readOutput));
+        this.volumeControl.connect("default-source-changed", Lang.bind(this, this.readInput));
+        this.volumeControl.connect("card-added", Lang.bind(this, this._onControlStateChanged));
+        this.volumeControl.connect("card-removed", Lang.bind(this, this._onControlStateChanged));
+        this.volumeControl.connect("stream-added", Lang.bind(this, this._reloadApps));
+        this.volumeControl.connect("stream-removed", Lang.bind(this, this._reloadApps));
+        
+        normVolume = this.volumeControl.get_vol_max_norm();
+        maxVolume = this.volumeControl.get_vol_max_amplified();
+        this.volumeControl.open();
+    },
+    
+        _onControlStateChanged: function() {
+        if ( this.volumeControl.get_state() == Gvc.MixerControlState.READY ) {
+            this.readOutput();
+            this.readInput();
+        }
+    },
+    
+    readOutput: function() {
+        this.output = this.volumeControl.get_default_sink();
+        this.parent.outputVolumeDisplay.setControl(this.output);
+        
+        //add output devices to context menu
+        let sinks = this.volumeControl.get_sinks();
+        this.outputDevices.removeAll();
+        for ( let i = 0; i < sinks.length; i++ ) {
+            let sink = sinks[i];
+            let device = this.volumeControl.lookup_device_from_stream(sink);
+            let deviceItem = new PopupMenu.PopupMenuItem(device.get_description());
+            if ( sinks[i].get_id() == this.output.get_id() ) {
+                deviceItem.setShowDot(true);
+            }
+            deviceItem.connect("activate", Lang.bind(this, function() {
+                global.log("Default output set as " + sink.get_description());
+                this.volumeControl.set_default_sink(sink);
+            }));
+            this.outputDevices.addMenuItem(deviceItem);
+        }
+    },
+    
+    readInput: function() {
+        this.input = this.volumeControl.get_default_source();
+        if ( this.input == null ) return;
+        if ( settings.showInput ) this.parent.inputVolumeDisplay.setControl(this.input);
+        
+        //add input devices to context menu
+        let sources = this.volumeControl.get_sources();
+        this.inputDevices.removeAll();
+        for ( let i = 0; i < sources.length; i++ ) {
+            let source = sources[i];
+            let device = this.volumeControl.lookup_device_from_stream(source);
+            let deviceItem = new PopupMenu.PopupMenuItem(device.get_description());
+            if ( sources[i].get_id() == this.input.get_id() ) {
+                deviceItem.setShowDot(true);
+            }
+            deviceItem.connect("activate", Lang.bind(this, function() {
+                global.log("Default input set as " + source.get_description());
+                this.volumeControl.set_default_source(source);
+            }));
+            this.inputDevices.addMenuItem(deviceItem);
+        }
+    },
+    
+    _reloadApps: function () {
+        for ( let i = 0; i < this.apps.length; i++ ) this.apps[i].destroy();
+        this.parent.appBox.destroy_all_children();
+        this.apps = [];
+        let ids = [];
+        
+        let streams = this.volumeControl.get_sink_inputs();
+        for ( let i = 0; i < streams.length; i++ ) {
+            let output = streams[i];
+            let id = output.get_application_id();
+            if ( id != "org.Cinnamon" && ids.indexOf(id) == -1 ) {
+                let divider = new Divider();
+                this.parent.appBox.add_actor(divider.actor);
+                
+                let app = new AppControl(output);
+                this.parent.appBox.add_actor(app.actor);
+                this.apps.push(app);
+                ids.push(id);
+            }
+        }
+    },
+    
+    refresh: function() {
+        this.readOutput();
+        this.readInput();
+        this._reloadApps();
+    }
+}
 
 
 /* Widgets */
@@ -402,15 +508,12 @@ Slider.prototype = {
 Signals.addSignalMethods(Slider.prototype);
 
 
-function SystemVolumeDisplay(title, normVolume, maxVolume, iconPrefix) {
-    this._init(title, normVolume, maxVolume, iconPrefix);
+function SystemVolumeDisplay(title, iconPrefix) {
+    this._init(title, iconPrefix);
 }
 
 SystemVolumeDisplay.prototype = {
-    _init: function(title, normVolume, maxVolume, iconPrefix) {
-        
-        this.normVolume = normVolume;
-        this.maxVolume = maxVolume;
+    _init: function(title, iconPrefix) {
         this.iconPrefix = iconPrefix;
         this.volume = 0;
         
@@ -477,11 +580,11 @@ SystemVolumeDisplay.prototype = {
     
     updateVolume: function(object, param_spec) {
         if ( !this.control.is_muted ) {
-            this.volume = this.control.volume / this.normVolume;
+            this.volume = this.control.volume / normVolume;
             
             this.volumeValueText.text = Math.round(100 * this.volume) + "%";
             this.volumeIcon.icon_name = null;
-            if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this.control.volume/this.maxVolume);
+            if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this.control.volume/maxVolume);
             else this.volumeSlider.setValue(this.volume);
             
             if ( this.volume <= 0 ) this.volumeIcon.icon_name = this.iconPrefix + "muted";
@@ -503,8 +606,8 @@ SystemVolumeDisplay.prototype = {
             this.muteTooltip.set_text(_("Unmute"));
         }
         else {
-            this.volume = this.control.volume / this.normVolume;
-            if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this.control.volume/this.maxVolume);
+            this.volume = this.control.volume / normVolume;
+            if ( settings.exceedNormVolume ) this.volumeSlider.setValue(this.control.volume/maxVolume);
             else this.volumeSlider.setValue(this.volume);
             this.volumeValueText.text = Math.floor(100 * this.volume) + "%";
             this.volumeIcon.icon_name = null;
@@ -522,8 +625,8 @@ SystemVolumeDisplay.prototype = {
     
     onSliderChanged: function(slider, value) {
         let volume;
-        if ( settings.exceedNormVolume ) volume = value * this.maxVolume;
-        else volume = value * this.normVolume;
+        if ( settings.exceedNormVolume ) volume = value * maxVolume;
+        else volume = value * normVolume;
         let prev_muted = this.control.is_muted;
         if ( volume < 1 ) {
             this.control.volume = 0;
@@ -543,14 +646,13 @@ SystemVolumeDisplay.prototype = {
 }
 
 
-function AppControl(app, maxVol) {
-    this._init(app, maxVol);
+function AppControl(app) {
+    this._init(app);
 }
 
 AppControl.prototype = {
-    _init: function(app, maxVol) {
+    _init: function(app) {
         this.app = app;
-        this.maxVol = maxVol;
         
         this.muteId = app.connect("notify::is-muted", Lang.bind(this, this.updateMute));
         this.volumeId = app.connect("notify::volume", Lang.bind(this, this.updateVolume));
@@ -605,7 +707,7 @@ AppControl.prototype = {
     
     updateVolume: function() {
         if ( !this.app.is_muted ) {
-            this.volume = this.app.volume / this.maxVol;
+            this.volume = this.app.volume / normVolume;
             this.volumeSlider.setValue(this.volume);
             this.volumeIcon.icon_name = null;
             
@@ -631,7 +733,7 @@ AppControl.prototype = {
             this.muteTooltip.set_text(_("Unmute"));
         }
         else {
-            this.volume = this.app.volume / this.maxVol;
+            this.volume = this.app.volume / normVolume;
             this.volumeSlider.setValue(this.volume);
             this.volumeIcon.icon_name = null;
             this.muteTooltip.set_text(_("Mute"));
@@ -652,7 +754,7 @@ AppControl.prototype = {
     },
     
     sliderChanged: function(slider, value) {
-        let volume = value * this.maxVol;
+        let volume = value * normVolume;
         let prev_muted = this.app.is_muted;
         if ( volume < 1 ) {
             this.app.volume = 0;
@@ -1314,7 +1416,6 @@ SoundboxLayout.prototype = {
             
             this.players = {};
             this.owners = [];
-            this.apps = [];
             this.playerShown = null;
             this.output = null;
             this.outputVolumeId = 0;
@@ -1347,17 +1448,7 @@ SoundboxLayout.prototype = {
                 }));
             }));
             
-            this.volumeControl = new Gvc.MixerControl({ name: "Cinnamon Volume Control" });
-            this.volumeControl.connect("state-changed", Lang.bind(this, this._onControlStateChanged));
-            this.volumeControl.connect("default-sink-changed", Lang.bind(this, this.readOutput));
-            this.volumeControl.connect("default-source-changed", Lang.bind(this, this.readInput));
-            this.volumeControl.connect("card-added", Lang.bind(this, this._onControlStateChanged));
-            this.volumeControl.connect("card-removed", Lang.bind(this, this._onControlStateChanged));
-            this.volumeControl.connect("stream-added", Lang.bind(this, this._reloadApps));
-            this.volumeControl.connect("stream-removed", Lang.bind(this, this._reloadApps));
-            this.normVolume = this.volumeControl.get_vol_max_norm();
-            this.maxVolume = this.volumeControl.get_vol_max_amplified();
-            this.volumeControl.open();
+            this.gvcHandler = new GVCHandler(this);
             
             settings.settings.connect("changed::showInput", Lang.bind(this, function(provider, key, oldVal, newVal) {
                 settings[key] = newVal;
@@ -1380,15 +1471,15 @@ SoundboxLayout.prototype = {
     
     _buildContext: function() {
         this.context.addMenuItem(new PopupMenu.PopupMenuItem(_("Output Devices"), { reactive: false }));
-        this.outputDevices = new PopupMenu.PopupMenuSection();
-        this.outputDevices.actor.add_style_class_name("soundBox-contextMenuSection");
-        this.context.addMenuItem(this.outputDevices);
+        this.gvcHandler.outputDevices = new PopupMenu.PopupMenuSection();
+        this.gvcHandler.outputDevices.actor.add_style_class_name("soundBox-contextMenuSection");
+        this.context.addMenuItem(this.gvcHandler.outputDevices);
         this.context.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         
         this.context.addMenuItem(new PopupMenu.PopupMenuItem(_("Input Devices"), { reactive: false }));
-        this.inputDevices = new PopupMenu.PopupMenuSection();
-        this.inputDevices.actor.add_style_class_name("soundBox-contextMenuSection");
-        this.context.addMenuItem(this.inputDevices);
+        this.gvcHandler.inputDevices = new PopupMenu.PopupMenuSection();
+        this.gvcHandler.inputDevices.actor.add_style_class_name("soundBox-contextMenuSection");
+        this.context.addMenuItem(this.gvcHandler.inputDevices);
         this.context.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         
         this.context.addSettingsAction(_("Sound Settings"), "sound");
@@ -1399,13 +1490,13 @@ SoundboxLayout.prototype = {
         this.volumeContent.destroy_all_children();
         
         //system volume controls
-        this.outputVolumeDisplay = new SystemVolumeDisplay("Volume: ", this.normVolume, this.maxVolume, "audio-volume-");
+        this.outputVolumeDisplay = new SystemVolumeDisplay("Volume: ", "audio-volume-");
         this.volumeContent.add_actor(this.outputVolumeDisplay.actor);
         
         if ( settings.showInput ) {
             let divider = new Divider();
             this.volumeContent.add_actor(divider.actor);
-            this.inputVolumeDisplay = new SystemVolumeDisplay("Input Volume: ", this.normVolume, this.maxVolume, "microphone-sensitivity-");
+            this.inputVolumeDisplay = new SystemVolumeDisplay("Input Volume: ", "microphone-sensitivity-");
             this.volumeContent.add_actor(this.inputVolumeDisplay.actor);
         }
         
@@ -1414,9 +1505,7 @@ SoundboxLayout.prototype = {
         this.volumeContent.add_actor(this.appBox);
         if ( !settings.showApps ) this.appBox.hide();
         
-        this.readOutput();
-        this.readInput();
-        this._reloadApps();
+        this.gvcHandler.refresh();
     },
     
     _buildPlayerControls: function() {
@@ -1470,56 +1559,6 @@ SoundboxLayout.prototype = {
     _setAppHideState: function() {
         if ( settings.showApps ) this.appBox.show();
         else this.appBox.hide();
-    },
-    
-    _onControlStateChanged: function() {
-        if ( this.volumeControl.get_state() == Gvc.MixerControlState.READY ) {
-            this.readOutput();
-            this.readInput();
-        }
-    },
-    
-    readOutput: function() {
-        this.output = this.volumeControl.get_default_sink();
-        this.outputVolumeDisplay.setControl(this.output);
-        
-        //add output devices to context menu
-        let sinks = this.volumeControl.get_sinks();
-        this.outputDevices.removeAll();
-        for ( let i = 0; i < sinks.length; i++ ) {
-            let sink = sinks[i];
-            let deviceItem = new PopupMenu.PopupMenuItem(sink.get_description());
-            if ( sinks[i].get_id() == this.output.get_id() ) {
-                deviceItem.setShowDot(true);
-            }
-            deviceItem.connect("activate", Lang.bind(this, function() {
-                global.log("Default output set as " + sink.get_description());
-                this.volumeControl.set_default_sink(sink);
-            }));
-            this.outputDevices.addMenuItem(deviceItem);
-        }
-    },
-    
-    readInput: function() {
-        this.input = this.volumeControl.get_default_source();
-        if ( this.input == null ) return;
-        if ( settings.showInput ) this.inputVolumeDisplay.setControl(this.input);
-        
-        //add input devices to context menu
-        let sources = this.volumeControl.get_sources();
-        this.inputDevices.removeAll();
-        for ( let i = 0; i < sources.length; i++ ) {
-            let source = sources[i];
-            let deviceItem = new PopupMenu.PopupMenuItem(source.get_description());
-            if ( sources[i].get_id() == this.input.get_id() ) {
-                deviceItem.setShowDot(true);
-            }
-            deviceItem.connect("activate", Lang.bind(this, function() {
-                global.log("Default input set as " + source.get_description());
-                this.volumeControl.set_default_source(source);
-            }));
-            this.inputDevices.addMenuItem(deviceItem);
-        }
     },
     
     refresh_players: function() {
@@ -1625,28 +1664,5 @@ SoundboxLayout.prototype = {
             this.playerBack.show();
             this.playerForward.show();
         }
-    },
-    
-    _reloadApps: function () {
-        for ( let i = 0; i < this.apps.length; i++ ) this.apps[i].destroy();
-        this.appBox.destroy_all_children();
-        this.apps = [];
-        let ids = [];
-        
-        let streams = this.volumeControl.get_sink_inputs();
-        for ( let i = 0; i < streams.length; i++ ) {
-            let output = streams[i];
-            let id = output.get_application_id();
-            if ( id != "org.Cinnamon" && ids.indexOf(id) == -1 ) {
-                let divider = new Divider();
-                this.appBox.add_actor(divider.actor);
-                
-                let app = new AppControl(output, this.normVolume);
-                this.appBox.add_actor(app.actor);
-                this.apps.push(app);
-                ids.push(id);
-            }
-        }
-        
     }
 }
