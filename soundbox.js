@@ -217,6 +217,8 @@ GVCHandler.prototype = {
         }));
         this[type+"Devices"].addMenuItem(deviceItem);
         this.devices.push({ id: id, type: type, menuItem: deviceItem });
+        
+        this.checkMenuHideState(type);
     },
     
     deviceRemoved: function(c, id, type) {
@@ -225,13 +227,20 @@ GVCHandler.prototype = {
             if ( device.id == id && device.type == type ) {
                 device.menuItem.destroy();
                 this.devices.splice(i, 1);
-                return;
+                break;
             }
         }
+        
+        this.checkMenuHideState(type);
     },
     
     deviceUpdated: function(c, id, type) {
         for ( let device of this.devices ) device.menuItem.setShowDot(device.id == id && device.type == type);
+    },
+    
+    checkMenuHideState: function(type) {
+        if ( this[type+"Devices"].numMenuItems == 0 ) this.parent[type+"Section"].actor.hide();
+        else this.parent[type+"Section"].actor.show();
     },
     
     readOutput: function() {
@@ -1470,16 +1479,24 @@ SoundboxLayout.prototype = {
     },
     
     _buildContext: function() {
-        this.context.addMenuItem(new PopupMenu.PopupMenuItem(_("Output Devices"), { reactive: false }));
+        this.outputSection = new PopupMenu.PopupMenuSection();
+        this.context.addMenuItem(this.outputSection);
+        this.outputSection.addMenuItem(new PopupMenu.PopupMenuItem(_("Output Devices"), { reactive: false }));
         this.gvcHandler.outputDevices = new PopupMenu.PopupMenuSection();
         this.gvcHandler.outputDevices.actor.add_style_class_name("soundBox-contextMenuSection");
-        this.context.addMenuItem(this.gvcHandler.outputDevices);
+        this.outputSection.addMenuItem(this.gvcHandler.outputDevices);
+        this.outputSection.actor.hide();
+        
         this.context.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         
-        this.context.addMenuItem(new PopupMenu.PopupMenuItem(_("Input Devices"), { reactive: false }));
+        this.inputSection = new PopupMenu.PopupMenuSection();
+        this.context.addMenuItem(this.inputSection);
+        this.inputSection.addMenuItem(new PopupMenu.PopupMenuItem(_("Input Devices"), { reactive: false }));
         this.gvcHandler.inputDevices = new PopupMenu.PopupMenuSection();
         this.gvcHandler.inputDevices.actor.add_style_class_name("soundBox-contextMenuSection");
-        this.context.addMenuItem(this.gvcHandler.inputDevices);
+        this.inputSection.addMenuItem(this.gvcHandler.inputDevices);
+        this.inputSection.actor.hide();
+        
         this.context.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         
         this.context.addSettingsAction(_("Sound Settings"), "sound");
