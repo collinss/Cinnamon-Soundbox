@@ -178,74 +178,74 @@ GVCHandler.prototype = {
     _init: function(parent) {
         this.parent = parent;
         this.apps = [];
+        this.devices = [];
         
         this.volumeControl = new Gvc.MixerControl({ name: "Cinnamon Volume Control" });
-        this.volumeControl.connect("state-changed", Lang.bind(this, this._onControlStateChanged));
+        this.volumeControl.connect("state-changed", Lang.bind(this, this.controlStateChanged));
+        this.volumeControl.connect("card-added", Lang.bind(this, this.controlStateChanged));
+        this.volumeControl.connect("card-removed", Lang.bind(this, this.controlStateChanged));
         this.volumeControl.connect("default-sink-changed", Lang.bind(this, this.readOutput));
         this.volumeControl.connect("default-source-changed", Lang.bind(this, this.readInput));
-        this.volumeControl.connect("card-added", Lang.bind(this, this._onControlStateChanged));
-        this.volumeControl.connect("card-removed", Lang.bind(this, this._onControlStateChanged));
-        this.volumeControl.connect("stream-added", Lang.bind(this, this._reloadApps));
-        this.volumeControl.connect("stream-removed", Lang.bind(this, this._reloadApps));
+        this.volumeControl.connect("output-added", Lang.bind(this, this.deviceAdded, "output"));
+        this.volumeControl.connect("input-added", Lang.bind(this, this.deviceAdded, "input"));
+        this.volumeControl.connect("output-removed", Lang.bind(this, this.deviceRemoved, "output"));
+        this.volumeControl.connect("input-removed", Lang.bind(this, this.deviceRemoved, "input"));
+        this.volumeControl.connect("active-output-update", Lang.bind(this, this.deviceUpdated, "output"));
+        this.volumeControl.connect("active-input-update", Lang.bind(this, this.deviceUpdated, "input"));
+        this.volumeControl.connect("stream-added", Lang.bind(this, this.reloadApps));
+        this.volumeControl.connect("stream-removed", Lang.bind(this, this.reloadApps));
         
         normVolume = this.volumeControl.get_vol_max_norm();
         maxVolume = this.volumeControl.get_vol_max_amplified();
         this.volumeControl.open();
     },
     
-        _onControlStateChanged: function() {
+    controlStateChanged: function() {
         if ( this.volumeControl.get_state() == Gvc.MixerControlState.READY ) {
             this.readOutput();
             this.readInput();
         }
     },
     
+    deviceAdded: function(c, id, type) {
+        let device = this.volumeControl["lookup_type_id".replace("type", type)](id);
+        
+        let deviceItem = new PopupMenu.PopupMenuItem(device.get_description());
+        deviceItem.connect("activate", Lang.bind(this, function() {
+            global.log("Default output set as " + device.get_description());
+            this.volumeControl["change_" + type](device);
+        }));
+        this[type+"Devices"].addMenuItem(deviceItem);
+        this.devices.push({ id: id, type: type, menuItem: deviceItem });
+    },
+    
+    deviceRemoved: function(c, id, type) {
+        for ( let i in this.devices ) {
+            let device = this.devices[i];
+            if ( device.id == id && device.type == type ) {
+                device.menuItem.destroy();
+                this.devices.splice(i, 1);
+                return;
+            }
+        }
+    },
+    
+    deviceUpdated: function(c, id, type) {
+        for ( let device of this.devices ) device.menuItem.setShowDot(device.id == id && device.type == type);
+    },
+    
     readOutput: function() {
         this.output = this.volumeControl.get_default_sink();
         this.parent.outputVolumeDisplay.setControl(this.output);
-        
-        //add output devices to context menu
-        let sinks = this.volumeControl.get_sinks();
-        this.outputDevices.removeAll();
-        for ( let i = 0; i < sinks.length; i++ ) {
-            let sink = sinks[i];
-            let device = this.volumeControl.lookup_device_from_stream(sink);
-            let deviceItem = new PopupMenu.PopupMenuItem(device.get_description());
-            if ( sinks[i].get_id() == this.output.get_id() ) {
-                deviceItem.setShowDot(true);
-            }
-            deviceItem.connect("activate", Lang.bind(this, function() {
-                global.log("Default output set as " + sink.get_description());
-                this.volumeControl.set_default_sink(sink);
-            }));
-            this.outputDevices.addMenuItem(deviceItem);
-        }
     },
     
     readInput: function() {
         this.input = this.volumeControl.get_default_source();
         if ( this.input == null ) return;
         if ( settings.showInput ) this.parent.inputVolumeDisplay.setControl(this.input);
-        
-        //add input devices to context menu
-        let sources = this.volumeControl.get_sources();
-        this.inputDevices.removeAll();
-        for ( let i = 0; i < sources.length; i++ ) {
-            let source = sources[i];
-            let device = this.volumeControl.lookup_device_from_stream(source);
-            let deviceItem = new PopupMenu.PopupMenuItem(device.get_description());
-            if ( sources[i].get_id() == this.input.get_id() ) {
-                deviceItem.setShowDot(true);
-            }
-            deviceItem.connect("activate", Lang.bind(this, function() {
-                global.log("Default input set as " + source.get_description());
-                this.volumeControl.set_default_source(source);
-            }));
-            this.inputDevices.addMenuItem(deviceItem);
-        }
     },
     
-    _reloadApps: function () {
+    reloadApps: function () {
         for ( let i = 0; i < this.apps.length; i++ ) this.apps[i].destroy();
         this.parent.appBox.destroy_all_children();
         this.apps = [];
@@ -270,7 +270,7 @@ GVCHandler.prototype = {
     refresh: function() {
         this.readOutput();
         this.readInput();
-        this._reloadApps();
+        this.reloadApps();
     }
 }
 
