@@ -215,6 +215,7 @@ GVCHandler.prototype = {
             global.log("Default output set as " + device.get_description());
             this.volumeControl["change_" + type](device);
         }));
+        deviceItem.addActor(new St.Label({ text: device.get_origin() }));
         this[type+"Devices"].addMenuItem(deviceItem);
         this.devices.push({ id: id, type: type, menuItem: deviceItem });
         
