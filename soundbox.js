@@ -48,6 +48,19 @@ const SUPPORT_SEEK = [
 let settings, actionManager;
 let normVolume, maxVolume;
 
+// l10n/translation
+const Gettext = imports.gettext;
+let UUID = "soundBox@scollins";
+
+Gettext.bindtextdomain(UUID, GLib.get_home_dir() + "/.local/share/locale");
+
+function _(str) {
+   let customTranslation = Gettext.dgettext(UUID, str);
+   if(customTranslation != str) {
+      return customTranslation;
+   }
+   return Gettext.gettext(str);
+};
 
 function registerSystrayIcons(uuid) {
     if ( !Main.systrayManager ) {
@@ -1508,13 +1521,13 @@ SoundboxLayout.prototype = {
         this.volumeContent.destroy_all_children();
         
         //system volume controls
-        this.outputVolumeDisplay = new SystemVolumeDisplay("Volume: ", "audio-volume-");
+        this.outputVolumeDisplay = new SystemVolumeDisplay(_("Volume:") + " ", "audio-volume-");
         this.volumeContent.add_actor(this.outputVolumeDisplay.actor);
         
         if ( settings.showInput ) {
             let divider = new Divider();
             this.volumeContent.add_actor(divider.actor);
-            this.inputVolumeDisplay = new SystemVolumeDisplay("Input Volume: ", "microphone-sensitivity-");
+            this.inputVolumeDisplay = new SystemVolumeDisplay(_("Input Volume:") + " ", "microphone-sensitivity-");
             this.volumeContent.add_actor(this.inputVolumeDisplay.actor);
         }
         

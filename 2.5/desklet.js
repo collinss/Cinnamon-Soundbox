@@ -4,6 +4,7 @@ const Main = imports.ui.main;
 const PopupMenu = imports.ui.popupMenu;
 const Settings = imports.ui.settings;
 
+const GLib = imports.gi.GLib;
 const Cinnamon = imports.gi.Cinnamon;
 const Clutter = imports.gi.Clutter;
 const St = imports.gi.St;
@@ -246,6 +247,18 @@ RaisedBox.prototype = {
 Signals.addSignalMethods(RaisedBox.prototype);
 
 
+// l10n/translation
+const Gettext = imports.gettext;
+let UUID;
+
+function _(str) {
+   let customTranslation = Gettext.dgettext(UUID, str);
+   if(customTranslation != str) {
+      return customTranslation;
+   }
+   return Gettext.gettext(str);
+};
+
 function myDesklet(metadata, desklet_id) {
     this._init(metadata, desklet_id);
 }
@@ -259,6 +272,10 @@ myDesklet.prototype = {
             this.metadata = metadata;
             Desklet.Desklet.prototype._init.call(this, metadata);
             this.inhibitor = new DragInhibitor(this._draggable, this);
+
+            // l10n/translation
+            UUID = metadata.uuid;
+            Gettext.bindtextdomain(UUID, GLib.get_home_dir() + "/.local/share/locale");
             
             this.containers = {};
             
